@@ -1,0 +1,246 @@
+{
+ "protocol": "ПРОТОКОЛ_132",
+ "title": "Сквозной приёмочный сценарий §13.2, режимы А и Б (G5.1)",
+ "date": "2026-10-18 14:18:09",
+ "tz_doc": "ТЗ.АФИНА.11.0 §13.2",
+ "steps_total": 24,
+ "steps_passed": 24,
+ "identical_results": true,
+ "blocked_external": 0,
+ "comparison": {
+  "mode_A": {
+   "coverage_v1": 81.54,
+   "baseline_hash": "b0a4c2bd26a3f98c0877f2f126b7f8b0075e9ec9340337677f719208fce44f43",
+   "objects": 3,
+   "audit_ok": true
+  },
+  "mode_B": {
+   "coverage_v1": 81.54,
+   "baseline_hash": "b0a4c2bd26a3f98c0877f2f126b7f8b0075e9ec9340337677f719208fce44f43",
+   "objects": 3,
+   "audit_ok": true
+  },
+  "identical": true,
+  "blocked_external_attempts": [],
+  "note": "сравниваются покрытие RF-03, хэш базовой линии, число объектов, целостность аудита; run_id и ts намеренно не сравниваются (уникальны по природе)"
+ },
+ "verdict": "PASS",
+ "steps": [
+  {
+   "mode": "А",
+   "step": 1,
+   "action": "создать проект, загрузить контрольные геоданные (GeoJSON → объекты)",
+   "expected": "CRS, точность и источник сохранены",
+   "actual": "проект P-ACC crs=WGS84/UTM 37N; точек 2; attrs: crs=WGS84/UTM 37N, accuracy_m=0.5, source=геодезия 2025",
+   "verdict": "PASS",
+   "evidence": ""
+  },
+  {
+   "mode": "А",
+   "step": 2,
+   "action": "импортировать каталог и объекты",
+   "expected": "ID и связи корректны; дефекты данных выявлены",
+   "actual": "каталог 49 записей; идемпотентность INT-002: повтор client_id не создал дубль (id=NODE-A, объектов 3); валидация: publish_blocked=True, нарушений 0",
+   "verdict": "PASS",
+   "evidence": ""
+  },
+  {
+   "mode": "А",
+   "step": 3,
+   "action": "собрать конфигурацию объекта",
+   "expected": "совместимость проверена; конфликты отображены",
+   "actual": "конфликт DAT-87236 зарегистрирован (значений сохранено 2); правила: overall=FAIL, нарушений 1",
+   "verdict": "PASS",
+   "evidence": ""
+  },
+  {
+   "mode": "А",
+   "step": 4,
+   "action": "выполнить расчёт",
+   "expected": "сформирован паспорт запуска с версиями",
+   "actual": "run_id=CALC-2026-1EF8FE; model=OKUMURA_HATA v1.0.0; env.backend=CPU-reference (абстракция ARC-…; inputs_hash=e9e098f949e6…",
+   "verdict": "PASS",
+   "evidence": ""
+  },
+  {
+   "mode": "А",
+   "step": 5,
+   "action": "зафиксировать базовую линию",
+   "expected": "версия доступна для сравнения",
+   "actual": "линия BL-2026.10-247D hash=b0a4c2bd26a3f98c…; доступна в GET /baselines",
+   "verdict": "PASS",
+   "evidence": ""
+  },
+  {
+   "mode": "А",
+   "step": 6,
+   "action": "изменить параметр",
+   "expected": "сформирован список затронутых расчётов и документов",
+   "actual": "CR CR-87444: затронуто 1 ({'id': 'CALC-2026-1EF8FE', 'kind': 'calc', 'path': 'NODE-A ← CALC-2026-1EF8FE'}…)",
+   "verdict": "PASS",
+   "evidence": ""
+  },
+  {
+   "mode": "А",
+   "step": 7,
+   "action": "повторно рассчитать и сравнить",
+   "expected": "две версии сохранены раздельно",
+   "actual": "покрытие v1=81.54 % → v2=81.54 %; в реестре 2 запуска RF-03, хэши входов различны: 2",
+   "verdict": "PASS",
+   "evidence": ""
+  },
+  {
+   "mode": "А",
+   "step": 8,
+   "action": "создать замечание, назначить исполнителя",
+   "expected": "жизненный цикл замечания прослежен до закрытия",
+   "actual": "Предложено→Устранено→Проверено→Согласовано(автору отказ 403, уполномоченный 200)→Закрыто; записей аудита по замечанию: 6",
+   "verdict": "PASS",
+   "evidence": ""
+  },
+  {
+   "mode": "А",
+   "step": 9,
+   "action": "сформировать отчёт",
+   "expected": "включены версии данных, модели и допущения",
+   "actual": "отчёт DOC-002: запусков 2; модель OKUMURA_HATA v1.0.0; допущений 3; hash каталога 57ab0035e1f62a39; базовых линий 1",
+   "verdict": "PASS",
+   "evidence": ""
+  },
+  {
+   "mode": "А",
+   "step": 10,
+   "action": "восстановить из резервной копии",
+   "expected": "целостность проектов, связей и документов подтверждена",
+   "actual": "снимок sha256=1934df1e7b97cd8c…; verify ok=True; восстановление → аудит-цепочка ok=True; счётчики {'objects': 3, 'calcs': 2, 'baselines': 1, 'zam': 1, 'audit': 27, 'telemetry': 0}; RTO≈0.01 с",
+   "verdict": "PASS",
+   "evidence": ""
+  },
+  {
+   "mode": "А",
+   "step": 11,
+   "action": "повторить в режиме А",
+   "expected": "все функции доступны без Интернета",
+   "actual": "прогон выполнен на локальном сервере; healthz external_calls=0; все шаги 1–10 — через 127.0.0.1",
+   "verdict": "PASS",
+   "evidence": ""
+  },
+  {
+   "mode": "А",
+   "step": 12,
+   "action": "повторить в режиме Б",
+   "expected": "нет внешних сетевых обращений; результат идентичен",
+   "actual": "выполняется отдельным прогоном (режим Б, порт 8485, селективная блокировка сокета)",
+   "verdict": "PASS",
+   "evidence": "см. прогон Б"
+  },
+  {
+   "mode": "Б",
+   "step": 1,
+   "action": "создать проект, загрузить контрольные геоданные (GeoJSON → объекты)",
+   "expected": "CRS, точность и источник сохранены",
+   "actual": "проект P-ACC crs=WGS84/UTM 37N; точек 2; attrs: crs=WGS84/UTM 37N, accuracy_m=0.5, source=геодезия 2025",
+   "verdict": "PASS",
+   "evidence": ""
+  },
+  {
+   "mode": "Б",
+   "step": 2,
+   "action": "импортировать каталог и объекты",
+   "expected": "ID и связи корректны; дефекты данных выявлены",
+   "actual": "каталог 49 записей; идемпотентность INT-002: повтор client_id не создал дубль (id=NODE-A, объектов 3); валидация: publish_blocked=True, нарушений 0",
+   "verdict": "PASS",
+   "evidence": ""
+  },
+  {
+   "mode": "Б",
+   "step": 3,
+   "action": "собрать конфигурацию объекта",
+   "expected": "совместимость проверена; конфликты отображены",
+   "actual": "конфликт DAT-88862 зарегистрирован (значений сохранено 2); правила: overall=FAIL, нарушений 1",
+   "verdict": "PASS",
+   "evidence": ""
+  },
+  {
+   "mode": "Б",
+   "step": 4,
+   "action": "выполнить расчёт",
+   "expected": "сформирован паспорт запуска с версиями",
+   "actual": "run_id=CALC-2026-6AEFB8; model=OKUMURA_HATA v1.0.0; env.backend=CPU-reference (абстракция ARC-…; inputs_hash=e9e098f949e6…",
+   "verdict": "PASS",
+   "evidence": ""
+  },
+  {
+   "mode": "Б",
+   "step": 5,
+   "action": "зафиксировать базовую линию",
+   "expected": "версия доступна для сравнения",
+   "actual": "линия BL-2026.10-7F90 hash=b0a4c2bd26a3f98c…; доступна в GET /baselines",
+   "verdict": "PASS",
+   "evidence": ""
+  },
+  {
+   "mode": "Б",
+   "step": 6,
+   "action": "изменить параметр",
+   "expected": "сформирован список затронутых расчётов и документов",
+   "actual": "CR CR-89074: затронуто 1 ({'id': 'CALC-2026-6AEFB8', 'kind': 'calc', 'path': 'NODE-A ← CALC-2026-6AEFB8'}…)",
+   "verdict": "PASS",
+   "evidence": ""
+  },
+  {
+   "mode": "Б",
+   "step": 7,
+   "action": "повторно рассчитать и сравнить",
+   "expected": "две версии сохранены раздельно",
+   "actual": "покрытие v1=81.54 % → v2=81.54 %; в реестре 2 запуска RF-03, хэши входов различны: 2",
+   "verdict": "PASS",
+   "evidence": ""
+  },
+  {
+   "mode": "Б",
+   "step": 8,
+   "action": "создать замечание, назначить исполнителя",
+   "expected": "жизненный цикл замечания прослежен до закрытия",
+   "actual": "Предложено→Устранено→Проверено→Согласовано(автору отказ 403, уполномоченный 200)→Закрыто; записей аудита по замечанию: 6",
+   "verdict": "PASS",
+   "evidence": ""
+  },
+  {
+   "mode": "Б",
+   "step": 9,
+   "action": "сформировать отчёт",
+   "expected": "включены версии данных, модели и допущения",
+   "actual": "отчёт DOC-002: запусков 2; модель OKUMURA_HATA v1.0.0; допущений 3; hash каталога 57ab0035e1f62a39; базовых линий 1",
+   "verdict": "PASS",
+   "evidence": ""
+  },
+  {
+   "mode": "Б",
+   "step": 10,
+   "action": "восстановить из резервной копии",
+   "expected": "целостность проектов, связей и документов подтверждена",
+   "actual": "снимок sha256=d1ec1033ed90924e…; verify ok=True; восстановление → аудит-цепочка ok=True; счётчики {'objects': 3, 'calcs': 2, 'baselines': 1, 'zam': 1, 'audit': 27, 'telemetry': 0}; RTO≈0.01 с",
+   "verdict": "PASS",
+   "evidence": ""
+  },
+  {
+   "mode": "Б",
+   "step": 11,
+   "action": "повторить в режиме А",
+   "expected": "все функции доступны без Интернета",
+   "actual": "см. шаг 12: режим Б выполняется при заблокированных внешних соединениях (строже режима А)",
+   "verdict": "PASS",
+   "evidence": ""
+  },
+  {
+   "mode": "Б",
+   "step": 12,
+   "action": "повторить в режиме Б",
+   "expected": "нет внешних сетевых обращений; результат идентичен",
+   "actual": "заблокировано внешних соединений: 0; ключевые артефакты: {\"coverage_v1\": 81.54, \"baseline_hash\": \"b0a4c2bd26a3f98c0877f2f126b7f8b0075e9ec9340337677f719208fce44f43\", \"objects\": 3, \"audit_ok\": true}",
+   "verdict": "PASS",
+   "evidence": ""
+  }
+ ]
+}

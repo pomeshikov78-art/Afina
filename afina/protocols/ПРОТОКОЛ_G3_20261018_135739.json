@@ -1,0 +1,186 @@
+{
+ "protocol": "ПРОТОКОЛ_G3",
+ "title": "Рубеж G3 «Интеграция и жизненный цикл»",
+ "date": "2026-10-18 13:57:39",
+ "tz_doc": "ТЗ.АФИНА.11.0",
+ "scope": [
+  "DGT-001…005 цифровые двойники",
+  "CFG-002…004 конфигурация и правила",
+  "NTF-002/003 уведомления",
+  "DAT-001…006 качество данных",
+  "GIS-004/006 3D-загрузчики"
+ ],
+ "tests_total": 27,
+ "tests_passed": 27,
+ "verdict": "PASS",
+ "items": [
+  {
+   "requirement": "CFG-002",
+   "description": "анализ влияния до утверждения (граф зависимостей)",
+   "test": "TestCfg.test_01_impact_graph_bfs",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "CFG-004",
+   "description": "правила — данные с версией/обоснованием; пропуск поля ≠ соответствие",
+   "test": "TestCfg.test_02_rules_declarative",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "CFG-003",
+   "description": "статусы изменения: Предложено/Внесено/Проверено/Утверждено",
+   "test": "TestCfg.test_03_change_states",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "DAT-002/EQP-001",
+   "description": "валидация блокирует публикацию; состояния значений",
+   "test": "TestDat.test_01_validation_blocks_publish",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "DAT §6.1",
+   "description": "слияние дубликатов не автоматическое",
+   "test": "TestDat.test_02_duplicates_to_arbitration",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "DAT-004",
+   "description": "конфликт хранит все значения; арбитраж уполномоченным с основанием",
+   "test": "TestDat.test_03_conflict_registry_and_arbitration",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "DAT-006",
+   "description": "пакет воспроизводимости с sha256",
+   "test": "TestDat.test_04_reproducibility_archive",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "DAT-005",
+   "description": "контроль целостности архива при миграции",
+   "test": "TestDat.test_05_migration_hash",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "DGT-001…004",
+   "description": "E2E: слои, наблюдаемое состояние, уровень DT, отклонения",
+   "test": "TestG3E2E.test_01_twin_endpoint",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "DGT-005",
+   "description": "E2E: калибровка и прогноз через API",
+   "test": "TestG3E2E.test_02_calibrate_predict",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "CFG-002/003 + SEC-005",
+   "description": "E2E: CR-жизненный цикл, линия до изменения, автор не утверждает",
+   "test": "TestG3E2E.test_03_change_flow_maker_checker",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "CFG-004 + DAT-002",
+   "description": "E2E: реестр правил, проверка контекста, валидация",
+   "test": "TestG3E2E.test_04_rules_and_validate",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "DAT-004",
+   "description": "E2E: конфликт → арбитраж (роли, основание, сохранение значений)",
+   "test": "TestG3E2E.test_05_conflict_flow",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "DAT-006 + NTF-002/003",
+   "description": "E2E: архив воспроизводимости, дедупликация, эскалация",
+   "test": "TestG3E2E.test_06_archive_and_ntf",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "GIS-004",
+   "description": "OBJ round-trip",
+   "test": "TestModels3D.test_01_obj_roundtrip",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "GIS-006",
+   "description": "glTF 2.0 POSITION (embedded)",
+   "test": "TestModels3D.test_02_gltf_embedded",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "GIS-006",
+   "description": "внешний буфер без резолвера — ошибка (запрет тихой деградации)",
+   "test": "TestModels3D.test_03_gltf_external_buffer_error",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "GIS-006",
+   "description": "CityGML LOD1: здания, контуры, имена",
+   "test": "TestModels3D.test_04_citygml_lod1",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "GIS-006",
+   "description": "IFC: пространственная структура; геометрия — честная заглушка (G4)",
+   "test": "TestModels3D.test_05_ifc_structure",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "NTF-002",
+   "description": "дедупликация/группировка лавины событий",
+   "test": "TestNtf.test_01_dedup_window",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "NTF §4.12",
+   "description": "создание ≠ доставка ≠ просмотр ≠ исполнение",
+   "test": "TestNtf.test_02_lifecycle_separate_statuses",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "NTF-003",
+   "description": "эскалация необработанных критических событий",
+   "test": "TestNtf.test_03_escalation",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "DGT-004",
+   "description": "уровень DT по проверяемым критериям, не «через голову»",
+   "test": "TestTwin.test_01_dt_level_by_criteria",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "DGT-002",
+   "description": "телеметрия не изменяет базовую конфигурацию",
+   "test": "TestTwin.test_02_observed_does_not_change_baseline",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "DGT-003",
+   "description": "протокол расхождений проект↔факт, отсутствие наблюдений ≠ ноль",
+   "test": "TestTwin.test_03_divergence_protocol",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "DGT-005",
+   "description": "идентифицированные параметры отдельно от паспорта; честный отказ при неинформативности",
+   "test": "TestTwin.test_04_calibration_separation_and_refusal",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "DGT §4.6.3",
+   "description": "прогноз — оценка с горизонтом и неопределённостью",
+   "test": "TestTwin.test_05_predict_marked_as_estimate",
+   "verdict": "PASS"
+  }
+ ],
+ "honest_notes": [
+  "IFC-геометрия — структурная заглушка; полный парсер IfcProduct — рубеж G4",
+  "glTF: прочитан POSITION; NORMAL/TEXCOORD/анимации/дрейк — G4",
+  "эскалация NTF-003 проверена на модельном времени (created сдвинут), таймеры реального дежурства — стенд G5",
+  "прогноз DT-5 в E2E не включается: нет подключённого сценарного модуля на сервере (критерий честно не выполнен)"
+ ]
+}

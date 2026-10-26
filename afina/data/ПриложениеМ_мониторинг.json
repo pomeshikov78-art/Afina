@@ -1,0 +1,26 @@
+{
+ "document": "Приложение М. Мониторинг и восстановление",
+ "date": "2026-10-17",
+ "monitoring": {
+  "endpoints": [
+   "/healthz",
+   "/api/v1/queue",
+   "/api/v1/audit/verify"
+  ],
+  "metrics": [
+   "очередь расчётов",
+   "статусы заданий",
+   "целостность аудит-цепочки",
+   "сессии"
+  ]
+ },
+ "backup": {
+  "procedure": "копирование data/afina.db + results/ + queue.json (атомарный снимок через sqlite backup API — G3)",
+  "RPO": "0 для зафиксированных транзакций (WAL+fsync — целевой режим PostgreSQL)",
+  "RTO": "целевое ≤15 мин; учебное восстановление — OPS-001 (демонстратор)"
+ },
+ "failure_handling": {
+  "queue": "задания status=running при перезапуске возвращаются в queued (реализовано, тест QueueTests)",
+  "degradation": "запрет тихой деградации: ошибка решателя не подменяется упрощённым значением (реализовано в runner/cosim)"
+ }
+}

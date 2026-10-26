@@ -1,0 +1,23 @@
+{
+ "document": "Приложение Л. SBOM",
+ "date": "2026-10-17",
+ "runtime_dependencies": [],
+ "note": "Эталонная реализация G1–G2 сознательно stdlib-only (Python 3.11): 0 сторонних компонентов в ядре — сильная позиция для автономности (AUT-002) и ИБ-приёмки. Инструментарий сборки (NSIS/Inno/Node — только стенд) в поставку не входит.",
+ "planned": [
+  {
+   "name": "PostgreSQL+PostGIS / Postgres Pro",
+   "license": "PostgreSQL/Proprietary",
+   "purpose": "целевая СУБД (G2+)"
+  },
+  {
+   "name": "MinIO",
+   "license": "AGPLv3",
+   "purpose": "объектное хранилище — ТРЕБУЕТ юридической проверки; fallback — файловое хранилище (реализован)"
+  },
+  {
+   "name": "локальная LLM (GGUF, опция)",
+   "license": "по модели",
+   "purpose": "расширение ИИ-слоя; отключаемо (AI-003)"
+  }
+ ]
+}

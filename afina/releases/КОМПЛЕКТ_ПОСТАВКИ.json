@@ -1,0 +1,375 @@
+{
+ "document": "КОМПЛЕКТ ПОСТАВКИ (§11.1, 18 позиций)",
+ "generated": "2026-10-18 14:40:48",
+ "release_line": "git-теги g0-docs…g5-*",
+ "items": [
+  {
+   "n": 1,
+   "item": "Установочные пакеты для обоих автономных режимов",
+   "status": "частично (стенд)",
+   "note": "скрипты NSIS/Inno/Linux готовы; .exe собирается и подписывается на Windows-стенде (честный статус)",
+   "paths": [
+    {
+     "path": "src/installer/afina.nsi",
+     "kind": "file",
+     "sha256": "fd85c9894d8967e2e0e0f0ac2dac419e5ad79fc13fa13b1be300fbe22763c717",
+     "bytes": 1056
+    },
+    {
+     "path": "src/installer/afina.iss",
+     "kind": "file",
+     "sha256": "11a17a873b0d754c84fa469210bcf61128e9c54c8ac6e4db40b3fb3bb5cda35c",
+     "bytes": 678
+    },
+    {
+     "path": "src/installer/build_linux.sh",
+     "kind": "file",
+     "sha256": "eaaa6434310a10bb486e672ff506770f76c309193d4e90e87abae09f78c19b11",
+     "bytes": 824
+    },
+    {
+     "path": "src/installer/run_server.pyw",
+     "kind": "file",
+     "sha256": "fdcc5b2f1a8946f2e8f792ccc80c163702f96527d091a2c03095616c1198f986",
+     "bytes": 2150
+    },
+    {
+     "path": "src/installer/bundle_manifest.json",
+     "kind": "file",
+     "sha256": "14173ac272723be4cd16e2814e1cc3ccb7a1a24cac01b6daad07310bc3fb4668",
+     "bytes": 302
+    }
+   ]
+  },
+  {
+   "n": 2,
+   "item": "Исходные тексты разработанных компонентов",
+   "status": "в комплекте",
+   "note": "",
+   "paths": [
+    {
+     "path": "src/afina/",
+     "kind": "dir"
+    },
+    {
+     "path": "src/client/",
+     "kind": "dir"
+    },
+    {
+     "path": "src/tools/",
+     "kind": "dir"
+    }
+   ]
+  },
+  {
+   "n": 3,
+   "item": "Сценарии воспроизводимой сборки и локальный репозиторий",
+   "status": "в комплекте",
+   "note": "git bundle --all (вся релизная линия с тегами)",
+   "paths": [
+    {
+     "path": "src/installer/build_linux.sh",
+     "kind": "file",
+     "sha256": "eaaa6434310a10bb486e672ff506770f76c309193d4e90e87abae09f78c19b11",
+     "bytes": 824
+    },
+    {
+     "path": "releases/afina_repo.bundle",
+     "kind": "file",
+     "sha256": "3a17b9438b8e6332ef9b1cfe786fb7a84d62f4c6a0a00db10753ab9f60b6a3dd",
+     "bytes": 2278782
+    }
+   ]
+  },
+  {
+   "n": 4,
+   "item": "Архитектурная спецификация",
+   "status": "в комплекте",
+   "note": "",
+   "paths": [
+    {
+     "path": "docs/Афина_Архитектурная_спецификация.md",
+     "kind": "file",
+     "sha256": "989dd2b48f6f032ab359f23c71cb1a917be94af15f8b98ebd85f3f887d80872c",
+     "bytes": 5042
+    }
+   ]
+  },
+  {
+   "n": 5,
+   "item": "Логическая и физическая модели БД, словарь данных, правила миграции",
+   "status": "в комплекте",
+   "note": "",
+   "paths": [
+    {
+     "path": "src/db/schema_postgres.sql",
+     "kind": "file",
+     "sha256": "5e42ea9ca0d48a9496f72b687dba4ef3bd1631d06b1f7b660d4a9ffb0ebca532",
+     "bytes": 6087
+    },
+    {
+     "path": "data/Афина_Словарь_данных_ПриложениеВ.json",
+     "kind": "file",
+     "sha256": "5c05d8e0828f3173d32c48b0f5dc582e66c8074e625f8a70d347265089288238",
+     "bytes": 8452
+    },
+    {
+     "path": "data/Афина_Модель_данных_ПриложениеГ.json",
+     "kind": "file",
+     "sha256": "d0b5948329249c6bb5c80ab44051196d07c261442762840f6d04c892bae8b5e1",
+     "bytes": 6480
+    },
+    {
+     "path": "docs/Афина_Регламенты.md",
+     "kind": "file",
+     "sha256": "1a536c6564016dae53271ff68862d7e4d36f3a3353287dda97518ee024be2079",
+     "bytes": 3286
+    }
+   ]
+  },
+  {
+   "n": 6,
+   "item": "Спецификации API и форматов обмена",
+   "status": "в комплекте",
+   "note": "генерируется интроспекцией маршрутов",
+   "paths": [
+    {
+     "path": "docs/Афина_API_спецификация.md",
+     "kind": "file",
+     "sha256": "15c27923d1fde1a5728dac6fb52e812f4a23126861b06a914799f9cbebf53bf6",
+     "bytes": 6831
+    },
+    {
+     "path": "src/afina/gis/io_formats.py",
+     "kind": "file",
+     "sha256": "f5a702c48feb0293e246b7a7b5791908c0a69a1d46c2d2524551316ed25a2b12",
+     "bytes": 11211
+    }
+   ]
+  },
+  {
+   "n": 7,
+   "item": "Реестр математических моделей с паспортами V&V",
+   "status": "в комплекте",
+   "note": "",
+   "paths": [
+    {
+     "path": "data/Афина_Реестр_моделей.json",
+     "kind": "file",
+     "sha256": "400cd0a7f0cf64e3a4280473f6d5e985fd334e7d9a474e246e52b197aea28051",
+     "bytes": 8815
+    },
+    {
+     "path": "protocols/ПРОТОКОЛ_MAT_20261018.json",
+     "kind": "file",
+     "sha256": "0aa5c7f67cda8cbf7b6c86766dcbefcf9704af970165a866b690c2ca265f2d9f",
+     "bytes": 3196
+    }
+   ]
+  },
+  {
+   "n": 8,
+   "item": "Матрица прослеживаемости требований (машиночитаемая)",
+   "status": "в комплекте",
+   "note": "",
+   "paths": [
+    {
+     "path": "data/Афина_RTM_машиночитаемая.csv",
+     "kind": "file",
+     "sha256": "84a690b0832a3dcf017ff39e37ba66b3dff575bdbf3618c0dbca60c4dfd8bb8f",
+     "bytes": 30399
+    },
+    {
+     "path": "data/Афина_RTM_машиночитаемая.json",
+     "kind": "file",
+     "sha256": "1df3712627fb21bf4a6d5956b4a9e07a6841e880d680eda41f3c9771aca4db73",
+     "bytes": 41938
+    },
+    {
+     "path": "data/Афина_Реестр_требований_ПриложениеА.json",
+     "kind": "file",
+     "sha256": "03798da49c3a9b700ba021043e9ec1e49eb617267c2f39fa040b46bd907673e8",
+     "bytes": 32889
+    }
+   ]
+  },
+  {
+   "n": 9,
+   "item": "ПМИ и протоколы всех видов испытаний",
+   "status": "в комплекте",
+   "note": "",
+   "paths": [
+    {
+     "path": "src/pmi/ПМИ.md",
+     "kind": "file",
+     "sha256": "e8c2e365a3c58cea57e6f3655ba8be90e14d7ccd1262cbd36608cbddbc436fbd",
+     "bytes": 4697
+    },
+    {
+     "path": "protocols/",
+     "kind": "dir"
+    }
+   ]
+  },
+  {
+   "n": 10,
+   "item": "Эталонные наборы данных и тестовые сценарии",
+   "status": "в комплекте",
+   "note": "",
+   "paths": [
+    {
+     "path": "data/ПриложениеЕ_эталонные_сценарии.json",
+     "kind": "file",
+     "sha256": "9fb2c526ed1a07b516dd2c700f7dab91d2d30968617137efb38a4d2a8586d0c0",
+     "bytes": 1968
+    },
+    {
+     "path": "src/tests/",
+     "kind": "dir"
+    },
+    {
+     "path": "src/pmi/run_132.py",
+     "kind": "file",
+     "sha256": "fa9a0e121752b800435ed150cf976259838dfeefdd974bc933fcb36ef7828b98",
+     "bytes": 22433
+    }
+   ]
+  },
+  {
+   "n": 11,
+   "item": "Руководства: пользователя, инженера, администратора, сопровождения",
+   "status": "в комплекте",
+   "note": "",
+   "paths": [
+    {
+     "path": "docs/Руководство_сопровождения.md",
+     "kind": "file",
+     "sha256": "997db7cef6cb27d209a48e1e01c04c83411ba352639b44173ff55ac9bd1c7d0a",
+     "bytes": 3000
+    },
+    {
+     "path": "docs/Руководство_администратора.md",
+     "kind": "file",
+     "sha256": "93ae21b2f0ad2ed2ce6fba839f3888dad958c007fea9c8b33eb2dbb7594d4661",
+     "bytes": 4010
+    },
+    {
+     "path": "docs/Руководство_инженера.md",
+     "kind": "file",
+     "sha256": "2303841fec8fad169691499e1192402c3aeeedf4b85afd20cf63a9500a9760d8",
+     "bytes": 3575
+    },
+    {
+     "path": "docs/Руководство_пользователя.md",
+     "kind": "file",
+     "sha256": "36a370496fe5965ceda0d889f48299b8611a549353b41142d87178ad4dffe9ff",
+     "bytes": 3667
+    }
+   ]
+  },
+  {
+   "n": 12,
+   "item": "Модель угроз и комплект документов по защите информации",
+   "status": "в комплекте",
+   "note": "СКЗИ — интерфейс CryptoProvider (стенд)",
+   "paths": [
+    {
+     "path": "G0/ИБ_модель_угроз.md",
+     "kind": "file",
+     "sha256": "d6d5672097a311cbf30c4eb337219db992fc4ac14c2f6311ec279b555e873808",
+     "bytes": 4535
+    }
+   ]
+  },
+  {
+   "n": 13,
+   "item": "Регламенты миграции, резервного копирования, восстановления и обновления",
+   "status": "в комплекте",
+   "note": "",
+   "paths": [
+    {
+     "path": "docs/Афина_Регламенты.md",
+     "kind": "file",
+     "sha256": "1a536c6564016dae53271ff68862d7e4d36f3a3353287dda97518ee024be2079",
+     "bytes": 3286
+    },
+    {
+     "path": "src/tools/backup.py",
+     "kind": "file",
+     "sha256": "364e0e3aa7915ecdc285b11de6ec389f9aa28531ef983f0120d9ba4548294c38",
+     "bytes": 8747
+    }
+   ]
+  },
+  {
+   "n": 14,
+   "item": "SBOM: сторонние компоненты, лицензии, ограничения",
+   "status": "в комплекте",
+   "note": "stdlib-only: сторонние компоненты в рантайме отсутствуют",
+   "paths": [
+    {
+     "path": "data/ПриложениеЛ_SBOM.json",
+     "kind": "file",
+     "sha256": "25ad3340ce19b41d66b732d035afdb45089feb442d807af23a4ee40945212b24",
+     "bytes": 1073
+    }
+   ]
+  },
+  {
+   "n": 15,
+   "item": "План сопровождения, исправления дефектов и развития",
+   "status": "в комплекте",
+   "note": "",
+   "paths": [
+    {
+     "path": "docs/Афина_План_сопровождения.md",
+     "kind": "file",
+     "sha256": "ee6a404617acd24b2905a7c2e4727f425352ec574c4dfb14df97f6c20ed302dc",
+     "bytes": 2239
+    }
+   ]
+  },
+  {
+   "n": 16,
+   "item": "План подготовки пользователей и администраторов",
+   "status": "в комплекте",
+   "note": "",
+   "paths": [
+    {
+     "path": "docs/Афина_План_подготовки.md",
+     "kind": "file",
+     "sha256": "da938db6e748e524e3e97f49d843a21a1e50bdd20b3d0aadb389b10f0aa14460",
+     "bytes": 2068
+    }
+   ]
+  },
+  {
+   "n": 17,
+   "item": "Ведомость передачи прав на код, модели, библиотеки и данные",
+   "status": "в комплекте",
+   "note": "",
+   "paths": [
+    {
+     "path": "docs/Афина_Ведомость_прав.md",
+     "kind": "file",
+     "sha256": "b3354f2a20fc7b3fc1f0e969a9324d797bb3dded44bab092d982b2f774c1d685",
+     "bytes": 2062
+    }
+   ]
+  },
+  {
+   "n": 18,
+   "item": "Перечень известных ограничений и технического долга",
+   "status": "в комплекте",
+   "note": "",
+   "paths": [
+    {
+     "path": "docs/Афина_Известные_ограничения.md",
+     "kind": "file",
+     "sha256": "81260dace9cf56167b717770c0b1171edbf548925e131d03c30562edfef5cada",
+     "bytes": 3962
+    }
+   ]
+  }
+ ]
+}

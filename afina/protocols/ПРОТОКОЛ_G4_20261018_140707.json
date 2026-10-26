@@ -1,0 +1,279 @@
+{
+ "protocol": "ПРОТОКОЛ_G4",
+ "title": "Рубеж G4 «Расширение»",
+ "date": "2026-10-18 14:07:07",
+ "tz_doc": "ТЗ.АФИНА.11.0",
+ "scope": [
+  "G4.1 сценарный модуль DT-5 + объяснения ИИ (AI-001…003)",
+  "G4.2 OPT-01/LCC-01 как сервис (ENG-006)",
+  "G4.3 Co-Simulation (ENG-005) + суррогаты (MOD-006) + glTF NORMAL/TEXCOORD, IFC-геометрия (GIS-006)",
+  "G4.4 военно-технический профиль ВТ-01…08 (§4.9, §4.8.4–4.8.5)",
+  "G4.5 геймификация, полигон, миссии (§4.11)",
+  "G4.6 аналитика и панель руководителя (ВТ-08)"
+ ],
+ "tests_total": 42,
+ "tests_passed": 42,
+ "verdict": "PASS",
+ "items": [
+  {
+   "requirement": "AI-001 §4.10",
+   "description": "ответ содержит источники, версии, допущения, ограничения, статус подтверждения",
+   "test": "TestExplainUnit.test_01_explain_calc_structure",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "§4.10.2",
+   "description": "при недостатке данных ИИ запрашивает данные, а не подставляет догадку",
+   "test": "TestExplainUnit.test_02_explain_without_passport_requests_data",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "§4.10.1",
+   "description": "объяснение ошибок топологии/совместимости; неизвестный тип — честный отказ",
+   "test": "TestExplainUnit.test_03_explain_issue_and_unknown",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "§4.10.1",
+   "description": "предложение допустимых сценариев по фактической наполненности данных",
+   "test": "TestExplainUnit.test_04_suggest_scenarios_data_driven",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "AI-002 §4.10.2",
+   "description": "семь запретов ИИ присутствуют в политике каждого ответа",
+   "test": "TestExplainUnit.test_05_policy_prohibitions_present",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "DGT DT-5 + SEC-001",
+   "description": "E2E: сценарий через API, валидация только ролью verify (403 для прочих)",
+   "test": "TestG4E2E.test_01_scenario_e2e_and_dt5",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "AI-001/003",
+   "description": "E2E: объяснение и предложение сценариев; отключение ИИ не ломает двойник/ГИС",
+   "test": "TestG4E2E.test_02_ai_explain_suggest_and_disable",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "OPT-01/LCC-01 + ARC-003",
+   "description": "E2E: оптимизация и TCO через очередь расчётов с паспортом",
+   "test": "TestG4E2E.test_03_opt01_lcc01_as_service",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "ENG-005 §4.5.6",
+   "description": "E2E: Co-Simulation — ID сценария, версии, единицы; ошибка решателя не подменяется",
+   "test": "TestG4E2E.test_04_cosim01_e2e",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "MOD-006 + SEC-001",
+   "description": "E2E: обучение/домен/сравнение/валидация (verify)/отключение (dict_edit)",
+   "test": "TestG4E2E.test_05_surrogate_service_e2e",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "ВТ-01…08",
+   "description": "E2E: кооперация, этапы и комиссия, метрология, унификация, старение, готовность, условия, панель",
+   "test": "TestG4E2E.test_06_vt_profile_e2e",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "§4.11",
+   "description": "E2E: начисление/дубль/отзыв по ролям, миссии с подсказками, полигон, индексы",
+   "test": "TestG4E2E.test_07_game_and_missions_e2e",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "ВТ-08 G4.6",
+   "description": "E2E: тренды из первичных реестров; demo-обучение суррогата на решателе RF-01",
+   "test": "TestG4E2E.test_08_analytics_and_demo_train",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "§4.11.3",
+   "description": "баллы за проверяемый результат; защита от повторного начисления",
+   "test": "TestGameUnit.test_01_award_only_for_verified_result",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "§4.11.3",
+   "description": "6 запрещённых оснований отклоняются архитектурно",
+   "test": "TestGameUnit.test_02_forbidden_grounds",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "§4.11.3",
+   "description": "отзыв ошибочных баллов с объяснением и журналированием корректировок",
+   "test": "TestGameUnit.test_03_revoke_with_explanation",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "§4.11.7",
+   "description": "уровни компетенции 0…5; уровень пользователя ≠ зрелость проекта",
+   "test": "TestGameUnit.test_04_competency_levels",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "§4.11.4",
+   "description": "полигон: 8 этапов, переход по инженерным критериям, не по очкам",
+   "test": "TestGameUnit.test_05_polygon_criteria_not_points",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "§4.11.8",
+   "description": "индексы готовности ЦД разделены; не рассчитанный — «не определён»",
+   "test": "TestGameUnit.test_06_readiness_indices_undefined",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "§4.11.6",
+   "description": "9 миссий на изолированных синтетических данных; объяснение «почему верно»",
+   "test": "TestMissionsUnit.test_01_all_missions_deterministic_and_checked",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "§4.11.6",
+   "description": "трёхуровневые подсказки не выдают ответ",
+   "test": "TestMissionsUnit.test_02_hints_three_levels_no_answer_leak",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "§4.11.6",
+   "description": "неизвестная миссия — честный отказ",
+   "test": "TestMissionsUnit.test_03_unknown_mission",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "ENG-006 §4.5.4",
+   "description": "нарушитель жёсткого ограничения не может быть «лучшим»; причины отклонения возвращаются",
+   "test": "TestOptUnit.test_01_hard_constraint_blocks_best",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "OPT-01 §4.5.4",
+   "description": "Парето-фронт и взвешенное ранжирование — раздельные результаты",
+   "test": "TestOptUnit.test_02_pareto_and_weights_separated",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "ENG-006",
+   "description": "неподдержанная спецификация ограничения отклоняется, а не игнорируется",
+   "test": "TestOptUnit.test_03_unknown_constraint_type_rejected",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "LCC-01 §4.5.4",
+   "description": "TCO = CAPEX + PV(OPEX) − PV(утилизация); чувствительность ±20 %",
+   "test": "TestOptUnit.test_04_lcc_math",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "DGT §4.6.1 DT-5",
+   "description": "сценарий маркирован «оценка»; базовая линия и телеметрия не изменяются (DGT-002)",
+   "test": "TestScenarioUnit.test_01_scenario_marked_as_estimate",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "§4.6.4/§4.10.2",
+   "description": "недостаточно данных — честный отказ с запросом данных, сценарий не записывается",
+   "test": "TestScenarioUnit.test_02_insufficient_data_honest_refusal",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "ENG §4.5.6",
+   "description": "незарегистрированный вид сценария отклоняется (тихая подмена запрещена)",
+   "test": "TestScenarioUnit.test_03_unknown_kind_rejected",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "DGT-004 + §4.10.2",
+   "description": "DT-5 только после независимой проверки сценария; уровни не пропускаются «через голову»",
+   "test": "TestScenarioUnit.test_04_dt5_requires_validated_scenario",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "REL-01 §4.5.4",
+   "description": "доступность в сценарии считается ядром REL-01, а не «на глаз»",
+   "test": "TestScenarioUnit.test_05_degradation_uses_rel_kernel",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "MOD-006 §4.5.8",
+   "description": "обучение на решателе, RMSE, область применения, детекция выхода за диапазон, маркировка",
+   "test": "TestSurrogateUnit.test_01_train_predict_domain",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "MOD-006",
+   "description": "вырожденный обучающий набор — честный отказ (постоянный признак не идентифицируется)",
+   "test": "TestSurrogateUnit.test_02_degenerate_set_refused",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "MOD-006 §4.5.8",
+   "description": "сравнение с основным решателем на независимом наборе; возможность отключения",
+   "test": "TestSurrogateUnit.test_03_compare_and_disable",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "GIS-006",
+   "description": "glTF: NORMAL, TEXCOORD_0 и индексы (5121/5123/5125) прочитаны",
+   "test": "TestSurrogateUnit.test_04_gltf_normals_uvs_indices",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "GIS-006",
+   "description": "IFC: IfcExtrudedAreaSolid → призма в абсолютных координатах через цепочку IfcLocalPlacement",
+   "test": "TestSurrogateUnit.test_05_ifc_extrusion_geometry",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "ВТ-02 §4.9",
+   "description": "файлы ≠ этап; закрытие только решением комиссии при готовых материалах, с основанием",
+   "test": "TestVTUnit.test_01_stage_commission_rule",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "ВТ-03 §4.8.4/4.8.5",
+   "description": "просроченная поверка СИ → результаты недопустимы; паспорт испытания полного состава",
+   "test": "TestVTUnit.test_02_metrology_blocks_approval",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "ВТ-05 §4.9",
+   "description": "4 уровня формальной готовности без пропуска; комиссия не подменяется",
+   "test": "TestVTUnit.test_03_readiness_no_skipping",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "ВТ-06 §4.9",
+   "description": "10 факторов условий эксплуатации; сопоставление с проектом, оба значения сохраняются",
+   "test": "TestVTUnit.test_04_conditions_and_factors",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "ВТ-07/ВТ-04 §4.9",
+   "description": "риски старения с вариантами реакции; дубли номенклатуры, заимствование, EOL-последствия",
+   "test": "TestVTUnit.test_05_aging_and_unification",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "ВТ-08 §4.9",
+   "description": "панель руководителя: 8 разделов из первичных реестров",
+   "test": "TestVTUnit.test_06_panel_sections",
+   "verdict": "PASS"
+  }
+ ],
+ "honest_notes": [
+  "ИИ-слой — детерминированный извлекающий RAG + шаблонные объяснения; локальная LLM (GGUF) остаётся ОПЦИЕЙ подключения при поставке весов Заказчиком (веса в комплект не входят, внешние API запрещены AUT-002)",
+  "Суррогат — полиномиальная модель степени ≤2 (МНК); гауссовские процессы/RBF/нейросети — расширяемый реестр на той же обвязке (обучение/домен/сравнение/отключение реализованы)",
+  "Полный 3D Ray-Tracing/SBR и UTD — целевой порт ядра C++/GPU (G5+); в G4 геометрическая трассировка LOS/Френель/дифракция из G1 сохранена и используется",
+  "ВТ-01: передача комплектов данных фиксируется реестровой записью с sha256; физический перенос — регламент режима Б (AUT-005), сетевого моста нет",
+  "Критерий 3-го этапа полигона («3+ объекта») упрощён относительно полного графа связности; графовый критерий применяется в CFG-анализе влияния",
+  "Пороги уровней компетенции и правила баллов — данные (настраиваются независимо от ядра, §4.11.2)"
+ ]
+}

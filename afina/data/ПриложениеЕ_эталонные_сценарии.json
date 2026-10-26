@@ -1,0 +1,70 @@
+{
+ "document": "Приложение Е. Эталонные сценарии и V&V",
+ "date": "2026-10-17",
+ "scenarios": [
+  {
+   "id": "REF-FSPL-1",
+   "desc": "FSPL 1 ГГц / 1 км",
+   "expect_db": 92.44,
+   "tol": 0.02,
+   "test": "MAT01.test_fspl_known_value"
+  },
+  {
+   "id": "REF-HATA-1",
+   "desc": "Окамура–Хата urban f=900, d=10, hBS=70, hMS=1.5",
+   "expect": "аналитическая формула",
+   "tol": 1e-06,
+   "test": "MAT01.test_hata_urban_reference"
+  },
+  {
+   "id": "REF-FRESNEL-1",
+   "desc": "F1 при d1=d2=5 км, f=6 ГГц",
+   "expect_m": 7.866,
+   "tol": 0.001,
+   "test": "MAT10.test_golden_fresnel"
+  },
+  {
+   "id": "REF-LB-1",
+   "desc": "Бюджет линии: 43−2+17−111.2+9 дБм",
+   "expect_dbm": -45.2,
+   "tol": 1e-06,
+   "test": "MAT10.test_golden_link_budget"
+  },
+  {
+   "id": "REF-COV-1",
+   "desc": "Покрытие 6×6 км, 1 БС Hata 900 МГц, порог −95",
+   "expect": "стабильность при измельчении сетки <1 п.п.",
+   "test": "MAT03"
+  },
+  {
+   "id": "REF-PWR-1",
+   "desc": "Автономность АКБ 11.2 кВт·ч, нагрузка 4.2 кВт, КПД 0.94",
+   "expect_h": 2.507,
+   "tol": 0.01,
+   "test": "PwrThmRelTests.test_power_balance"
+  },
+  {
+   "id": "REF-MARKOV-1",
+   "desc": "Стационар цепи [[.9,.1],[.5,.5]]",
+   "expect": [
+    0.8333,
+    0.1667
+   ],
+   "tol": 0.0001,
+   "test": "PwrThmRelTests.test_markov_converges"
+  },
+  {
+   "id": "REF-CRS-1",
+   "desc": "UTM round-trip 3 точки",
+   "expect": "≤1e-6 град",
+   "test": "CRSTests.test_utm_roundtrip"
+  },
+  {
+   "id": "REF-RT-1",
+   "desc": "GeoJSON round-trip",
+   "expect": "0 необъяснимых потерь",
+   "test": "FormatTests.test_geojson_roundtrip_zero_loss"
+  }
+ ],
+ "note": "Каждый сценарий привязан к автоматическому тесту; протоколы — src/pmi/run_mat.py"
+}

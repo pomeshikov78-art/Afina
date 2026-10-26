@@ -1,0 +1,83 @@
+{
+ "document": "Протокол интеграционных испытаний и безопасности (сервер API)",
+ "date": "2026-10-18 14:39:58",
+ "environment": "Linux-4.19.91-c8dfc93.al7.x86_64-x86_64-with-glibc2.36",
+ "python": "3.11.2",
+ "ran": 14,
+ "results": [
+  {
+   "requirement": "Bootstrap-регистрация и контроль ролей при регистрации",
+   "test": "test_01_bootstrap_and_roles",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "SEC-001 RBAC: аутентификация, отказы по матрице ролей",
+   "test": "test_02_auth_and_rbac",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "INT-002 Идемпотентность операций (client_id)",
+   "test": "test_03_objects_and_idempotency",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "SEC-004 Экспорт без закрытых полей и персональных данных",
+   "test": "test_04_export_sec004",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "ENG-001/MOD-005 Паспорт расчёта через API (RF-03, 4 компонента неопределённости)",
+   "test": "test_05_calc_rf03_with_passport",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "INT-001 Отрицательный тест: незарегистрированная функция отклонена (без тихой подмены)",
+   "test": "test_06_unknown_function_rejected",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "SEC-005 Maker–Checker: цепочка замечания, само-согласование отклонено",
+   "test": "test_07_zam_maker_checker",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "DGT-002 Телеметрия не изменяет базовую линию",
+   "test": "test_08_telemetry_does_not_touch_baseline",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "SEC-003 Аудит: хэш-цепочка верифицируема, отказы залогированы",
+   "test": "test_09_audit_chain_and_denials_logged",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "Многопользовательская сессия: блокировки объектов (409 конфликт)",
+   "test": "test_10_locks_multiuser",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "Каталог 1940→2036: поиск, честная маркировка прогнозов",
+   "test": "test_11_catalog_db",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "AI-001 ИИ-API: источники и ограничения в ответе; MIL-12",
+   "test": "test_12_ai_ask",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "DAT-004 Сканер аномалий: политика арбитража",
+   "test": "test_13_ai_anomalies",
+   "verdict": "PASS"
+  },
+  {
+   "requirement": "AI-003 Отключаемость ИИ без влияния на расчёты",
+   "test": "test_14_ai_disable_ai003",
+   "verdict": "PASS"
+  }
+ ],
+ "summary": {
+  "pass": 14,
+  "total": 14
+ }
+}

@@ -1,0 +1,12 @@
+{
+ "document": "Протокол автономности AUT-T01/T02 (ядро ENG6+ и ГИС)",
+ "date": "2026-10-17 03:28:43",
+ "method": "полный прогон тестов с заблокированным socket.connect",
+ "tests_ran": 44,
+ "failures": 0,
+ "errors": 0,
+ "blocked_connection_attempts": [],
+ "unauthorized_outgoing": 0,
+ "verdict": "PASS",
+ "note": "0 неразрешённых исходящих соединений при полном наборе сценариев (критерий AUT-002/008)"
+}

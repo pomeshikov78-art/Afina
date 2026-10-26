@@ -1,0 +1,137 @@
+{
+ "document": "Протокол математических и геоинформационных испытаний",
+ "date": "2026-10-18 14:39:56",
+ "environment": {
+  "python": "3.11.2",
+  "platform": "Linux-4.19.91-c8dfc93.al7.x86_64-x86_64-with-glibc2.36",
+  "backend": "CPU-reference (эталонная реализация G1; целевой C++/Vulkan — G2+)"
+ },
+ "note": "Протокол фиксирует фактические результаты; требование со статусом «реализовано» не считается принятым до проверки (§11.2).",
+ "results": [
+  {
+   "test": "MAT-01 Аналитический эталон",
+   "module": "tests.test_eng6",
+   "class": "MAT01_AnalyticReference",
+   "ran": 4,
+   "failures": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "details": []
+  },
+  {
+   "test": "MAT-02 Размерности",
+   "module": "tests.test_eng6",
+   "class": "MAT02_Dimensions",
+   "ran": 3,
+   "failures": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "details": []
+  },
+  {
+   "test": "MAT-03 Сходимость",
+   "module": "tests.test_eng6",
+   "class": "MAT03_Convergence",
+   "ran": 1,
+   "failures": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "details": []
+  },
+  {
+   "test": "MAT-04 Границы применимости",
+   "module": "tests.test_eng6",
+   "class": "MAT04_Applicability",
+   "ran": 2,
+   "failures": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "details": []
+  },
+  {
+   "test": "MAT-05 Неопределённость",
+   "module": "tests.test_eng6",
+   "class": "MAT05_Uncertainty",
+   "ran": 1,
+   "failures": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "details": []
+  },
+  {
+   "test": "MAT-06 Сопряжение",
+   "module": "tests.test_eng6",
+   "class": "MAT06_CoSimulation",
+   "ran": 3,
+   "failures": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "details": []
+  },
+  {
+   "test": "MAT-07 Воспроизводимость",
+   "module": "tests.test_eng6",
+   "class": "MAT07_Reproducibility",
+   "ran": 1,
+   "failures": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "details": []
+  },
+  {
+   "test": "MAT-08 Суррогат",
+   "module": "tests.test_eng6",
+   "class": "MAT08_Surrogate",
+   "ran": 1,
+   "failures": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "details": []
+  },
+  {
+   "test": "MAT-09 Оптимизатор",
+   "module": "tests.test_eng6",
+   "class": "MAT09_Optimizer",
+   "ran": 2,
+   "failures": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "details": []
+  },
+  {
+   "test": "MAT-10 Регрессия",
+   "module": "tests.test_eng6",
+   "class": "MAT10_Regression",
+   "ran": 3,
+   "failures": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "details": []
+  },
+  {
+   "test": "GIS-001…004 (CRS/форматы/round-trip)",
+   "module": "tests.test_gis",
+   "class": "все",
+   "ran": 15,
+   "failures": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "details": []
+  },
+  {
+   "test": "ARC-003 Очередь",
+   "module": "tests.test_eng6",
+   "class": "QueueTests",
+   "ran": 2,
+   "failures": 0,
+   "errors": 0,
+   "verdict": "PASS",
+   "details": []
+  }
+ ],
+ "summary": {
+  "total": 38,
+  "passed_suites": 12,
+  "failed_suites": 0
+ }
+}
