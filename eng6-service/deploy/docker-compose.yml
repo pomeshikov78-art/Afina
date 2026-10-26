@@ -1,0 +1,123 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# docker-compose: сервис ENG6-PLAN + Prometheus + Grafana (ЭТАП 5).
+#
+#   docker compose -f deploy/docker-compose.yml up -d --build
+#   UI:        http://localhost:8080
+#   API:       http://localhost:8080/api/v1/meta
+#   Метрики:   http://localhost:8080/metrics
+#   Prometheus http://localhost:9090  (цель eng6-plan уже настроена)
+#   Grafana    http://localhost:3000  admin/admin, дашборд «ENG6-PLAN» подхватывается автоматически
+# ═══════════════════════════════════════════════════════════════════════════
+name: eng6-plan
+
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      target: runtime
+    image: eng6-plan:1.0.0
+    container_name: eng6-plan-api
+    restart: unless-stopped
+    environment:
+      ENG6_ENV: production
+      ENG6_HOST: 0.0.0.0
+      ENG6_PORT: "8080"
+      # ── пул расчёта ────────────────────────────────────────────────────
+      ENG6_WORKERS: "3"
+      ENG6_MAX_QUEUE: "256"
+      ENG6_MAX_SYNC_CONCURRENCY: "3"
+      ENG6_TASK_TIMEOUT_MS: "300000"
+      ENG6_WORKER_RESTART_AFTER: "200"
+      ENG6_RESULT_TTL_MS: "1800000"
+      ENG6_MAX_STORED_RESULTS: "128"
+      # ── лимиты экземпляра задачи (защита от OOM) ───────────────────────
+      ENG6_LIMIT_NODES: "200000"
+      ENG6_LIMIT_LINKS: "800000"
+      ENG6_LIMIT_DEMANDS: "20000"
+      ENG6_MAX_BODY_BYTES: "67108864"
+      # ── ограничение частоты ────────────────────────────────────────────
+      ENG6_RATELIMIT_ENABLED: "true"
+      ENG6_RL_REQUESTS: "240"
+      ENG6_RL_WINDOW_MS: "60000"
+      ENG6_RL_HEAVY_NODES: "5000"
+      ENG6_RL_HEAVY_WEIGHT: "5"
+      # ── безопасность (NFR-02) ──────────────────────────────────────────
+      ENG6_AUTH_ENABLED: "true"
+      ENG6_API_KEYS: ${ENG6_API_KEYS:?задайте ENG6_API_KEYS в .env (через запятую)}
+      ENG6_REQUIRE_REQUESTOR: "true"
+      ENG6_TLS_ENABLED: "false" # включите + смонтируйте сертификаты для внешнего контура
+      ENG6_AUDIT_ENABLED: "true"
+      ENG6_AUDIT_LOG_PAYLOAD: "false"
+      ENG6_METRICS_ENABLED: "true"
+      TZ: Europe/Moscow
+    ports:
+      - "8080:8080"
+    volumes:
+      - audit:/app/var
+      # - ./certs:/app/certs:ro   # для ENG6_TLS_ENABLED=true
+    read_only: true
+    tmpfs:
+      - /tmp:size=64M
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    deploy:
+      resources:
+        limits:
+          cpus: "4.0"
+          memory: 6g
+        reservations:
+          cpus: "1.0"
+          memory: 1g
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/readyz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 4s
+      retries: 3
+      start_period: 25s
+    logging:
+      driver: json-file
+      options: { max-size: "20m", max-file: "5" }
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    container_name: eng6-plan-prometheus
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=30d
+      - --web.enable-lifecycle
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    depends_on:
+      api:
+        condition: service_healthy
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    container_name: eng6-plan-grafana
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_SERVER_ROOT_URL: http://localhost:3000
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro   # datasources/ + dashboards/
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+
+volumes:
+  audit:
+  prometheus-data:
+  grafana-data:

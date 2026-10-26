@@ -1,0 +1,248 @@
+{
+ "meta": {
+  "name": "Граничный случай: перегрузка каналов",
+  "seed": 5
+ },
+ "environment": {
+  "clutterType": "open",
+  "terrain": {
+   "source": "flat",
+   "amplitudeM": 0
+  }
+ },
+ "topology": {
+  "nodes": [
+   {
+    "id": "cp",
+    "type": "cp",
+    "name": "cp",
+    "lat": 55.75,
+    "lng": 37.62,
+    "status": "active",
+    "parentId": null
+   },
+   {
+    "id": "hub",
+    "type": "relay",
+    "name": "hub",
+    "lat": 55.75,
+    "lng": 37.779613,
+    "status": "active",
+    "parentId": "cp"
+   },
+   {
+    "id": "a1",
+    "type": "radio",
+    "name": "a1",
+    "lat": 55.794916,
+    "lng": 37.939595,
+    "status": "active",
+    "parentId": "hub"
+   },
+   {
+    "id": "a2",
+    "type": "radio",
+    "name": "a2",
+    "lat": 55.705084,
+    "lng": 37.938859,
+    "status": "active",
+    "parentId": "hub"
+   },
+   {
+    "id": "a3",
+    "type": "radio",
+    "name": "a3",
+    "lat": 55.75,
+    "lng": 38.019033,
+    "status": "active",
+    "parentId": "hub"
+   },
+   {
+    "id": "a4",
+    "type": "radio",
+    "name": "a4",
+    "lat": 55.839831,
+    "lng": 37.939964,
+    "status": "active",
+    "parentId": "hub"
+   }
+  ],
+  "links": [
+   {
+    "id": "l-cp-hub",
+    "from": "cp",
+    "to": "hub",
+    "type": "VHF",
+    "priority": 1,
+    "bwKhz": 25,
+    "mod": "QPSK",
+    "fec": "none"
+   },
+   {
+    "id": "l-hub-a1",
+    "from": "hub",
+    "to": "a1",
+    "type": "VHF",
+    "priority": 2
+   },
+   {
+    "id": "l-hub-a2",
+    "from": "hub",
+    "to": "a2",
+    "type": "VHF",
+    "priority": 2
+   },
+   {
+    "id": "l-hub-a3",
+    "from": "hub",
+    "to": "a3",
+    "type": "VHF",
+    "priority": 2
+   },
+   {
+    "id": "l-hub-a4",
+    "from": "hub",
+    "to": "a4",
+    "type": "VHF",
+    "priority": 2
+   }
+  ]
+ },
+ "demands": [
+  {
+   "id": "d1a",
+   "from": "cp",
+   "to": "a1",
+   "rateKbps": 16,
+   "maxDelayMs": 200,
+   "priority": 1
+  },
+  {
+   "id": "d1b",
+   "from": "a1",
+   "to": "cp",
+   "rateKbps": 16,
+   "maxDelayMs": 200,
+   "priority": 3
+  },
+  {
+   "id": "d2a",
+   "from": "cp",
+   "to": "a2",
+   "rateKbps": 16,
+   "maxDelayMs": 200,
+   "priority": 1
+  },
+  {
+   "id": "d2b",
+   "from": "a2",
+   "to": "cp",
+   "rateKbps": 16,
+   "maxDelayMs": 200,
+   "priority": 3
+  },
+  {
+   "id": "d3a",
+   "from": "cp",
+   "to": "a3",
+   "rateKbps": 16,
+   "maxDelayMs": 200,
+   "priority": 1
+  },
+  {
+   "id": "d3b",
+   "from": "a3",
+   "to": "cp",
+   "rateKbps": 16,
+   "maxDelayMs": 200,
+   "priority": 3
+  },
+  {
+   "id": "d4a",
+   "from": "cp",
+   "to": "a4",
+   "rateKbps": 16,
+   "maxDelayMs": 200,
+   "priority": 1
+  },
+  {
+   "id": "d4b",
+   "from": "a4",
+   "to": "cp",
+   "rateKbps": 16,
+   "maxDelayMs": 200,
+   "priority": 3
+  }
+ ],
+ "fleet": [
+  {
+   "unitId": "U-00001",
+   "kind": "П-240И (командно-штабная машина)",
+   "nodeType": "cp",
+   "condition": "green",
+   "costDeploy": 30,
+   "deployTimeMin": 45,
+   "powerW": 230,
+   "note": ""
+  },
+  {
+   "unitId": "U-00002",
+   "kind": "Р-419Л1 (ретранслятор)",
+   "nodeType": "relay",
+   "condition": "green",
+   "costDeploy": 18,
+   "deployTimeMin": 25,
+   "powerW": 259,
+   "note": ""
+  },
+  {
+   "unitId": "U-00003",
+   "kind": "Р-168-100К (КВ/УКВ)",
+   "nodeType": "radio",
+   "condition": "green",
+   "costDeploy": 6,
+   "deployTimeMin": 10,
+   "powerW": 584,
+   "note": ""
+  },
+  {
+   "unitId": "U-00004",
+   "kind": "Р-168-100К (КВ/УКВ)",
+   "nodeType": "radio",
+   "condition": "green",
+   "costDeploy": 6,
+   "deployTimeMin": 10,
+   "powerW": 329,
+   "note": ""
+  },
+  {
+   "unitId": "U-00005",
+   "kind": "Р-168-100К (КВ/УКВ)",
+   "nodeType": "radio",
+   "condition": "green",
+   "costDeploy": 6,
+   "deployTimeMin": 10,
+   "powerW": 642,
+   "note": ""
+  },
+  {
+   "unitId": "U-00006",
+   "kind": "Р-168-100К (КВ/УКВ)",
+   "nodeType": "radio",
+   "condition": "yellow",
+   "costDeploy": 6,
+   "deployTimeMin": 10,
+   "powerW": 266,
+   "note": "требуется ЗИП"
+  }
+ ],
+ "constraints": {
+  "budget": 1000,
+  "minMarginDb": 3,
+  "maxDelayMs": 250,
+  "physics": "fast",
+  "maxUtilizationPct": 85,
+  "upgradeCostRatio": 0.25,
+  "upgradeFactor": 0.5
+ }
+}

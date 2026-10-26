@@ -1,0 +1,587 @@
+{
+ "header": {
+  "generatedAt": "2026-10-20T21:47:46.558Z",
+  "source": "ENG6-PLAN",
+  "engineVersion": "5.1.0",
+  "engineSha256": "adb610c9eee1ca17b257cbc6087e2278fdde3eef92f3b6a360cfb51968d48b20",
+  "plannerVersion": "1.0.0",
+  "requestId": "erp-export-14-20261016",
+  "status": "PARTIAL",
+  "grade": "C",
+  "objectiveValue": 0.2624,
+  "computeMs": 101.11,
+  "totalCost": 220,
+  "budget": 700
+ },
+ "map_object": [
+  {
+   "object_id": "OBJ-14-KP",
+   "object_type": "cp",
+   "unit_id": "ИНВ-41001-001",
+   "condition": "green",
+   "geo_lat": 55.7521,
+   "geo_lng": 37.6182,
+   "cost": 30,
+   "wave_index": 1,
+   "start_min": 0
+  },
+  {
+   "object_id": "OBJ-14-US1",
+   "object_type": "relay",
+   "unit_id": "ИНВ-41001-002",
+   "condition": "green",
+   "geo_lat": 55.7884,
+   "geo_lng": 37.6611,
+   "cost": 18,
+   "wave_index": 2,
+   "start_min": 52.27
+  },
+  {
+   "object_id": "OBJ-14-ROTA-A",
+   "object_type": "radio",
+   "unit_id": "ИНВ-41001-003",
+   "condition": "green",
+   "geo_lat": 55.7301,
+   "geo_lng": 37.6904,
+   "cost": 6,
+   "wave_index": 2,
+   "start_min": 52.71
+  },
+  {
+   "object_id": "OBJ-14-ROTA-B",
+   "object_type": "radio",
+   "unit_id": "ИНВ-41001-005",
+   "condition": "green",
+   "geo_lat": 55.7011,
+   "geo_lng": 37.5522,
+   "cost": 6,
+   "wave_index": 2,
+   "start_min": 55.53
+  },
+  {
+   "object_id": "OBJ-14-NP1",
+   "object_type": "observer",
+   "unit_id": "ИНВ-41001-006",
+   "condition": "green",
+   "geo_lat": 55.8151,
+   "geo_lng": 37.7203,
+   "cost": 4,
+   "wave_index": 3,
+   "start_min": 91.49
+  }
+ ],
+ "link_line": [
+  {
+   "line_id": "ВОЛС-14-1",
+   "a": "OBJ-14-KP",
+   "b": "OBJ-14-US1",
+   "kind": "FOC",
+   "length_km": 4.8469,
+   "margin_db": 26.12,
+   "sens_margin_db": 26.12,
+   "capacity_kbps": 1153846.15,
+   "load_kbps": 41.04,
+   "util_pct": 0,
+   "delay_ms": 28.312,
+   "availability_pct": 99.967,
+   "cost": 120,
+   "role": "primary"
+  },
+  {
+   "line_id": "УКВ-14-1",
+   "a": "OBJ-14-KP",
+   "b": "OBJ-14-ROTA-A",
+   "kind": "VHF",
+   "length_km": 5.139,
+   "margin_db": 9.3,
+   "sens_margin_db": 55.4,
+   "capacity_kbps": 49.04,
+   "load_kbps": 32,
+   "util_pct": 65.3,
+   "delay_ms": 4.017,
+   "availability_pct": 0,
+   "cost": 0,
+   "role": "primary"
+  },
+  {
+   "line_id": "УКВ-14-2",
+   "a": "OBJ-14-KP",
+   "b": "OBJ-14-ROTA-B",
+   "kind": "VHF",
+   "length_km": 7.0171,
+   "margin_db": 8.95,
+   "sens_margin_db": 52.42,
+   "capacity_kbps": 49.04,
+   "load_kbps": 49.04,
+   "util_pct": 100,
+   "delay_ms": 4.023,
+   "availability_pct": 0,
+   "cost": 0,
+   "role": "primary"
+  },
+  {
+   "line_id": "УКВ-14-3",
+   "a": "OBJ-14-US1",
+   "b": "OBJ-14-NP1",
+   "kind": "UHF",
+   "length_km": 4.7438,
+   "margin_db": 20.43,
+   "sens_margin_db": 46.12,
+   "capacity_kbps": 32.69,
+   "load_kbps": 8,
+   "util_pct": 24.5,
+   "delay_ms": 4.016,
+   "availability_pct": 0,
+   "cost": 0,
+   "role": "primary"
+  }
+ ],
+ "link_rejected": [
+  {
+   "line_id": "РРЛ-14-1",
+   "a": "OBJ-14-US1",
+   "b": "OBJ-14-ROTA-A",
+   "kind": "RRL",
+   "code": "CAPACITY_ZERO",
+   "reason": "нулевая пропускная способность при заданном SNR",
+   "margin_db": -25.11,
+   "length_km": 6.737
+  },
+  {
+   "line_id": "УКВ-14-5",
+   "a": "OBJ-14-ROTA-A",
+   "b": "OBJ-14-REB",
+   "kind": "VHF",
+   "code": "CAPACITY_ZERO",
+   "reason": "нулевая пропускная способность при заданном SNR",
+   "margin_db": -88.22,
+   "length_km": 10.041
+  },
+  {
+   "line_id": "СПУТ-14-1",
+   "a": "OBJ-14-KP",
+   "b": "OBJ-14-REB",
+   "kind": "SAT",
+   "code": "CAPACITY_ZERO",
+   "reason": "нулевая пропускная способность при заданном SNR",
+   "margin_db": -100.93,
+   "length_km": 13.592
+  }
+ ],
+ "route": [
+  {
+   "demand_id": "НАРЯД-101",
+   "src": "OBJ-14-KP",
+   "dst": "OBJ-14-ROTA-A",
+   "requested_kbps": 32,
+   "granted_kbps": 32,
+   "deficit_kbps": 0,
+   "status": "ROUTED",
+   "reason": "OK",
+   "delay_ms": 37.267,
+   "limit_ms": 150,
+   "hops": 1,
+   "margin_db": 9.3,
+   "availability_pct": 0,
+   "redundant": false,
+   "path_nodes": [
+    "OBJ-14-KP",
+    "OBJ-14-ROTA-A"
+   ],
+   "path_lines": [
+    "УКВ-14-1"
+   ],
+   "backup_nodes": null,
+   "backup_lines": null
+  },
+  {
+   "demand_id": "НАРЯД-102",
+   "src": "OBJ-14-KP",
+   "dst": "OBJ-14-ROTA-B",
+   "requested_kbps": 16,
+   "granted_kbps": 16,
+   "deficit_kbps": 0,
+   "status": "ROUTED",
+   "reason": "OK",
+   "delay_ms": 68.523,
+   "limit_ms": 200,
+   "hops": 1,
+   "margin_db": 8.95,
+   "availability_pct": 0,
+   "redundant": false,
+   "path_nodes": [
+    "OBJ-14-KP",
+    "OBJ-14-ROTA-B"
+   ],
+   "path_lines": [
+    "УКВ-14-2"
+   ],
+   "backup_nodes": null,
+   "backup_lines": null
+  },
+  {
+   "demand_id": "НАРЯД-103",
+   "src": "OBJ-14-KP",
+   "dst": "OBJ-14-NP1",
+   "requested_kbps": 8,
+   "granted_kbps": 8,
+   "deficit_kbps": 0,
+   "status": "ROUTED",
+   "reason": "OK",
+   "delay_ms": 161.328,
+   "limit_ms": 250,
+   "hops": 2,
+   "margin_db": 20.43,
+   "availability_pct": 0,
+   "redundant": false,
+   "path_nodes": [
+    "OBJ-14-KP",
+    "OBJ-14-US1",
+    "OBJ-14-NP1"
+   ],
+   "path_lines": [
+    "ВОЛС-14-1",
+    "УКВ-14-3"
+   ],
+   "backup_nodes": null,
+   "backup_lines": null
+  },
+  {
+   "demand_id": "НАРЯД-104",
+   "src": "OBJ-14-KP",
+   "dst": "OBJ-14-NP2",
+   "requested_kbps": 8,
+   "granted_kbps": 0,
+   "deficit_kbps": 8,
+   "status": "REJECTED",
+   "reason": "UNIT_NOT_READY",
+   "delay_ms": null,
+   "limit_ms": 300,
+   "hops": null,
+   "margin_db": null,
+   "availability_pct": null,
+   "redundant": false,
+   "path_nodes": [],
+   "path_lines": [],
+   "backup_nodes": null,
+   "backup_lines": null
+  },
+  {
+   "demand_id": "НАРЯД-105",
+   "src": "OBJ-14-KP",
+   "dst": "OBJ-14-REB",
+   "requested_kbps": 512,
+   "granted_kbps": 0,
+   "deficit_kbps": 512,
+   "status": "REJECTED",
+   "reason": "NET_DISCONNECTED",
+   "delay_ms": null,
+   "limit_ms": 200,
+   "hops": null,
+   "margin_db": null,
+   "availability_pct": null,
+   "redundant": false,
+   "path_nodes": [],
+   "path_lines": [],
+   "backup_nodes": null,
+   "backup_lines": null
+  },
+  {
+   "demand_id": "НАРЯД-106",
+   "src": "OBJ-14-US1",
+   "dst": "OBJ-14-ROTA-B",
+   "requested_kbps": 64,
+   "granted_kbps": 33.038,
+   "deficit_kbps": 30.962,
+   "status": "PARTIAL",
+   "reason": "CAPACITY_SHORTAGE",
+   "delay_ms": 51.961,
+   "limit_ms": 250,
+   "hops": 2,
+   "margin_db": 8.95,
+   "availability_pct": 0,
+   "redundant": false,
+   "path_nodes": [
+    "OBJ-14-US1",
+    "OBJ-14-KP",
+    "OBJ-14-ROTA-B"
+   ],
+   "path_lines": [
+    "ВОЛС-14-1",
+    "УКВ-14-2"
+   ],
+   "backup_nodes": null,
+   "backup_lines": null
+  }
+ ],
+ "deployment_wave": [
+  {
+   "wave_index": 1,
+   "t_start_min": 0,
+   "t_end_min": 45,
+   "duration_min": 45,
+   "crews_used": 1,
+   "items": [
+    {
+     "object_id": "OBJ-14-KP",
+     "unit_id": "ИНВ-41001-001",
+     "crew": 0,
+     "start_min": 0,
+     "end_min": 45
+    }
+   ]
+  },
+  {
+   "wave_index": 2,
+   "t_start_min": 52.27,
+   "t_end_min": 77.27,
+   "duration_min": 25,
+   "crews_used": 3,
+   "items": [
+    {
+     "object_id": "OBJ-14-US1",
+     "unit_id": "ИНВ-41001-002",
+     "crew": 1,
+     "start_min": 52.27,
+     "end_min": 77.27
+    },
+    {
+     "object_id": "OBJ-14-ROTA-A",
+     "unit_id": "ИНВ-41001-003",
+     "crew": 2,
+     "start_min": 52.71,
+     "end_min": 62.71
+    },
+    {
+     "object_id": "OBJ-14-ROTA-B",
+     "unit_id": "ИНВ-41001-005",
+     "crew": 0,
+     "start_min": 55.53,
+     "end_min": 65.53
+    }
+   ]
+  },
+  {
+   "wave_index": 3,
+   "t_start_min": 91.49,
+   "t_end_min": 106.49,
+   "duration_min": 15,
+   "crews_used": 1,
+   "items": [
+    {
+     "object_id": "OBJ-14-NP1",
+     "unit_id": "ИНВ-41001-006",
+     "crew": 2,
+     "start_min": 91.49,
+     "end_min": 106.49
+    }
+   ]
+  }
+ ],
+ "schedule_summary": {
+  "makespan_min": 106.49,
+  "crews": 3,
+  "crew_util_pct": 32.9,
+  "critical_path": [
+   "OBJ-14-KP",
+   "OBJ-14-US1",
+   "OBJ-14-NP1"
+  ]
+ },
+ "survivability": {
+  "componentsCount": 1,
+  "candidateComponentsCount": 2,
+  "connectivityPct": 100,
+  "largestComponentPct": 100,
+  "spofNodes": [
+   "OBJ-14-KP",
+   "OBJ-14-US1"
+  ],
+  "spofCount": 2,
+  "bridgeLinks": [
+   "ВОЛС-14-1",
+   "УКВ-14-1",
+   "УКВ-14-2",
+   "УКВ-14-3"
+  ],
+  "bridgeCount": 4,
+  "minCutKbps": null,
+  "minCutPair": null,
+  "computed": [
+   "components",
+   "bridges",
+   "articulations"
+  ]
+ },
+ "actions_required": [
+  {
+   "action": "ADD_RELAY",
+   "at_lat": 55.68515,
+   "at_lng": 37.69795,
+   "value": null,
+   "line_id": null,
+   "connects": [
+    0,
+    1
+   ],
+   "span_km": 10.041,
+   "required_eirp_dbm": -6,
+   "reason": "компоненты 0 (7 узл.) и 1 (2 узл.), ближайшая пара OBJ-14-ROTA-A—OBJ-14-REB"
+  },
+  {
+   "action": "ADD_CAPACITY",
+   "at_lat": null,
+   "at_lng": null,
+   "value": 30.96,
+   "line_id": "ВОЛС-14-1",
+   "connects": null,
+   "span_km": null,
+   "required_eirp_dbm": null,
+   "reason": "требуемое увеличение пропускной способности, кбит/с"
+  },
+  {
+   "action": "ADD_CAPACITY",
+   "at_lat": null,
+   "at_lng": null,
+   "value": 30.96,
+   "line_id": "УКВ-14-2",
+   "connects": null,
+   "span_km": null,
+   "required_eirp_dbm": null,
+   "reason": "требуемое увеличение пропускной способности, кбит/с"
+  }
+ ],
+ "issues": [
+  {
+   "sev": "crit",
+   "code": "UNIT_SHORTAGE",
+   "title": "Нехватка техники: observer",
+   "text": "1 узл(ов) не могут быть развернуты — в парке нет готовых единиц типа «observer»"
+  },
+  {
+   "sev": "warn",
+   "code": "NO_BACKUP_PATH",
+   "title": "Нет резервного маршрута: НАРЯД-101",
+   "text": "Альтернативный реберно-непересекающийся путь не найден в пределах допустимой задержки."
+  },
+  {
+   "sev": "warn",
+   "code": "BRIDGE_LINK",
+   "title": "Линия-мост (единственное соединение)",
+   "text": "Удаление линии разрывает сеть — требуется резервное направление"
+  },
+  {
+   "sev": "warn",
+   "code": "BRIDGE_LINK",
+   "title": "Линия-мост (единственное соединение)",
+   "text": "Удаление линии разрывает сеть — требуется резервное направление"
+  },
+  {
+   "sev": "warn",
+   "code": "BRIDGE_LINK",
+   "title": "Линия-мост (единственное соединение)",
+   "text": "Удаление линии разрывает сеть — требуется резервное направление"
+  },
+  {
+   "sev": "warn",
+   "code": "BRIDGE_LINK",
+   "title": "Линия-мост (единственное соединение)",
+   "text": "Удаление линии разрывает сеть — требуется резервное направление"
+  },
+  {
+   "sev": "warn",
+   "code": "OVERLOAD",
+   "title": "Перегрузка каналов",
+   "text": "Максимальная утилизация 100% > порога 85%"
+  },
+  {
+   "sev": "crit",
+   "code": "NET_DISCONNECTED",
+   "title": "Сеть несвязна",
+   "text": "2 компонент связности; largest = 87.5% узлов"
+  },
+  {
+   "sev": "crit",
+   "code": "UNIT_NOT_READY",
+   "title": "Техника: ИНВ-41001-007",
+   "text": "Неисправна/в ремонте — размещение запрещено (FR-RES-03)"
+  }
+ ],
+ "recommendations": [
+  {
+   "id": "REC-SPOF",
+   "priority": 1,
+   "title": "Устранить единые точки отказа",
+   "text": "Развернуть резервные направления для 2 узл. и 4 лин.-мостов (требуется requireRedundancy=true или protected=true у заявок)"
+  },
+  {
+   "id": "REC-CAP",
+   "priority": 2,
+   "title": "Нарастить пропускную способность",
+   "text": "Перегружено каналов: 2. Варианты: переход на 16QAM/64QAM, расширение полосы, РРЛ вместо УКВ."
+  },
+  {
+   "id": "REC-RELAY",
+   "priority": 1,
+   "title": "Установить ретрансляторы",
+   "text": "55.68515,37.69795"
+  },
+  {
+   "id": "REC-MARGIN",
+   "priority": 3,
+   "title": "Поднять антенны / усилить передатчики",
+   "text": "4 линий имеют запас < 10 дБ — снизить риск деградации при осадках и замираниях"
+  }
+ ],
+ "metrics": {
+  "objectiveValue": 0.2624,
+  "grade": "C",
+  "gradeByObjective": "B",
+  "gradeByService": "C",
+  "serviceLevelByCountPct": 58.333,
+  "serviceLevelByBandwidthPct": 13.912,
+  "nodesTotal": 8,
+  "nodesDeployed": 5,
+  "linksCandidate": 9,
+  "linksFeasible": 6,
+  "linksActive": 4,
+  "totalCost": 220,
+  "budget": 700,
+  "budgetUsedPct": 31.43,
+  "demandsTotal": 6,
+  "demandsSatisfied": 3,
+  "demandsPartial": 1,
+  "demandsRejected": 2,
+  "demandServedPct": 13.912,
+  "throughputKbps": 89.04,
+  "capacityTotalKbps": 1153976.92,
+  "loadTotalKbps": 130.08,
+  "utilMaxPct": 100,
+  "utilAvgPct": 0.01,
+  "avgDelayMs": 79.77,
+  "maxDelayMs": 161.328,
+  "delayViolations": 0,
+  "minAvailabilityPct": 0,
+  "connectivityPct": 100,
+  "componentsCount": 1,
+  "candidateComponentsCount": 2,
+  "largestComponentPct": 100,
+  "spofNodes": 2,
+  "bridgeLinks": 4,
+  "minCutKbps": null,
+  "avgMarginDb": 16.2,
+  "minMarginDb": 8.95,
+  "linksBelow10Db": 4,
+  "marginHistogram": {
+   "<0": 0,
+   "0-3": 0,
+   "3-10": 2,
+   "10-20": 0,
+   ">20": 2
+  },
+  "redundancyAdded": 0,
+  "scheduleMakespanMin": 106.49,
+  "scheduleWaves": 3,
+  "crewUtilPct": 32.9
+ }
+}

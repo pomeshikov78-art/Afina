@@ -1,0 +1,30 @@
+{
+  "name": "eng6-plan-service",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Промышленный вычислительный сервис планирования систем связи: headless-ядро ENG6-PLAN + API + UI + нагрузочный стенд",
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "scripts": {
+    "start": "node api/main.mjs",
+    "dev": "node --watch api/main.mjs",
+    "test": "node --test tests/unit tests/conformance",
+    "test:unit": "node --test tests/unit",
+    "test:conformance": "node --test tests/conformance",
+    "bench": "node loadtest/run_load.mjs --profile=quick",
+    "bench:full": "node loadtest/run_load.mjs --profile=full",
+    "conformance": "node --test tests/conformance",
+    "selfcheck": "node scripts/selfcheck.mjs",
+    "build:ui": "node scripts/build_frontend.mjs",
+    "tz:docx": "python3 scripts/make_tz_docx.py",
+    "smoke": "node tests/smoke_planner.mjs && node tests/smoke_api.mjs",
+    "test:ui-dom": "node --test tests/unit/frontend_dom.test.mjs"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "jsdom": "^29.1.1"
+  },
+  "license": "UNLICENSED"
+}

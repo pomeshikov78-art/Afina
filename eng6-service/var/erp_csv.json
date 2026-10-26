@@ -1,0 +1,410 @@
+{
+ "header": {
+  "generatedAt": "2026-10-20T21:50:26.073Z",
+  "source": "ENG6-PLAN",
+  "engineVersion": "5.1.0",
+  "engineSha256": "adb610c9eee1ca17b257cbc6087e2278fdde3eef92f3b6a360cfb51968d48b20",
+  "plannerVersion": "1.0.0",
+  "requestId": null,
+  "status": "FEASIBLE",
+  "grade": "D",
+  "objectiveValue": 0.56378,
+  "computeMs": 84.2,
+  "totalCost": 273.62,
+  "budget": null
+ },
+ "map_object": [
+  {
+   "object_id": "K-1",
+   "object_type": "cp",
+   "unit_id": null,
+   "condition": "n/a",
+   "geo_lat": 55.75,
+   "geo_lng": 37.62,
+   "cost": 30,
+   "wave_index": 1,
+   "start_min": 0
+  },
+  {
+   "object_id": "R-1",
+   "object_type": "relay",
+   "unit_id": null,
+   "condition": "n/a",
+   "geo_lat": 55.79,
+   "geo_lng": 37.67,
+   "cost": 18,
+   "wave_index": 2,
+   "start_min": 53.16
+  },
+  {
+   "object_id": "A-1",
+   "object_type": "radio",
+   "unit_id": null,
+   "condition": "n/a",
+   "geo_lat": 55.73,
+   "geo_lng": 37.69,
+   "cost": 6,
+   "wave_index": 3,
+   "start_min": 85.53
+  },
+  {
+   "object_id": "A-2",
+   "object_type": "radio",
+   "unit_id": null,
+   "condition": "n/a",
+   "geo_lat": 55.7,
+   "geo_lng": 37.55,
+   "cost": 6,
+   "wave_index": 1,
+   "start_min": 10.62
+  },
+  {
+   "object_id": "NP-1",
+   "object_type": "observer",
+   "unit_id": null,
+   "condition": "n/a",
+   "geo_lat": 55.81,
+   "geo_lng": 37.72,
+   "cost": 4,
+   "wave_index": 3,
+   "start_min": 91.87
+  }
+ ],
+ "link_line": [
+  {
+   "line_id": "L-1",
+   "a": "K-1",
+   "b": "R-1",
+   "kind": "FOC",
+   "length_km": 5.4373,
+   "margin_db": 25.97,
+   "sens_margin_db": 25.97,
+   "capacity_kbps": 769230.77,
+   "load_kbps": 24,
+   "util_pct": 0,
+   "delay_ms": 31.639,
+   "availability_pct": 99.962,
+   "cost": 209.62,
+   "role": "primary"
+  },
+  {
+   "line_id": "L-3",
+   "a": "R-1",
+   "b": "A-1",
+   "kind": "VHF",
+   "length_km": 6.788,
+   "margin_db": 23.26,
+   "sens_margin_db": 12.24,
+   "capacity_kbps": 32.69,
+   "load_kbps": 16,
+   "util_pct": 48.9,
+   "delay_ms": 4.023,
+   "availability_pct": 0,
+   "cost": 0,
+   "role": "primary"
+  },
+  {
+   "line_id": "L-5",
+   "a": "R-1",
+   "b": "NP-1",
+   "kind": "UHF",
+   "length_km": 3.8356,
+   "margin_db": 19.17,
+   "sens_margin_db": 8.15,
+   "capacity_kbps": 32.69,
+   "load_kbps": 8,
+   "util_pct": 24.5,
+   "delay_ms": 4.013,
+   "availability_pct": 0.006,
+   "cost": 0,
+   "role": "primary"
+  },
+  {
+   "line_id": "L-6",
+   "a": "K-1",
+   "b": "A-2",
+   "kind": "UHF",
+   "length_km": 7.0799,
+   "margin_db": 13.82,
+   "sens_margin_db": 2.8,
+   "capacity_kbps": 32.69,
+   "load_kbps": 32,
+   "util_pct": 97.9,
+   "delay_ms": 4.024,
+   "availability_pct": 0.286,
+   "cost": 0,
+   "role": "primary"
+  }
+ ],
+ "link_rejected": [],
+ "route": [
+  {
+   "demand_id": "Q-1",
+   "src": "K-1",
+   "dst": "A-1",
+   "requested_kbps": 16,
+   "granted_kbps": 16,
+   "deficit_kbps": 0,
+   "status": "ROUTED",
+   "reason": "OK",
+   "delay_ms": 102.162,
+   "limit_ms": 200,
+   "hops": 2,
+   "margin_db": 23.26,
+   "availability_pct": 0,
+   "redundant": false,
+   "path_nodes": [
+    "K-1",
+    "R-1",
+    "A-1"
+   ],
+   "path_lines": [
+    "L-1",
+    "L-3"
+   ],
+   "backup_nodes": null,
+   "backup_lines": null
+  },
+  {
+   "demand_id": "Q-2",
+   "src": "K-1",
+   "dst": "A-2",
+   "requested_kbps": 32,
+   "granted_kbps": 32,
+   "deficit_kbps": 0,
+   "status": "ROUTED",
+   "reason": "OK",
+   "delay_ms": 37.274,
+   "limit_ms": 200,
+   "hops": 1,
+   "margin_db": 13.82,
+   "availability_pct": 0.286,
+   "redundant": false,
+   "path_nodes": [
+    "K-1",
+    "A-2"
+   ],
+   "path_lines": [
+    "L-6"
+   ],
+   "backup_nodes": null,
+   "backup_lines": null
+  },
+  {
+   "demand_id": "Q-3",
+   "src": "K-1",
+   "dst": "NP-1",
+   "requested_kbps": 8,
+   "granted_kbps": 8,
+   "deficit_kbps": 0,
+   "status": "ROUTED",
+   "reason": "OK",
+   "delay_ms": 164.652,
+   "limit_ms": 250,
+   "hops": 2,
+   "margin_db": 19.17,
+   "availability_pct": 0.006,
+   "redundant": false,
+   "path_nodes": [
+    "K-1",
+    "R-1",
+    "NP-1"
+   ],
+   "path_lines": [
+    "L-1",
+    "L-5"
+   ],
+   "backup_nodes": null,
+   "backup_lines": null
+  }
+ ],
+ "deployment_wave": [
+  {
+   "wave_index": 1,
+   "t_start_min": 0,
+   "t_end_min": 45,
+   "duration_min": 45,
+   "crews_used": 2,
+   "items": [
+    {
+     "object_id": "K-1",
+     "unit_id": null,
+     "crew": 0,
+     "start_min": 0,
+     "end_min": 45
+    },
+    {
+     "object_id": "A-2",
+     "unit_id": null,
+     "crew": 1,
+     "start_min": 10.62,
+     "end_min": 20.62
+    }
+   ]
+  },
+  {
+   "wave_index": 2,
+   "t_start_min": 53.16,
+   "t_end_min": 78.16,
+   "duration_min": 25,
+   "crews_used": 1,
+   "items": [
+    {
+     "object_id": "R-1",
+     "unit_id": null,
+     "crew": 2,
+     "start_min": 53.16,
+     "end_min": 78.16
+    }
+   ]
+  },
+  {
+   "wave_index": 3,
+   "t_start_min": 85.53,
+   "t_end_min": 106.87,
+   "duration_min": 21.34,
+   "crews_used": 2,
+   "items": [
+    {
+     "object_id": "A-1",
+     "unit_id": null,
+     "crew": 1,
+     "start_min": 85.53,
+     "end_min": 95.53
+    },
+    {
+     "object_id": "NP-1",
+     "unit_id": null,
+     "crew": 3,
+     "start_min": 91.87,
+     "end_min": 106.87
+    }
+   ]
+  }
+ ],
+ "schedule_summary": {
+  "makespan_min": 106.87,
+  "crews": 4,
+  "crew_util_pct": 24.6,
+  "critical_path": [
+   "NP-1"
+  ]
+ },
+ "survivability": {
+  "componentsCount": 1,
+  "candidateComponentsCount": 1,
+  "connectivityPct": 100,
+  "largestComponentPct": 100,
+  "spofNodes": [
+   "K-1",
+   "R-1"
+  ],
+  "spofCount": 2,
+  "bridgeLinks": [
+   "L-1",
+   "L-3",
+   "L-5",
+   "L-6"
+  ],
+  "bridgeCount": 4,
+  "minCutKbps": null,
+  "minCutPair": null,
+  "computed": [
+   "components",
+   "bridges",
+   "articulations"
+  ]
+ },
+ "actions_required": [],
+ "issues": [
+  {
+   "sev": "warn",
+   "code": "BRIDGE_LINK",
+   "title": "Линия-мост (единственное соединение)",
+   "text": "Удаление линии разрывает сеть — требуется резервное направление"
+  },
+  {
+   "sev": "warn",
+   "code": "BRIDGE_LINK",
+   "title": "Линия-мост (единственное соединение)",
+   "text": "Удаление линии разрывает сеть — требуется резервное направление"
+  },
+  {
+   "sev": "warn",
+   "code": "BRIDGE_LINK",
+   "title": "Линия-мост (единственное соединение)",
+   "text": "Удаление линии разрывает сеть — требуется резервное направление"
+  },
+  {
+   "sev": "warn",
+   "code": "BRIDGE_LINK",
+   "title": "Линия-мост (единственное соединение)",
+   "text": "Удаление линии разрывает сеть — требуется резервное направление"
+  },
+  {
+   "sev": "warn",
+   "code": "OVERLOAD",
+   "title": "Перегрузка каналов",
+   "text": "Максимальная утилизация 97.88% > порога 85%"
+  }
+ ],
+ "recommendations": [
+  {
+   "id": "REC-SPOF",
+   "priority": 1,
+   "title": "Устранить единые точки отказа",
+   "text": "Развернуть резервные направления для 2 узл. и 4 лин.-мостов (требуется requireRedundancy=true или protected=true у заявок)"
+  }
+ ],
+ "metrics": {
+  "objectiveValue": 0.56378,
+  "grade": "D",
+  "gradeByObjective": "D",
+  "gradeByService": "A",
+  "serviceLevelByCountPct": 100,
+  "serviceLevelByBandwidthPct": 100,
+  "nodesTotal": 6,
+  "nodesDeployed": 5,
+  "linksCandidate": 6,
+  "linksFeasible": 6,
+  "linksActive": 4,
+  "totalCost": 273.62,
+  "budget": null,
+  "budgetUsedPct": null,
+  "demandsTotal": 3,
+  "demandsSatisfied": 3,
+  "demandsPartial": 0,
+  "demandsRejected": 0,
+  "demandServedPct": 100,
+  "throughputKbps": 56,
+  "capacityTotalKbps": 769328.85,
+  "loadTotalKbps": 80,
+  "utilMaxPct": 97.88,
+  "utilAvgPct": 0.01,
+  "avgDelayMs": 101.363,
+  "maxDelayMs": 164.652,
+  "delayViolations": 0,
+  "minAvailabilityPct": 0,
+  "connectivityPct": 100,
+  "componentsCount": 1,
+  "candidateComponentsCount": 1,
+  "largestComponentPct": 100,
+  "spofNodes": 2,
+  "bridgeLinks": 4,
+  "minCutKbps": null,
+  "avgMarginDb": 20.56,
+  "minMarginDb": 13.82,
+  "linksBelow10Db": 0,
+  "marginHistogram": {
+   "<0": 0,
+   "0-3": 0,
+   "3-10": 0,
+   "10-20": 2,
+   ">20": 2
+  },
+  "redundancyAdded": 0,
+  "scheduleMakespanMin": 106.87,
+  "scheduleWaves": 3,
+  "crewUtilPct": 24.6
+ }
+}

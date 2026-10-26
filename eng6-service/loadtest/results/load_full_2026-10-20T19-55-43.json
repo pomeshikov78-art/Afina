@@ -1,0 +1,312 @@
+{
+ "meta": {
+  "profile": "full",
+  "at": "2026-10-20T19:55:16.606Z",
+  "node": "v20.20.2",
+  "platform": "linux x64",
+  "cpus": 2,
+  "argv": [
+   "--profile=full"
+  ],
+  "engine": {
+   "version": "5.1.0",
+   "sha256": "adb610c9eee1ca17b257cbc6087e2278fdde3eef92f3b6a360cfb51968d48b20"
+  }
+ },
+ "core": [
+  {
+   "n": 100,
+   "links": 354,
+   "demands": 2,
+   "status": "PARTIAL",
+   "totalMs": 33.6,
+   "phases": {
+    "validate": 4.436,
+    "fleet": 11.643,
+    "physics": 3.672,
+    "graph": 0.531,
+    "backbone": 1.482,
+    "routing": 1.469,
+    "improve": 0.521,
+    "redundancy": 0.48,
+    "survivability": 1.567,
+    "schedule": 1.618,
+    "metrics": 1.991
+   },
+   "metrics": {
+    "linksFeasible": 354,
+    "linksActive": 15,
+    "demandsSatisfied": 1,
+    "demandsRejected": 0,
+    "throughputKbps": 64.69,
+    "utilMaxPct": 100,
+    "connectivityPct": 67.5,
+    "totalCost": 318,
+    "grade": "D",
+    "objectiveValue": 0.53407
+   },
+   "memBefore": {
+    "rssMb": 61.4,
+    "heapMb": 9.3,
+    "externalMb": 1.9,
+    "heapTotalMb": 12.7
+   },
+   "memAfter": {
+    "rssMb": 65,
+    "heapMb": 10.8,
+    "externalMb": 2.1,
+    "heapTotalMb": 17.1
+   },
+   "memDeltaMb": 3.6,
+   "responseBytes": 26468,
+   "physicsMode": "fast"
+  },
+  {
+   "n": 1000,
+   "links": 3565,
+   "demands": 20,
+   "status": "PARTIAL",
+   "totalMs": 211.6,
+   "phases": {
+    "validate": 15.392,
+    "fleet": 4.365,
+    "physics": 70.013,
+    "graph": 2.286,
+    "backbone": 24.316,
+    "routing": 16.054,
+    "improve": 0.047,
+    "redundancy": 2.796,
+    "survivability": 68.173,
+    "schedule": 2.334,
+    "metrics": 1.967
+   },
+   "metrics": {
+    "linksFeasible": 3563,
+    "linksActive": 376,
+    "demandsSatisfied": 9,
+    "demandsRejected": 6,
+    "throughputKbps": 337.86,
+    "utilMaxPct": 100,
+    "connectivityPct": 97.117,
+    "totalCost": 4322,
+    "grade": "D",
+    "objectiveValue": 0.54511
+   },
+   "memBefore": {
+    "rssMb": 72.5,
+    "heapMb": 11.7,
+    "externalMb": 2,
+    "heapTotalMb": 18.3
+   },
+   "memAfter": {
+    "rssMb": 75.7,
+    "heapMb": 12.9,
+    "externalMb": 3.7,
+    "heapTotalMb": 20.8
+   },
+   "memDeltaMb": 3.2,
+   "responseBytes": 376467,
+   "physicsMode": "fast"
+  },
+  {
+   "n": 5000,
+   "links": 17702,
+   "demands": 100,
+   "status": "PARTIAL",
+   "totalMs": 572.3,
+   "phases": {
+    "validate": 100.953,
+    "fleet": 17.508,
+    "physics": 155.406,
+    "graph": 13.568,
+    "backbone": 72.992,
+    "routing": 139.445,
+    "improve": 0.128,
+    "redundancy": 1.862,
+    "survivability": 14.031,
+    "schedule": 10.621,
+    "metrics": 32.384
+   },
+   "metrics": {
+    "linksFeasible": 17702,
+    "linksActive": 1237,
+    "demandsSatisfied": 21,
+    "demandsRejected": 47,
+    "throughputKbps": 1462.14,
+    "utilMaxPct": 100,
+    "connectivityPct": 88.074,
+    "totalCost": 15618,
+    "grade": "D",
+    "objectiveValue": 0.52153
+   },
+   "memBefore": {
+    "rssMb": 79.4,
+    "heapMb": 17,
+    "externalMb": 2,
+    "heapTotalMb": 24.9
+   },
+   "memAfter": {
+    "rssMb": 85.8,
+    "heapMb": 20.4,
+    "externalMb": 7.5,
+    "heapTotalMb": 26.7
+   },
+   "memDeltaMb": 6.4,
+   "responseBytes": 1167977,
+   "physicsMode": "fast"
+  },
+  {
+   "n": 10000,
+   "links": 35320,
+   "demands": 200,
+   "status": "PARTIAL",
+   "totalMs": 1271.4,
+   "phases": {
+    "validate": 176.144,
+    "fleet": 22.48,
+    "physics": 311.753,
+    "graph": 13.287,
+    "backbone": 73.575,
+    "routing": 379.965,
+    "improve": 0.175,
+    "redundancy": 19.328,
+    "survivability": 33.311,
+    "schedule": 158.025,
+    "metrics": 9.528
+   },
+   "metrics": {
+    "linksFeasible": 35320,
+    "linksActive": 2364,
+    "demandsSatisfied": 73,
+    "demandsRejected": 88,
+    "throughputKbps": 2452.59,
+    "utilMaxPct": 100,
+    "connectivityPct": 86.92,
+    "totalCost": 27890,
+    "grade": "D",
+    "objectiveValue": 0.53591
+   },
+   "memBefore": {
+    "rssMb": 94.1,
+    "heapMb": 27.3,
+    "externalMb": 2.1,
+    "heapTotalMb": 34.8
+   },
+   "memAfter": {
+    "rssMb": 112.8,
+    "heapMb": 28.5,
+    "externalMb": 13,
+    "heapTotalMb": 36.3
+   },
+   "memDeltaMb": 18.7,
+   "responseBytes": 2106353,
+   "physicsMode": "fast"
+  },
+  {
+   "n": 25000,
+   "links": 88326,
+   "demands": 500,
+   "status": "PARTIAL",
+   "totalMs": 3414,
+   "phases": {
+    "validate": 552.682,
+    "fleet": 53.867,
+    "physics": 511.716,
+    "graph": 68.084,
+    "backbone": 186.995,
+    "routing": 1646.856,
+    "improve": 0.985,
+    "redundancy": 66.434,
+    "survivability": 81.37,
+    "schedule": 95.39,
+    "metrics": 10.051
+   },
+   "metrics": {
+    "linksFeasible": 88325,
+    "linksActive": 5830,
+    "demandsSatisfied": 177,
+    "demandsRejected": 233,
+    "throughputKbps": 6359.88,
+    "utilMaxPct": 100,
+    "connectivityPct": 87.592,
+    "totalCost": 71974,
+    "grade": "D",
+    "objectiveValue": 0.52757
+   },
+   "memBefore": {
+    "rssMb": 136.1,
+    "heapMb": 49.5,
+    "externalMb": 2.3,
+    "heapTotalMb": 57
+   },
+   "memAfter": {
+    "rssMb": 175.9,
+    "heapMb": 55.4,
+    "externalMb": 37.2,
+    "heapTotalMb": 64.7
+   },
+   "memDeltaMb": 39.8,
+   "responseBytes": 4077813,
+   "physicsMode": "fast"
+  },
+  {
+   "n": 50000,
+   "links": 176704,
+   "demands": 1000,
+   "status": "PARTIAL",
+   "totalMs": 11721.6,
+   "phases": {
+    "validate": 1208.995,
+    "fleet": 205.18,
+    "physics": 805.455,
+    "graph": 311.692,
+    "backbone": 384.565,
+    "routing": 7472.394,
+    "improve": 1.032,
+    "redundancy": 579.024,
+    "survivability": 17.503,
+    "schedule": 166.514,
+    "metrics": 15.147
+   },
+   "metrics": {
+    "linksFeasible": 176704,
+    "linksActive": 11278,
+    "demandsSatisfied": 320,
+    "demandsRejected": 505,
+    "throughputKbps": 10948.3,
+    "utilMaxPct": 100,
+    "connectivityPct": 88.338,
+    "totalCost": 140682,
+    "grade": "D",
+    "objectiveValue": 0.5292
+   },
+   "memBefore": {
+    "rssMb": 190.2,
+    "heapMb": 85.5,
+    "externalMb": 2.7,
+    "heapTotalMb": 95.1
+   },
+   "memAfter": {
+    "rssMb": 258.9,
+    "heapMb": 104.8,
+    "externalMb": 78.2,
+    "heapTotalMb": 114.4
+   },
+   "memDeltaMb": 68.7,
+   "responseBytes": 5031522,
+   "physicsMode": "fast"
+  }
+ ],
+ "api": [],
+ "burst": [],
+ "summary": {
+  "error": "Cannot read properties of null (reading 'linksFeasible')",
+  "wallS": 26.8,
+  "memFinal": {
+   "rssMb": 310.1,
+   "heapMb": 155,
+   "externalMb": 1.9,
+   "heapTotalMb": 169.9
+  }
+ }
+}

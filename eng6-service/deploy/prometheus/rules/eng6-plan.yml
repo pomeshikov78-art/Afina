@@ -1,0 +1,105 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# Правила записи и алерты ENG6-PLAN (кладётся в /etc/prometheus/rules/)
+# Пороги соответствуют НТЗ и результатам нагрузочных испытаний:
+#   docs/04_TEST_REPORT.md
+# ═══════════════════════════════════════════════════════════════════════════
+groups:
+  - name: eng6-plan.recording
+    interval: 30s
+    rules:
+      - record: eng6:plan_duration_ms:p95
+        expr: histogram_quantile(0.95, sum by (le, mode) (rate(eng6_plan_duration_ms_bucket[5m])))
+      - record: eng6:plan_duration_ms:p99
+        expr: histogram_quantile(0.99, sum by (le, mode) (rate(eng6_plan_duration_ms_bucket[5m])))
+      - record: eng6:plan_rate_rps
+        expr: sum(rate(eng6_plan_total[5m]))
+      - record: eng6:http_error_rate
+        expr: |
+          sum(rate(eng6_http_requests_total{code=~"5.."}[5m]))
+            / clamp_min(sum(rate(eng6_http_requests_total[5m])), 1e-9)
+      - record: eng6:queue_saturation
+        expr: eng6_queue_length / clamp_min(eng6_queue_length + 1, 1)
+      - record: eng6:worker_utilization
+        expr: eng6_workers_busy / clamp_min(eng6_workers_total, 1)
+
+  - name: eng6-plan.alerts
+    rules:
+      # ── доступность ────────────────────────────────────────────────────
+      - alert: Eng6ApiDown
+        expr: up{job="eng6-plan"} == 0
+        for: 1m
+        labels: { severity: critical, team: comms }
+        annotations:
+          summary: "API ENG6-PLAN недоступен"
+          description: "Цель {{ $labels.instance }} не отвечает более минуты."
+
+      - alert: Eng6ReadinessFailing
+        expr: probe_success{job="eng6-readyz"} == 0
+        for: 2m
+        labels: { severity: warning }
+        annotations:
+          summary: "readiness-проверка ENG6-PLAN не проходит"
+
+      # ── производительность (пороги из нагрузочных испытаний) ───────────
+      - alert: Eng6PlanLatencyHigh
+        expr: eng6:plan_duration_ms:p95 > 5000
+        for: 5m
+        labels: { severity: warning }
+        annotations:
+          summary: "p95 времени расчёта выше 5 с"
+          description: "Текущее значение {{ $value | printf \"%.0f\" }} мс. Проверьте размеры графов (eng6_plan_graph_nodes) и число воркеров."
+
+      - alert: Eng6QueueGrowing
+        expr: eng6_queue_length > 32
+        for: 5m
+        labels: { severity: warning }
+        annotations:
+          summary: "Очередь расчёта растёт ({{ $value }} задач)"
+          description: "Сервис не успевает за потоком: увеличьте ENG6_WORKERS или снизьте ENG6_RL_REQUESTS."
+
+      - alert: Eng6QueueRejectsHigh
+        expr: rate(eng6_queue_rejected_total[5m]) > 0.5
+        for: 3m
+        labels: { severity: critical }
+        annotations:
+          summary: "Много отказов 429 из-за переполнения очереди"
+          description: "{{ $value | printf \"%.2f\" }} отказов/с. Требуется масштабирование пула."
+
+      - alert: Eng6WorkersSaturated
+        expr: eng6:worker_utilization > 0.95
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "Все воркеры расчёта заняты более 10 минут"
+
+      # ── надёжность ─────────────────────────────────────────────────────
+      - alert: Eng6WorkerRestarts
+        expr: increase(eng6_worker_restarts_total[10m]) > 5
+        for: 0m
+        labels: { severity: critical }
+        annotations:
+          summary: "Частые перезапуски воркеров"
+          description: "{{ $value }} перезапусков за 10 мин. Вероятные причины: OOM, TASK_TIMEOUT, исключение в ядре. См. журнал аудита."
+
+      - alert: Eng6ComputeErrors
+        expr: sum(rate(eng6_plan_total{status="ERROR"}[5m])) > 0.02
+        for: 2m
+        labels: { severity: critical }
+        annotations:
+          summary: "Ядро возвращает ERROR"
+          description: "Появились сбои расчёта. Проверьте ENG6_STRICT=1 и журнал аудита по inputSha256."
+
+      - alert: Eng6MemoryHigh
+        expr: eng6_process_memory_rss_bytes > 5e9
+        for: 5m
+        labels: { severity: warning }
+        annotations:
+          summary: "RSS сервиса выше 5 ГБ"
+
+      - alert: Eng6ValidationFlood
+        expr: sum(rate(eng6_validation_failed_total[5m])) > 1
+        for: 5m
+        labels: { severity: info }
+        annotations:
+          summary: "Поток некорректных запросов (422)"
+          description: "Вероятна ошибка интеграции на стороне ERP/CRM или попытка фаззинга."

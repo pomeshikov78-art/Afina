@@ -1,0 +1,273 @@
+{
+ "meta": {
+  "name": "Эталон: батальон",
+  "author": "ENG6-PLAN/tests",
+  "seed": 1
+ },
+ "environment": {
+  "clutterType": "forest",
+  "weather": {
+   "rainRateMmHr": 0,
+   "temperatureC": 15,
+   "humidityPercent": 60
+  },
+  "ionosphere": {
+   "timeOfDay": 12,
+   "season": "equinox",
+   "solarActivity": "medium"
+  },
+  "terrain": {
+   "source": "synth",
+   "amplitudeM": 40
+  }
+ },
+ "topology": {
+  "nodes": [
+   {
+    "id": "cp-bat",
+    "type": "cp",
+    "name": "КП батальона",
+    "lat": 55.75,
+    "lng": 37.62,
+    "status": "active",
+    "parentId": null
+   },
+   {
+    "id": "r1",
+    "type": "relay",
+    "name": "Ретранслятор Р-1",
+    "lat": 55.785932,
+    "lng": 37.715856,
+    "status": "active",
+    "parentId": "cp-bat"
+   },
+   {
+    "id": "co-a",
+    "type": "radio",
+    "name": "Рота А",
+    "lat": 55.803899,
+    "lng": 37.492133,
+    "status": "active",
+    "parentId": "cp-bat"
+   },
+   {
+    "id": "co-b",
+    "type": "radio",
+    "name": "Рота Б",
+    "lat": 55.687118,
+    "lng": 37.763421,
+    "status": "active",
+    "parentId": "cp-bat"
+   },
+   {
+    "id": "co-c",
+    "type": "radio",
+    "name": "Рота В",
+    "lat": 55.651186,
+    "lng": 37.572237,
+    "status": "active",
+    "parentId": "cp-bat"
+   },
+   {
+    "id": "obs-1",
+    "type": "observer",
+    "name": "НП-1",
+    "lat": 55.830848,
+    "lng": 37.843923,
+    "status": "active",
+    "parentId": "r1"
+   },
+   {
+    "id": "obs-2",
+    "type": "observer",
+    "name": "НП-2",
+    "lat": 55.714068,
+    "lng": 37.396747,
+    "status": "active",
+    "parentId": "co-a"
+   }
+  ],
+  "links": [
+   {
+    "id": "l1",
+    "from": "cp-bat",
+    "to": "r1",
+    "type": "FOC",
+    "priority": 2
+   },
+   {
+    "id": "l2",
+    "from": "cp-bat",
+    "to": "co-a",
+    "type": "VHF",
+    "priority": 2
+   },
+   {
+    "id": "l3",
+    "from": "cp-bat",
+    "to": "co-b",
+    "type": "VHF",
+    "priority": 2
+   },
+   {
+    "id": "l4",
+    "from": "cp-bat",
+    "to": "co-c",
+    "type": "VHF",
+    "priority": 2
+   },
+   {
+    "id": "l5",
+    "from": "r1",
+    "to": "co-b",
+    "type": "VHF",
+    "priority": 2
+   },
+   {
+    "id": "l6",
+    "from": "co-a",
+    "to": "co-c",
+    "type": "VHF",
+    "priority": 2
+   },
+   {
+    "id": "l7",
+    "from": "r1",
+    "to": "obs-1",
+    "type": "UHF",
+    "priority": 2
+   },
+   {
+    "id": "l8",
+    "from": "co-a",
+    "to": "obs-2",
+    "type": "UHF",
+    "priority": 2
+   }
+  ]
+ },
+ "demands": [
+  {
+   "id": "d1",
+   "from": "cp-bat",
+   "to": "co-a",
+   "rateKbps": 16,
+   "maxDelayMs": 120,
+   "priority": 1
+  },
+  {
+   "id": "d2",
+   "from": "cp-bat",
+   "to": "co-b",
+   "rateKbps": 32,
+   "maxDelayMs": 120,
+   "priority": 1
+  },
+  {
+   "id": "d3",
+   "from": "cp-bat",
+   "to": "co-c",
+   "rateKbps": 16,
+   "maxDelayMs": 150,
+   "priority": 2
+  },
+  {
+   "id": "d4",
+   "from": "cp-bat",
+   "to": "obs-1",
+   "rateKbps": 8,
+   "maxDelayMs": 200,
+   "priority": 3
+  },
+  {
+   "id": "d5",
+   "from": "co-a",
+   "to": "obs-2",
+   "rateKbps": 4,
+   "maxDelayMs": 400,
+   "priority": 4
+  }
+ ],
+ "fleet": [
+  {
+   "unitId": "PU-001",
+   "kind": "П-240И",
+   "nodeType": "cp",
+   "condition": "green",
+   "costDeploy": 30,
+   "deployTimeMin": 45
+  },
+  {
+   "unitId": "PU-002",
+   "kind": "Р-419Л1",
+   "nodeType": "relay",
+   "condition": "green",
+   "costDeploy": 18,
+   "deployTimeMin": 25
+  },
+  {
+   "unitId": "PU-003",
+   "kind": "Р-168-100К",
+   "nodeType": "radio",
+   "condition": "green",
+   "costDeploy": 6,
+   "deployTimeMin": 10
+  },
+  {
+   "unitId": "PU-004",
+   "kind": "Р-168-100К",
+   "nodeType": "radio",
+   "condition": "yellow",
+   "costDeploy": 6,
+   "deployTimeMin": 12,
+   "note": "требуется ЗИП: блок питания"
+  },
+  {
+   "unitId": "PU-005",
+   "kind": "Р-168-100К",
+   "nodeType": "radio",
+   "condition": "green",
+   "costDeploy": 6,
+   "deployTimeMin": 10
+  },
+  {
+   "unitId": "PU-006",
+   "kind": "1Л261",
+   "nodeType": "observer",
+   "condition": "green",
+   "costDeploy": 4,
+   "deployTimeMin": 15
+  },
+  {
+   "unitId": "PU-007",
+   "kind": "1Л261",
+   "nodeType": "observer",
+   "condition": "red",
+   "costDeploy": 4,
+   "deployTimeMin": 15,
+   "note": "в ремонте, отказ блока АЦП"
+  },
+  {
+   "unitId": "PU-008",
+   "kind": "П-240И",
+   "nodeType": "cp",
+   "condition": "green",
+   "costDeploy": 30,
+   "deployTimeMin": 45
+  }
+ ],
+ "constraints": {
+  "budget": 400,
+  "minMarginDb": 3,
+  "maxDelayMs": 250,
+  "maxHops": 6,
+  "requireRedundancy": false,
+  "physics": "fast"
+ },
+ "weights": {
+  "cost": 0.4,
+  "delay": 0.3,
+  "survivability": 0.2,
+  "margin": 0.1
+ }
+}

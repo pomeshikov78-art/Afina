@@ -1,0 +1,2 @@
+{"ts":"2026-10-20T21:50:18.826Z","level":"info","msg":"ENG6 ядро загружено","version":"5.1.0","sha256":"adb610c9eee1ca17b257cbc6087e2278fdde3eef92f3b6a360cfb51968d48b20","keys":69,"loadMs":35,"chars":677183}
+{"ts":"2026-10-20T21:50:18.839Z","level":"info","msg":"сервис запущен","url":"http://0.0.0.0:8080","env":"development","workers":2,"maxQueue":512,"maxSyncConcurrency":1,"taskTimeoutMs":300000,"tls":false,"auth":false,"ratelimit":true,"metrics":"/metrics"}

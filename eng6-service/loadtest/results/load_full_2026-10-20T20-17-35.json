@@ -1,0 +1,108 @@
+{
+ "meta": {
+  "profile": "full",
+  "at": "2026-10-20T20:16:40.436Z",
+  "node": "v20.20.2",
+  "platform": "linux x64",
+  "cpus": 2,
+  "argv": [
+   "--profile=full",
+   "--only=burst"
+  ],
+  "engine": {
+   "version": "5.1.0",
+   "sha256": "adb610c9eee1ca17b257cbc6087e2278fdde3eef92f3b6a360cfb51968d48b20"
+  }
+ },
+ "core": [],
+ "api": [],
+ "burst": [
+  {
+   "nodes": 1200,
+   "workers": 2,
+   "maxQueue": 64,
+   "concurrency": 60,
+   "asyncCodes": {
+    "202": 60
+   },
+   "asyncCodes2": {
+    "202": 60
+   },
+   "syncCodes": {
+    "200": 2,
+    "429": 28
+   },
+   "junkCodes": [
+    422,
+    422,
+    422
+   ],
+   "accepted": 60,
+   "rejected429": 0,
+   "drained": [
+    {
+     "id": "plan_mvh4j7tf_dcm5_1",
+     "state": "SUCCEEDED",
+     "status": "PARTIAL",
+     "computeMs": 928.44,
+     "queueWaitMs": 650.56
+    },
+    {
+     "id": "plan_mvh4jhx6_8dor_14",
+     "state": "SUCCEEDED",
+     "status": "PARTIAL",
+     "computeMs": 302.61,
+     "queueWaitMs": 7174.39
+    },
+    {
+     "id": "plan_mvh4jizz_8b2g_1b",
+     "state": "SUCCEEDED",
+     "status": "PARTIAL",
+     "computeMs": 308.22,
+     "queueWaitMs": 6762.78
+    },
+    {
+     "id": "plan_mvh4jjde_5mgq_1e",
+     "state": "SUCCEEDED",
+     "status": "PARTIAL",
+     "computeMs": 285.3,
+     "queueWaitMs": 6732.7
+    },
+    {
+     "id": "plan_mvh4jj8b_h3co_1d",
+     "state": "SUCCEEDED",
+     "status": "PARTIAL",
+     "computeMs": 225.16,
+     "queueWaitMs": 6846.84
+    },
+    {
+     "id": "plan_mvh4jj2z_f626_1c",
+     "state": "SUCCEEDED",
+     "status": "PARTIAL",
+     "computeMs": 297.32,
+     "queueWaitMs": 6794.68
+    }
+   ],
+   "healthAfter": {
+    "status": 200,
+    "readyz": 200,
+    "rssMb": 539,
+    "queueLength": 0,
+    "workerRestarts": 0,
+    "completed": 124,
+    "failed": 0,
+    "timedOut": 0
+   },
+   "verdict": "PASS"
+  }
+ ],
+ "summary": {
+  "wallS": 54.6,
+  "memFinal": {
+   "rssMb": 138.4,
+   "heapMb": 14.6,
+   "externalMb": 44.2,
+   "heapTotalMb": 16
+  }
+ }
+}

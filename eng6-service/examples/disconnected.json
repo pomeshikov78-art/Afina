@@ -1,0 +1,262 @@
+{
+ "meta": {
+  "name": "Граничный случай: несвязная сеть",
+  "author": "ENG6-PLAN/tests",
+  "seed": 1
+ },
+ "environment": {
+  "clutterType": "forest",
+  "weather": {
+   "rainRateMmHr": 0,
+   "temperatureC": 15,
+   "humidityPercent": 60
+  },
+  "ionosphere": {
+   "timeOfDay": 12,
+   "season": "equinox",
+   "solarActivity": "medium"
+  },
+  "terrain": {
+   "source": "synth",
+   "amplitudeM": 40
+  }
+ },
+ "topology": {
+  "nodes": [
+   {
+    "id": "cp-bat",
+    "type": "cp",
+    "name": "КП батальона",
+    "lat": 55.75,
+    "lng": 37.62,
+    "status": "active",
+    "parentId": null
+   },
+   {
+    "id": "r1",
+    "type": "relay",
+    "name": "Ретранслятор Р-1",
+    "lat": 55.785932,
+    "lng": 37.715856,
+    "status": "active",
+    "parentId": "cp-bat"
+   },
+   {
+    "id": "co-a",
+    "type": "radio",
+    "name": "Рота А",
+    "lat": 55.803899,
+    "lng": 37.492133,
+    "status": "active",
+    "parentId": "cp-bat"
+   },
+   {
+    "id": "co-b",
+    "type": "radio",
+    "name": "Рота Б",
+    "lat": 55.687118,
+    "lng": 37.763421,
+    "status": "active",
+    "parentId": "cp-bat"
+   },
+   {
+    "id": "co-c",
+    "type": "radio",
+    "name": "Рота В",
+    "lat": 55.651186,
+    "lng": 37.572237,
+    "status": "active",
+    "parentId": "cp-bat"
+   },
+   {
+    "id": "far-1",
+    "type": "radio",
+    "name": "Дальний узел 1",
+    "lat": 58.444934,
+    "lng": 44.486277,
+    "status": "active",
+    "parentId": null
+   },
+   {
+    "id": "far-2",
+    "type": "radio",
+    "name": "Дальний узел 2",
+    "lat": 58.471883,
+    "lng": 44.623708,
+    "status": "active",
+    "parentId": "far-1"
+   }
+  ],
+  "links": [
+   {
+    "id": "l1",
+    "from": "cp-bat",
+    "to": "r1",
+    "type": "FOC",
+    "priority": 2
+   },
+   {
+    "id": "l2",
+    "from": "cp-bat",
+    "to": "co-a",
+    "type": "VHF",
+    "priority": 2
+   },
+   {
+    "id": "l3",
+    "from": "cp-bat",
+    "to": "co-b",
+    "type": "VHF",
+    "priority": 2
+   },
+   {
+    "id": "l4",
+    "from": "cp-bat",
+    "to": "co-c",
+    "type": "VHF",
+    "priority": 2
+   },
+   {
+    "id": "l5",
+    "from": "r1",
+    "to": "co-b",
+    "type": "VHF",
+    "priority": 2
+   },
+   {
+    "id": "l6",
+    "from": "co-a",
+    "to": "co-c",
+    "type": "VHF",
+    "priority": 2
+   },
+   {
+    "id": "lf1",
+    "from": "far-1",
+    "to": "far-2",
+    "type": "VHF",
+    "priority": 2
+   }
+  ]
+ },
+ "demands": [
+  {
+   "id": "d1",
+   "from": "cp-bat",
+   "to": "co-a",
+   "rateKbps": 16,
+   "maxDelayMs": 120,
+   "priority": 1
+  },
+  {
+   "id": "d2",
+   "from": "cp-bat",
+   "to": "co-b",
+   "rateKbps": 32,
+   "maxDelayMs": 120,
+   "priority": 1
+  },
+  {
+   "id": "dx",
+   "from": "cp-bat",
+   "to": "far-1",
+   "rateKbps": 16,
+   "maxDelayMs": 300,
+   "priority": 1
+  },
+  {
+   "id": "dy",
+   "from": "co-a",
+   "to": "far-2",
+   "rateKbps": 8,
+   "maxDelayMs": 300,
+   "priority": 2
+  }
+ ],
+ "fleet": [
+  {
+   "unitId": "U-00001",
+   "kind": "П-240И (командно-штабная машина)",
+   "nodeType": "cp",
+   "condition": "green",
+   "costDeploy": 30,
+   "deployTimeMin": 45,
+   "powerW": 623,
+   "note": ""
+  },
+  {
+   "unitId": "U-00002",
+   "kind": "Р-419Л1 (ретранслятор)",
+   "nodeType": "relay",
+   "condition": "green",
+   "costDeploy": 18,
+   "deployTimeMin": 25,
+   "powerW": 672,
+   "note": ""
+  },
+  {
+   "unitId": "U-00003",
+   "kind": "Р-168-100К (КВ/УКВ)",
+   "nodeType": "radio",
+   "condition": "green",
+   "costDeploy": 6,
+   "deployTimeMin": 10,
+   "powerW": 630,
+   "note": ""
+  },
+  {
+   "unitId": "U-00004",
+   "kind": "Р-168-100К (КВ/УКВ)",
+   "nodeType": "radio",
+   "condition": "yellow",
+   "costDeploy": 6,
+   "deployTimeMin": 10,
+   "powerW": 624,
+   "note": "требуется ЗИП"
+  },
+  {
+   "unitId": "U-00005",
+   "kind": "Р-168-100К (КВ/УКВ)",
+   "nodeType": "radio",
+   "condition": "green",
+   "costDeploy": 6,
+   "deployTimeMin": 10,
+   "powerW": 560,
+   "note": ""
+  },
+  {
+   "unitId": "U-00006",
+   "kind": "Р-168-100К (КВ/УКВ)",
+   "nodeType": "radio",
+   "condition": "green",
+   "costDeploy": 6,
+   "deployTimeMin": 10,
+   "powerW": 874,
+   "note": ""
+  },
+  {
+   "unitId": "U-00007",
+   "kind": "Р-168-100К (КВ/УКВ)",
+   "nodeType": "radio",
+   "condition": "green",
+   "costDeploy": 6,
+   "deployTimeMin": 10,
+   "powerW": 736,
+   "note": ""
+  }
+ ],
+ "constraints": {
+  "budget": 400,
+  "minMarginDb": 3,
+  "maxDelayMs": 250,
+  "maxHops": 6,
+  "requireRedundancy": false,
+  "physics": "fast"
+ },
+ "weights": {
+  "cost": 0.4,
+  "delay": 0.3,
+  "survivability": 0.2,
+  "margin": 0.1
+ }
+}

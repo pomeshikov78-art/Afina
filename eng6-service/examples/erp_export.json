@@ -1,0 +1,46 @@
+{
+  "projectName": "АСУ-Э «Восток»: узел связи объекта №14 (экспорт из ERP, 2026-10-16)",
+  "requestId": "erp-export-14-20261016",
+  "sites": [
+    { "id": "OBJ-14-KP", "name": "КП объекта №14", "type": "hq", "lat": 55.7521, "lng": 37.6182, "parent": null, "antHeightM": 12 },
+    { "id": "OBJ-14-US1", "name": "Узел связи 1", "type": "relay", "lat": 55.7884, "lng": 37.6611, "parent": "OBJ-14-KP", "antHeightM": 18 },
+    { "id": "OBJ-14-ROTA-A", "name": "Рота А", "type": "station", "lat": 55.7301, "lng": 37.6904, "parent": "OBJ-14-KP" },
+    { "id": "OBJ-14-ROTA-B", "name": "Рота Б", "type": "station", "lat": 55.7011, "lng": 37.5522, "parent": "OBJ-14-KP" },
+    { "id": "OBJ-14-NP1", "name": "НП-1", "type": "post", "lat": 55.8151, "lng": 37.7203, "parent": "OBJ-14-US1" },
+    { "id": "OBJ-14-NP2", "name": "НП-2", "type": "post", "lat": 55.6688, "lng": 37.4801, "parent": "OBJ-14-ROTA-B" },
+    { "id": "OBJ-14-SPUT", "name": "Станция спутниковой связи", "type": "sat", "lat": 55.7566, "lng": 37.6233, "parent": "OBJ-14-KP" },
+    { "id": "OBJ-14-REB", "name": "Расчёт РЭБ", "type": "ew", "lat": 55.6402, "lng": 37.7055, "parent": "OBJ-14-KP" }
+  ],
+  "assets": [
+    { "inventoryNo": "ИНВ-41001-001", "model": "П-240И (командно-штабная машина)", "nodeType": "hq", "state": "ok", "cost": 30, "deployMin": 45, "powerW": 900 },
+    { "inventoryNo": "ИНВ-41001-002", "model": "Р-419Л1 (радиорелейная станция)", "nodeType": "relay", "state": "ok", "cost": 18, "deployMin": 25, "powerW": 1100 },
+    { "inventoryNo": "ИНВ-41001-003", "model": "Р-168-100К (радиостанция УКВ)", "nodeType": "radio", "state": "ok", "cost": 6, "deployMin": 10, "powerW": 300 },
+    { "inventoryNo": "ИНВ-41001-004", "model": "Р-168-100К (радиостанция УКВ)", "nodeType": "radio", "state": "limited", "cost": 6, "deployMin": 12, "powerW": 300, "defect": "требуется ЗИП: блок питания" },
+    { "inventoryNo": "ИНВ-41001-005", "model": "Р-168-100К (радиостанция УКВ)", "nodeType": "radio", "state": "ok", "cost": 6, "deployMin": 10, "powerW": 300 },
+    { "inventoryNo": "ИНВ-41001-006", "model": "1Л261 (пост радионаблюдения)", "nodeType": "observer", "state": "ok", "cost": 4, "deployMin": 15, "powerW": 150 },
+    { "inventoryNo": "ИНВ-41001-007", "model": "1Л261 (пост радионаблюдения)", "nodeType": "observer", "state": "repair", "cost": 4, "deployMin": 15, "powerW": 150, "defect": "в ремонте: отказ блока АЦП" },
+    { "inventoryNo": "ИНВ-41001-008", "model": "Р-438Н «Белозёр»", "nodeType": "sat", "state": "ok", "cost": 60, "deployMin": 60, "powerW": 1500 },
+    { "inventoryNo": "ИНВ-41001-009", "model": "РБ-341В «Леер-3»", "nodeType": "ew", "state": "ok", "cost": 25, "deployMin": 30, "powerW": 2000 }
+  ],
+  "circuits": [
+    { "id": "ВОЛС-14-1", "a": "OBJ-14-KP", "b": "OBJ-14-US1", "kind": "fiber", "cost": 120 },
+    { "id": "ВОЛС-14-2", "a": "OBJ-14-KP", "b": "OBJ-14-SPUT", "kind": "optical", "cost": 40 },
+    { "id": "УКВ-14-1", "a": "OBJ-14-KP", "b": "OBJ-14-ROTA-A", "kind": "vhf" },
+    { "id": "УКВ-14-2", "a": "OBJ-14-KP", "b": "OBJ-14-ROTA-B", "kind": "vhf" },
+    { "id": "УКВ-14-3", "a": "OBJ-14-US1", "b": "OBJ-14-NP1", "kind": "uhf" },
+    { "id": "УКВ-14-4", "a": "OBJ-14-ROTA-B", "b": "OBJ-14-NP2", "kind": "uhf" },
+    { "id": "РРЛ-14-1", "a": "OBJ-14-US1", "b": "OBJ-14-ROTA-A", "kind": "microwave", "cost": 90 },
+    { "id": "УКВ-14-5", "a": "OBJ-14-ROTA-A", "b": "OBJ-14-REB", "kind": "vhf" },
+    { "id": "СПУТ-14-1", "a": "OBJ-14-KP", "b": "OBJ-14-REB", "kind": "sat", "cost": 60 }
+  ],
+  "orders": [
+    { "id": "НАРЯД-101", "src": "OBJ-14-KP", "dst": "OBJ-14-ROTA-A", "kbps": 32, "deadlineMs": 150, "prio": 1, "critical": true },
+    { "id": "НАРЯД-102", "src": "OBJ-14-KP", "dst": "OBJ-14-ROTA-B", "kbps": 16, "deadlineMs": 200, "prio": 1 },
+    { "id": "НАРЯД-103", "src": "OBJ-14-KP", "dst": "OBJ-14-NP1", "kbps": 8, "deadlineMs": 250, "prio": 2 },
+    { "id": "НАРЯД-104", "src": "OBJ-14-KP", "dst": "OBJ-14-NP2", "kbps": 8, "deadlineMs": 300, "prio": 3 },
+    { "id": "НАРЯД-105", "src": "OBJ-14-KP", "dst": "OBJ-14-REB", "kbps": 512, "deadlineMs": 200, "prio": 2, "critical": true },
+    { "id": "НАРЯД-106", "src": "OBJ-14-US1", "dst": "OBJ-14-ROTA-B", "kbps": 64, "deadlineMs": 250, "prio": 3 }
+  ],
+  "constraints": { "budget": 700, "minMarginDb": 3, "maxDelayMs": 300, "maxHops": 6, "requireRedundancy": false, "maxSimultaneousDeploy": 3, "crewSpeedKmh": 40 },
+  "weights": { "cost": 0.45, "delay": 0.25, "survivability": 0.2, "margin": 0.1 }
+}

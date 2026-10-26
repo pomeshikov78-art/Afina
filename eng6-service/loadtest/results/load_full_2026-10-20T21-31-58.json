@@ -1,0 +1,98 @@
+{
+ "meta": {
+  "profile": "full",
+  "at": "2026-10-20T21:31:14.923Z",
+  "node": "v20.20.2",
+  "platform": "linux x64",
+  "cpus": 2,
+  "argv": [
+   "--profile=full",
+   "--only=core",
+   "--sizes=100000"
+  ],
+  "engine": {
+   "version": "5.1.0",
+   "sha256": "adb610c9eee1ca17b257cbc6087e2278fdde3eef92f3b6a360cfb51968d48b20"
+  }
+ },
+ "core": [
+  {
+   "n": 100000,
+   "statusReasons": [
+    {
+     "code": "DEMANDS_REJECTED",
+     "message": "Отклонено заявок: 910 из 2000",
+     "count": 910
+    },
+    {
+     "code": "DEMANDS_PARTIAL",
+     "message": "Частично удовлетворено заявок: 363",
+     "count": 363
+    },
+    {
+     "code": "SPOF_PRESENT",
+     "message": "Единых точек отказа: 18163 узл., 20374 лин."
+    },
+    {
+     "code": "HIGH_UTILIZATION",
+     "message": "Утилизация каналов до 100% — выше порога 85%"
+    }
+   ],
+   "links": 352889,
+   "demands": 2000,
+   "status": "PARTIAL",
+   "totalMs": 39576.9,
+   "phases": {
+    "validate": 1878.281,
+    "fleet": 74.864,
+    "physics": 1619.254,
+    "graph": 316.073,
+    "backbone": 1248.94,
+    "routing": 32035.587,
+    "improve": 1.58,
+    "redundancy": 1640.079,
+    "survivability": 85.891,
+    "schedule": 302.63,
+    "metrics": 78.957
+   },
+   "metrics": {
+    "linksFeasible": 352885,
+    "linksActive": 23402,
+    "demandsSatisfied": 727,
+    "demandsRejected": 910,
+    "throughputKbps": 24272,
+    "utilMaxPct": 100,
+    "connectivityPct": 87.239,
+    "totalCost": 294180,
+    "grade": "D",
+    "objectiveValue": 0.53021
+   },
+   "memBefore": {
+    "rssMb": 190.6,
+    "heapMb": 64.9,
+    "externalMb": 3.5,
+    "heapTotalMb": 109.7
+   },
+   "memAfter": {
+    "rssMb": 419.2,
+    "heapMb": 186.8,
+    "externalMb": 112.3,
+    "heapTotalMb": 194.6
+   },
+   "memDeltaMb": 228.6,
+   "responseBytes": 14339836,
+   "physicsMode": "fast"
+  }
+ ],
+ "api": [],
+ "burst": [],
+ "summary": {
+  "wallS": 43.4,
+  "memFinal": {
+   "rssMb": 415.1,
+   "heapMb": 7.6,
+   "externalMb": 112.3,
+   "heapTotalMb": 37.6
+  }
+ }
+}

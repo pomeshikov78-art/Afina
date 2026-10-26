@@ -1,0 +1,129 @@
+{
+ "meta": {
+  "profile": "quick",
+  "at": "2026-10-20T19:53:47.179Z",
+  "node": "v20.20.2",
+  "platform": "linux x64",
+  "cpus": 2,
+  "argv": [
+   "--profile=quick",
+   "--only=api"
+  ],
+  "engine": {
+   "version": "5.1.0",
+   "sha256": "adb610c9eee1ca17b257cbc6087e2278fdde3eef92f3b6a360cfb51968d48b20"
+  }
+ },
+ "core": [],
+ "api": [
+  {
+   "mode": "sync",
+   "nodes": 1000,
+   "requestBytes": 580461,
+   "sent": 96,
+   "wallS": 13,
+   "rps": 7.38,
+   "codes": {
+    "200": 35,
+    "429": 61
+   },
+   "latencyMs": {
+    "p50": 1239.96,
+    "p90": 2849.35,
+    "p95": 5050.09,
+    "p99": 6674.49,
+    "min": 261.19,
+    "max": 6674.49,
+    "avg": 1537.5
+   },
+   "pool": {
+    "workers": 2,
+    "busy": 0,
+    "idle": 2,
+    "ready": 2,
+    "queueLength": 0,
+    "maxQueue": 512,
+    "pending": 0,
+    "stats": {
+     "submitted": 36,
+     "completed": 36,
+     "failed": 0,
+     "timedOut": 0,
+     "rejectedQueueFull": 0,
+     "workerRestarts": 0,
+     "oom": 0
+    },
+    "cpus": 2
+   },
+   "memory": {
+    "rssBytes": 289787904,
+    "heapBytes": 13380264,
+    "uptimeS": 13.89,
+    "loadavg": [
+     1.52,
+     0.73,
+     0.29
+    ]
+   }
+  },
+  {
+   "mode": "async",
+   "nodes": 1000,
+   "submitted": 12,
+   "accepted": 12,
+   "rejected429": 0,
+   "states": {
+    "SUCCEEDED": 12
+   },
+   "e2eMs": {
+    "p50": 7.74,
+    "p95": 195.76,
+    "max": 195.76
+   },
+   "queueWaitMs": {
+    "p50": 611.54,
+    "max": 786.83
+   },
+   "computeMs": {
+    "p50": 91.87,
+    "max": 121.3
+   },
+   "wallS": 1.7
+  }
+ ],
+ "burst": [],
+ "summary": {
+  "prometheusSample": {
+   "planTotal": [
+    "eng6_plan_total{mode=\"sync\",status=\"PARTIAL\"} 36",
+    "eng6_plan_total{mode=\"async\",status=\"PARTIAL\"} 12"
+   ],
+   "planDurationCount": [
+    "eng6_plan_duration_ms_count{mode=\"sync\"} 36",
+    "eng6_plan_duration_ms_count{mode=\"async\"} 12"
+   ],
+   "queueLength": [
+    "eng6_queue_length 10"
+   ],
+   "workersBusy": [
+    "eng6_workers_busy 2"
+   ],
+   "requestsTotal": [
+    "eng6_http_requests_total{code=\"200\",method=\"GET\",path=\"GET /api/v1/meta\"} 1",
+    "eng6_http_requests_total{code=\"200\",method=\"POST\",path=\"POST /api/v1/plan/sync\"} 36",
+    "eng6_http_requests_total{code=\"429\",method=\"POST\",path=\"POST /api/v1/plan/sync\"} 61",
+    "eng6_http_requests_total{code=\"200\",method=\"GET\",path=\"GET /healthz\"} 1"
+   ],
+   "memoryRss": [
+    "eng6_process_memory_rss_bytes 330223616"
+   ]
+  },
+  "wallS": 16.4,
+  "memFinal": {
+   "rssMb": 103.4,
+   "heapMb": 28.6,
+   "externalMb": 18.1,
+   "heapTotalMb": 35.4
+  }
+ }
+}

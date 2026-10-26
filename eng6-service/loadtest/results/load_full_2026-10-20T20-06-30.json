@@ -1,0 +1,494 @@
+{
+ "meta": {
+  "profile": "full",
+  "at": "2026-10-20T20:05:05.495Z",
+  "node": "v20.20.2",
+  "platform": "linux x64",
+  "cpus": 2,
+  "argv": [
+   "--profile=full"
+  ],
+  "engine": {
+   "version": "5.1.0",
+   "sha256": "adb610c9eee1ca17b257cbc6087e2278fdde3eef92f3b6a360cfb51968d48b20"
+  }
+ },
+ "core": [
+  {
+   "n": 100,
+   "statusReasons": [
+    {
+     "code": "DEMANDS_PARTIAL",
+     "message": "Частично удовлетворено заявок: 1",
+     "count": 1
+    },
+    {
+     "code": "SPOF_PRESENT",
+     "message": "Единых точек отказа: 10 узл., 12 лин."
+    },
+    {
+     "code": "HIGH_UTILIZATION",
+     "message": "Утилизация каналов до 100% — выше порога 85%"
+    }
+   ],
+   "links": 354,
+   "demands": 2,
+   "status": "PARTIAL",
+   "totalMs": 48.2,
+   "phases": {
+    "validate": 3.621,
+    "fleet": 14.491,
+    "physics": 3.835,
+    "graph": 0.587,
+    "backbone": 1.536,
+    "routing": 1.91,
+    "improve": 0.526,
+    "redundancy": 11.056,
+    "survivability": 2.206,
+    "schedule": 1.77,
+    "metrics": 2.11
+   },
+   "metrics": {
+    "linksFeasible": 354,
+    "linksActive": 15,
+    "demandsSatisfied": 1,
+    "demandsRejected": 0,
+    "throughputKbps": 64.69,
+    "utilMaxPct": 100,
+    "connectivityPct": 67.5,
+    "totalCost": 318,
+    "grade": "D",
+    "objectiveValue": 0.53407
+   },
+   "memBefore": {
+    "rssMb": 57.4,
+    "heapMb": 7.2,
+    "externalMb": 2,
+    "heapTotalMb": 15.9
+   },
+   "memAfter": {
+    "rssMb": 60.6,
+    "heapMb": 10.8,
+    "externalMb": 2.1,
+    "heapTotalMb": 16.8
+   },
+   "memDeltaMb": 3.2,
+   "responseBytes": 26467,
+   "physicsMode": "fast"
+  },
+  {
+   "n": 1000,
+   "statusReasons": [
+    {
+     "code": "DEMANDS_REJECTED",
+     "message": "Отклонено заявок: 6 из 20",
+     "count": 6
+    },
+    {
+     "code": "DEMANDS_PARTIAL",
+     "message": "Частично удовлетворено заявок: 5",
+     "count": 5
+    },
+    {
+     "code": "SPOF_PRESENT",
+     "message": "Единых точек отказа: 99 узл., 105 лин."
+    },
+    {
+     "code": "HIGH_UTILIZATION",
+     "message": "Утилизация каналов до 100% — выше порога 85%"
+    }
+   ],
+   "links": 3565,
+   "demands": 20,
+   "status": "PARTIAL",
+   "totalMs": 202,
+   "phases": {
+    "validate": 59.792,
+    "fleet": 6.835,
+    "physics": 24.582,
+    "graph": 2.312,
+    "backbone": 62.535,
+    "routing": 16.573,
+    "improve": 0.109,
+    "redundancy": 3.313,
+    "survivability": 16.512,
+    "schedule": 2.731,
+    "metrics": 1.96
+   },
+   "metrics": {
+    "linksFeasible": 3563,
+    "linksActive": 376,
+    "demandsSatisfied": 9,
+    "demandsRejected": 6,
+    "throughputKbps": 337.86,
+    "utilMaxPct": 100,
+    "connectivityPct": 97.117,
+    "totalCost": 4322,
+    "grade": "D",
+    "objectiveValue": 0.54511
+   },
+   "memBefore": {
+    "rssMb": 67.9,
+    "heapMb": 8.7,
+    "externalMb": 1.9,
+    "heapTotalMb": 17.3
+   },
+   "memAfter": {
+    "rssMb": 71.9,
+    "heapMb": 13.9,
+    "externalMb": 3.5,
+    "heapTotalMb": 18.8
+   },
+   "memDeltaMb": 4,
+   "responseBytes": 376466,
+   "physicsMode": "fast"
+  },
+  {
+   "n": 5000,
+   "statusReasons": [
+    {
+     "code": "DEMANDS_REJECTED",
+     "message": "Отклонено заявок: 47 из 100",
+     "count": 47
+    },
+    {
+     "code": "DEMANDS_PARTIAL",
+     "message": "Частично удовлетворено заявок: 32",
+     "count": 32
+    },
+    {
+     "code": "SPOF_PRESENT",
+     "message": "Единых точек отказа: 693 узл., 770 лин."
+    },
+    {
+     "code": "HIGH_UTILIZATION",
+     "message": "Утилизация каналов до 100% — выше порога 85%"
+    }
+   ],
+   "links": 17702,
+   "demands": 100,
+   "status": "PARTIAL",
+   "totalMs": 615,
+   "phases": {
+    "validate": 112.036,
+    "fleet": 15.299,
+    "physics": 99.705,
+    "graph": 39.717,
+    "backbone": 21.318,
+    "routing": 214.063,
+    "improve": 0.168,
+    "redundancy": 12.511,
+    "survivability": 60.263,
+    "schedule": 14.458,
+    "metrics": 10.813
+   },
+   "metrics": {
+    "linksFeasible": 17702,
+    "linksActive": 1237,
+    "demandsSatisfied": 21,
+    "demandsRejected": 47,
+    "throughputKbps": 1462.14,
+    "utilMaxPct": 100,
+    "connectivityPct": 88.074,
+    "totalCost": 15618,
+    "grade": "D",
+    "objectiveValue": 0.52153
+   },
+   "memBefore": {
+    "rssMb": 75,
+    "heapMb": 11.5,
+    "externalMb": 2,
+    "heapTotalMb": 22
+   },
+   "memAfter": {
+    "rssMb": 88.6,
+    "heapMb": 18.4,
+    "externalMb": 8.3,
+    "heapTotalMb": 26.7
+   },
+   "memDeltaMb": 13.6,
+   "responseBytes": 1167976,
+   "physicsMode": "fast"
+  },
+  {
+   "n": 10000,
+   "statusReasons": [
+    {
+     "code": "DEMANDS_REJECTED",
+     "message": "Отклонено заявок: 88 из 200",
+     "count": 88
+    },
+    {
+     "code": "DEMANDS_PARTIAL",
+     "message": "Частично удовлетворено заявок: 39",
+     "count": 39
+    },
+    {
+     "code": "SPOF_PRESENT",
+     "message": "Единых точек отказа: 1697 узл., 1893 лин."
+    },
+    {
+     "code": "HIGH_UTILIZATION",
+     "message": "Утилизация каналов до 100% — выше порога 85%"
+    }
+   ],
+   "links": 35320,
+   "demands": 200,
+   "status": "PARTIAL",
+   "totalMs": 1196,
+   "phases": {
+    "validate": 176.544,
+    "fleet": 23.71,
+    "physics": 238.342,
+    "graph": 25.214,
+    "backbone": 69.337,
+    "routing": 381.859,
+    "improve": 0.193,
+    "redundancy": 27.444,
+    "survivability": 69.204,
+    "schedule": 90.842,
+    "metrics": 16.031
+   },
+   "metrics": {
+    "linksFeasible": 35320,
+    "linksActive": 2364,
+    "demandsSatisfied": 73,
+    "demandsRejected": 88,
+    "throughputKbps": 2452.59,
+    "utilMaxPct": 100,
+    "connectivityPct": 86.92,
+    "totalCost": 27890,
+    "grade": "D",
+    "objectiveValue": 0.53591
+   },
+   "memBefore": {
+    "rssMb": 91.2,
+    "heapMb": 15.1,
+    "externalMb": 2.1,
+    "heapTotalMb": 28
+   },
+   "memAfter": {
+    "rssMb": 109.3,
+    "heapMb": 28.5,
+    "externalMb": 13.5,
+    "heapTotalMb": 36.3
+   },
+   "memDeltaMb": 18.1,
+   "responseBytes": 2106353,
+   "physicsMode": "fast"
+  },
+  {
+   "n": 25000,
+   "statusReasons": [
+    {
+     "code": "DEMANDS_REJECTED",
+     "message": "Отклонено заявок: 233 из 500",
+     "count": 233
+    },
+    {
+     "code": "DEMANDS_PARTIAL",
+     "message": "Частично удовлетворено заявок: 90",
+     "count": 90
+    },
+    {
+     "code": "SPOF_PRESENT",
+     "message": "Единых точек отказа: 3508 узл., 3929 лин."
+    },
+    {
+     "code": "HIGH_UTILIZATION",
+     "message": "Утилизация каналов до 100% — выше порога 85%"
+    }
+   ],
+   "links": 88326,
+   "demands": 500,
+   "status": "PARTIAL",
+   "totalMs": 3979.5,
+   "phases": {
+    "validate": 730.636,
+    "fleet": 73.653,
+    "physics": 475.761,
+    "graph": 48.177,
+    "backbone": 265.564,
+    "routing": 1802.325,
+    "improve": 0.903,
+    "redundancy": 119.617,
+    "survivability": 100.658,
+    "schedule": 174.454,
+    "metrics": 23.572
+   },
+   "metrics": {
+    "linksFeasible": 88325,
+    "linksActive": 5830,
+    "demandsSatisfied": 177,
+    "demandsRejected": 233,
+    "throughputKbps": 6359.88,
+    "utilMaxPct": 100,
+    "connectivityPct": 87.592,
+    "totalCost": 71974,
+    "grade": "D",
+    "objectiveValue": 0.52757
+   },
+   "memBefore": {
+    "rssMb": 119.2,
+    "heapMb": 25.3,
+    "externalMb": 2.3,
+    "heapTotalMb": 48.4
+   },
+   "memAfter": {
+    "rssMb": 188.7,
+    "heapMb": 55.6,
+    "externalMb": 31.9,
+    "heapTotalMb": 64.9
+   },
+   "memDeltaMb": 69.5,
+   "responseBytes": 3621036,
+   "physicsMode": "fast"
+  },
+  {
+   "n": 50000,
+   "statusReasons": [
+    {
+     "code": "DEMANDS_REJECTED",
+     "message": "Отклонено заявок: 448 из 1000",
+     "count": 448
+    },
+    {
+     "code": "DEMANDS_PARTIAL",
+     "message": "Частично удовлетворено заявок: 196",
+     "count": 196
+    },
+    {
+     "code": "SPOF_PRESENT",
+     "message": "Единых точек отказа: 8279 узл., 9283 лин."
+    },
+    {
+     "code": "HIGH_UTILIZATION",
+     "message": "Утилизация каналов до 100% — выше порога 85%"
+    }
+   ],
+   "links": 176704,
+   "demands": 1000,
+   "status": "PARTIAL",
+   "totalMs": 12545.1,
+   "phases": {
+    "validate": 949.852,
+    "fleet": 142.848,
+    "physics": 879.722,
+    "graph": 210.031,
+    "backbone": 375.076,
+    "routing": 8794.623,
+    "improve": 1.195,
+    "redundancy": 651.007,
+    "survivability": 82.465,
+    "schedule": 226.78,
+    "metrics": 80.463
+   },
+   "metrics": {
+    "linksFeasible": 176704,
+    "linksActive": 11569,
+    "demandsSatisfied": 356,
+    "demandsRejected": 448,
+    "throughputKbps": 12329.23,
+    "utilMaxPct": 100,
+    "connectivityPct": 87.468,
+    "totalCost": 144420,
+    "grade": "D",
+    "objectiveValue": 0.5299
+   },
+   "memBefore": {
+    "rssMb": 205,
+    "heapMb": 37.3,
+    "externalMb": 2.7,
+    "heapTotalMb": 73.4
+   },
+   "memAfter": {
+    "rssMb": 255.6,
+    "heapMb": 96.1,
+    "externalMb": 76.1,
+    "heapTotalMb": 108.5
+   },
+   "memDeltaMb": 50.6,
+   "responseBytes": 7078856,
+   "physicsMode": "fast"
+  },
+  {
+   "n": 100000,
+   "statusReasons": [
+    {
+     "code": "DEMANDS_REJECTED",
+     "message": "Отклонено заявок: 910 из 2000",
+     "count": 910
+    },
+    {
+     "code": "DEMANDS_PARTIAL",
+     "message": "Частично удовлетворено заявок: 363",
+     "count": 363
+    },
+    {
+     "code": "SPOF_PRESENT",
+     "message": "Единых точек отказа: 18163 узл., 20374 лин."
+    },
+    {
+     "code": "HIGH_UTILIZATION",
+     "message": "Утилизация каналов до 100% — выше порога 85%"
+    }
+   ],
+   "links": 352889,
+   "demands": 2000,
+   "status": "PARTIAL",
+   "totalMs": 47278.1,
+   "phases": {
+    "validate": 2310.187,
+    "fleet": 115.513,
+    "physics": 1499.792,
+    "graph": 443.707,
+    "backbone": 1186.732,
+    "routing": 35072.151,
+    "improve": 1.398,
+    "redundancy": 4835.884,
+    "survivability": 434.727,
+    "schedule": 693.685,
+    "metrics": 89.486
+   },
+   "metrics": {
+    "linksFeasible": 352885,
+    "linksActive": 23402,
+    "demandsSatisfied": 727,
+    "demandsRejected": 910,
+    "throughputKbps": 24272,
+    "utilMaxPct": 100,
+    "connectivityPct": 87.239,
+    "totalCost": 294180,
+    "grade": "D",
+    "objectiveValue": 0.53021
+   },
+   "memBefore": {
+    "rssMb": 293.7,
+    "heapMb": 66.3,
+    "externalMb": 3.5,
+    "heapTotalMb": 119.8
+   },
+   "memAfter": {
+    "rssMb": 433.7,
+    "heapMb": 182,
+    "externalMb": 107,
+    "heapTotalMb": 195.4
+   },
+   "memDeltaMb": 140,
+   "responseBytes": 14339836,
+   "physicsMode": "fast"
+  }
+ ],
+ "api": [],
+ "burst": [],
+ "summary": {
+  "wallS": 84.5,
+  "memFinal": {
+   "rssMb": 57.2,
+   "heapMb": 7.3,
+   "externalMb": 1.9,
+   "heapTotalMb": 8.7
+  },
+  "isolated": true
+ }
+}

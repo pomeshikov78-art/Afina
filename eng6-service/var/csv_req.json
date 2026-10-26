@@ -1,0 +1,152 @@
+{
+ "meta": {
+  "name": "Импорт CSV",
+  "author": "ERP-коннектор"
+ },
+ "topology": {
+  "nodes": [
+   {
+    "id": "K-1",
+    "type": "cp",
+    "name": "КП «Центр»",
+    "lat": 55.75,
+    "lng": 37.62,
+    "parentId": null,
+    "status": "active",
+    "unitId": null
+   },
+   {
+    "id": "R-1",
+    "type": "relay",
+    "name": "Ретранслятор Р-1",
+    "lat": 55.79,
+    "lng": 37.67,
+    "parentId": "K-1",
+    "status": "active",
+    "unitId": null
+   },
+   {
+    "id": "R-2",
+    "type": "relay",
+    "name": "Ретранслятор Р-2",
+    "lat": 55.71,
+    "lng": 37.56,
+    "parentId": "K-1",
+    "status": "active",
+    "unitId": null
+   },
+   {
+    "id": "A-1",
+    "type": "radio",
+    "name": "Рота А",
+    "lat": 55.73,
+    "lng": 37.69,
+    "parentId": "R-1",
+    "status": "active",
+    "unitId": null
+   },
+   {
+    "id": "A-2",
+    "type": "radio",
+    "name": "Рота Б",
+    "lat": 55.7,
+    "lng": 37.55,
+    "parentId": "R-2",
+    "status": "active",
+    "unitId": null
+   },
+   {
+    "id": "NP-1",
+    "type": "observer",
+    "name": "НП-1",
+    "lat": 55.81,
+    "lng": 37.72,
+    "parentId": "R-1",
+    "status": "active",
+    "unitId": null
+   }
+  ],
+  "links": [
+   {
+    "priority": 2,
+    "id": "L-1",
+    "from": "K-1",
+    "to": "R-1",
+    "type": "FOC",
+    "bwKhz": 0,
+    "freqMhz": 0
+   },
+   {
+    "priority": 2,
+    "id": "L-2",
+    "from": "K-1",
+    "to": "R-2",
+    "type": "VHF",
+    "bwKhz": 0,
+    "freqMhz": 0
+   },
+   {
+    "priority": 2,
+    "id": "L-3",
+    "from": "R-1",
+    "to": "A-1",
+    "type": "VHF",
+    "bwKhz": 0,
+    "freqMhz": 0
+   },
+   {
+    "priority": 2,
+    "id": "L-4",
+    "from": "R-2",
+    "to": "A-2",
+    "type": "VHF",
+    "bwKhz": 0,
+    "freqMhz": 0
+   },
+   {
+    "priority": 2,
+    "id": "L-5",
+    "from": "R-1",
+    "to": "NP-1",
+    "type": "UHF",
+    "bwKhz": 0,
+    "freqMhz": 0
+   },
+   {
+    "priority": 2,
+    "id": "L-6",
+    "from": "K-1",
+    "to": "A-2",
+    "type": "UHF",
+    "bwKhz": 0,
+    "freqMhz": 0
+   }
+  ]
+ },
+ "demands": [
+  {
+   "id": "Q-1",
+   "from": "K-1",
+   "to": "A-1",
+   "rateKbps": 16,
+   "maxDelayMs": 200,
+   "priority": 1
+  },
+  {
+   "id": "Q-2",
+   "from": "K-1",
+   "to": "A-2",
+   "rateKbps": 32,
+   "maxDelayMs": 200,
+   "priority": 1
+  },
+  {
+   "id": "Q-3",
+   "from": "K-1",
+   "to": "NP-1",
+   "rateKbps": 8,
+   "maxDelayMs": 250,
+   "priority": 2
+  }
+ ]
+}

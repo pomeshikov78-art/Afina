@@ -1,0 +1,246 @@
+{
+ "meta": {
+  "profile": "quick",
+  "at": "2026-10-20T21:32:15.377Z",
+  "node": "v20.20.2",
+  "platform": "linux x64",
+  "cpus": 2,
+  "argv": [
+   "--profile=quick",
+   "--only=api,burst"
+  ],
+  "engine": {
+   "version": "5.1.0",
+   "sha256": "adb610c9eee1ca17b257cbc6087e2278fdde3eef92f3b6a360cfb51968d48b20"
+  }
+ },
+ "core": [],
+ "api": [
+  {
+   "mode": "sync",
+   "nodes": 1000,
+   "requestBytes": 580461,
+   "sent": 96,
+   "wallS": 12.8,
+   "rps": 7.5,
+   "codes": {
+    "200": 39,
+    "429": 57
+   },
+   "latencyMs": {
+    "p50": 1208.55,
+    "p90": 2663.43,
+    "p95": 3833.14,
+    "p99": 5020.85,
+    "min": 310.06,
+    "max": 5020.85,
+    "avg": 1427.3
+   },
+   "serverComputeMs": {
+    "p50": 128.34,
+    "p95": 433.97,
+    "max": 588.29
+   },
+   "serverQueueMs": {
+    "p50": 233.08,
+    "p95": 834.89,
+    "max": 1060.26
+   },
+   "pool": {
+    "workers": 2,
+    "busy": 0,
+    "idle": 2,
+    "ready": 2,
+    "queueLength": 0,
+    "maxQueue": 512,
+    "pending": 0,
+    "workerHeapMb": 264,
+    "stats": {
+     "submitted": 40,
+     "completed": 40,
+     "failed": 0,
+     "timedOut": 0,
+     "rejectedQueueFull": 0,
+     "workerRestarts": 0,
+     "oom": 0
+    },
+    "cpus": 2,
+    "totalMemMb": 1058,
+    "freeMemMb": 544
+   },
+   "memory": {
+    "rssBytes": 283226112,
+    "heapBytes": 23933568,
+    "uptimeS": 13.639,
+    "loadavg": [
+     1.36,
+     1.51,
+     1.84
+    ]
+   }
+  },
+  {
+   "mode": "sync-small",
+   "nodes": 7,
+   "requestBytes": 3370,
+   "sent": 240,
+   "wallS": 10,
+   "rps": 24,
+   "codes": {
+    "200": 240
+   },
+   "latencyMs": {
+    "p50": 7.17,
+    "p95": 10.16,
+    "p99": 23.48,
+    "max": 60.07
+   },
+   "serverComputeMs": {
+    "p50": 2.93,
+    "p95": 4.21,
+    "max": 51.17
+   }
+  },
+  {
+   "mode": "async",
+   "nodes": 1000,
+   "submitted": 12,
+   "accepted": 12,
+   "rejected429": 0,
+   "states": {
+    "SUCCEEDED": 12
+   },
+   "e2eMs": {
+    "p50": 6.6,
+    "p95": 394.93,
+    "max": 394.93
+   },
+   "queueWaitMs": {
+    "p50": 820.82,
+    "max": 1036.36
+   },
+   "computeMs": {
+    "p50": 201.07,
+    "max": 305.64
+   },
+   "wallS": 2.7
+  }
+ ],
+ "burst": [
+  {
+   "nodes": 2000,
+   "workers": 2,
+   "maxQueue": 16,
+   "concurrency": 40,
+   "asyncCodes": {
+    "202": 26,
+    "429": 14
+   },
+   "asyncCodes2": {
+    "202": 23,
+    "429": 17
+   },
+   "syncCodes": {
+    "200": 2,
+    "429": 28
+   },
+   "junkCodes": [
+    422,
+    422,
+    422
+   ],
+   "accepted": 26,
+   "rejected429": 14,
+   "drained": [
+    {
+     "id": "plan_mvh78zfv_iz5b_1",
+     "state": "SUCCEEDED",
+     "status": "PARTIAL",
+     "computeMs": 699.45,
+     "queueWaitMs": 1882.55
+    },
+    {
+     "id": "plan_mvh7917p_2lnf_a",
+     "state": "SUCCEEDED",
+     "status": "PARTIAL",
+     "computeMs": 450.27,
+     "queueWaitMs": 5702.73
+    },
+    {
+     "id": "plan_mvh7914e_f2xp_9",
+     "state": "SUCCEEDED",
+     "status": "PARTIAL",
+     "computeMs": 392.39,
+     "queueWaitMs": 5868.61
+    },
+    {
+     "id": "plan_mvh790nl_f2ub_5",
+     "state": "SUCCEEDED",
+     "status": "PARTIAL",
+     "computeMs": 412.07,
+     "queueWaitMs": 2971.93
+    },
+    {
+     "id": "plan_mvh791c4_8ra7_b",
+     "state": "SUCCEEDED",
+     "status": "PARTIAL",
+     "computeMs": 330.59,
+     "queueWaitMs": 6048.41
+    },
+    {
+     "id": "plan_mvh791f6_3pte_c",
+     "state": "SUCCEEDED",
+     "status": "PARTIAL",
+     "computeMs": 213.8,
+     "queueWaitMs": 5945.2
+    }
+   ],
+   "healthAfter": {
+    "status": 200,
+    "readyz": 200,
+    "rssMb": 492.9,
+    "queueLength": 0,
+    "workerRestarts": 0,
+    "completed": 53,
+    "failed": 0,
+    "timedOut": 0
+   },
+   "verdict": "PASS"
+  }
+ ],
+ "summary": {
+  "prometheusSample": {
+   "planTotal": [
+    "eng6_plan_total{mode=\"sync\",status=\"PARTIAL\"} 280",
+    "eng6_plan_total{mode=\"async\",status=\"PARTIAL\"} 12"
+   ],
+   "planDurationCount": [
+    "eng6_plan_duration_ms_count{mode=\"sync\"} 280",
+    "eng6_plan_duration_ms_count{mode=\"async\"} 12"
+   ],
+   "queueLength": [
+    "eng6_queue_length 0"
+   ],
+   "workersBusy": [
+    "eng6_workers_busy 2"
+   ],
+   "requestsTotal": [
+    "eng6_http_requests_total{code=\"200\",method=\"GET\",path=\"GET /api/v1/meta\"} 1",
+    "eng6_http_requests_total{code=\"200\",method=\"POST\",path=\"POST /api/v1/plan/sync\"} 280",
+    "eng6_http_requests_total{code=\"429\",method=\"POST\",path=\"POST /api/v1/plan/sync\"} 57",
+    "eng6_http_requests_total{code=\"200\",method=\"GET\",path=\"GET /healthz\"} 1"
+   ],
+   "memoryRss": [
+    "eng6_process_memory_rss_bytes 317894656"
+   ]
+  },
+  "wallS": 56.4,
+  "memFinal": {
+   "rssMb": 57.8,
+   "heapMb": 7.5,
+   "externalMb": 1.9,
+   "heapTotalMb": 8.7
+  },
+  "isolated": true
+ }
+}

@@ -1,0 +1,172 @@
+{
+  "uid": "eng6-plan",
+  "title": "ENG6-PLAN · Промышленный вычислительный сервис",
+  "tags": ["eng6", "comms-planner", "e6"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "editable": true,
+  "time": { "from": "now-1h", "to": "now" },
+  "templating": {
+    "list": [
+      {
+        "name": "mode",
+        "label": "Режим расчёта",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "Prometheus" },
+        "query": "label_values(eng6_plan_total, mode)",
+        "includeAll": true,
+        "multi": true,
+        "current": { "text": "All", "value": "$__all" },
+        "refresh": 2
+      }
+    ]
+  },
+  "annotations": { "list": [] },
+  "panels": [
+    {
+      "type": "row", "title": "Состояние сервиса", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 }, "collapsed": false
+    },
+    {
+      "type": "stat", "title": "Статус сервиса", "id": 1,
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
+      "targets": [{ "expr": "up{job=\"eng6-plan\"}", "refId": "A", "legendFormat": "up" }],
+      "options": { "colorMode": "background", "graphMode": "none", "textMode": "value_and_name" },
+      "fieldConfig": { "defaults": { "mappings": [{ "type": "value", "options": { "0": { "text": "НЕДОСТУПЕН", "color": "red" }, "1": { "text": "В РАБОТЕ", "color": "green" } } }] }, "overrides": [] }
+    },
+    {
+      "type": "stat", "title": "Расчётов/с", "id": 2,
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 1 },
+      "targets": [{ "expr": "sum(rate(eng6_plan_total{mode=~\"$mode\"}[5m]))", "refId": "A" }],
+      "fieldConfig": { "defaults": { "unit": "reqps", "decimals": 2 }, "overrides": [] }
+    },
+    {
+      "type": "stat", "title": "Очередь", "id": 3,
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 1 },
+      "targets": [{ "expr": "eng6_queue_length", "refId": "A" }],
+      "fieldConfig": { "defaults": { "unit": "short", "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 8 }, { "color": "red", "value": 32 }] } }, "overrides": [] },
+      "options": { "colorMode": "background" }
+    },
+    {
+      "type": "stat", "title": "Занято воркеров", "id": 4,
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 1 },
+      "targets": [{ "expr": "eng6_workers_busy", "refId": "A" }, { "expr": "eng6_workers_total", "refId": "B" }],
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] }
+    },
+    {
+      "type": "stat", "title": "RSS, МБ", "id": 5,
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 1 },
+      "targets": [{ "expr": "eng6_process_memory_rss_bytes / 1048576", "refId": "A" }],
+      "fieldConfig": { "defaults": { "unit": "decmbytes", "decimals": 0, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 2048 }, { "color": "red", "value": 4096 }] } }, "overrides": [] },
+      "options": { "colorMode": "value" }
+    },
+    {
+      "type": "stat", "title": "Отказы 429/с", "id": 6,
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 1 },
+      "targets": [
+        { "expr": "sum(rate(eng6_queue_rejected_total[5m]))", "refId": "A", "legendFormat": "очередь" },
+        { "expr": "sum(rate(eng6_ratelimited_total[5m]))", "refId": "B", "legendFormat": "rate limit" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps", "decimals": 2 }, "overrides": [] }
+    },
+    {
+      "type": "row", "title": "Производительность ядра", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 }, "collapsed": false
+    },
+    {
+      "type": "timeseries", "title": "Время расчёта (квантили)", "id": 10,
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "targets": [
+        { "expr": "histogram_quantile(0.50, sum by (le, mode) (rate(eng6_plan_duration_ms_bucket{mode=~\"$mode\"}[5m])))", "refId": "A", "legendFormat": "p50 {{mode}}" },
+        { "expr": "histogram_quantile(0.95, sum by (le, mode) (rate(eng6_plan_duration_ms_bucket{mode=~\"$mode\"}[5m])))", "refId": "B", "legendFormat": "p95 {{mode}}" },
+        { "expr": "histogram_quantile(0.99, sum by (le, mode) (rate(eng6_plan_duration_ms_bucket{mode=~\"$mode\"}[5m])))", "refId": "C", "legendFormat": "p99 {{mode}}" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "ms", "custom": { "drawStyle": "line", "fillOpacity": 8, "lineWidth": 2 } }, "overrides": [] }
+    },
+    {
+      "type": "timeseries", "title": "Очередь и ожидание", "id": 11,
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "targets": [
+        { "expr": "eng6_queue_length", "refId": "A", "legendFormat": "длина очереди" },
+        { "expr": "histogram_quantile(0.95, sum by (le) (rate(eng6_queue_wait_ms_bucket[5m])))", "refId": "B", "legendFormat": "p95 ожидания, мс" },
+        { "expr": "eng6_workers_busy", "refId": "C", "legendFormat": "занято воркеров" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "short", "custom": { "drawStyle": "line", "fillOpacity": 10 } }, "overrides": [] }
+    },
+    {
+      "type": "timeseries", "title": "Размеры графов в запросах", "id": 12,
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 14 },
+      "targets": [
+        { "expr": "histogram_quantile(0.5, sum by (le) (rate(eng6_plan_graph_nodes_bucket[10m])))", "refId": "A", "legendFormat": "p50 узлов" },
+        { "expr": "histogram_quantile(0.95, sum by (le) (rate(eng6_plan_graph_nodes_bucket[10m])))", "refId": "B", "legendFormat": "p95 узлов" },
+        { "expr": "histogram_quantile(0.95, sum by (le) (rate(eng6_plan_graph_links_bucket[10m])))", "refId": "C", "legendFormat": "p95 рёбер" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] }
+    },
+    {
+      "type": "piechart", "title": "Статусы расчётов", "id": 13,
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 14 },
+      "targets": [{ "expr": "sum by (status) (increase(eng6_plan_total{mode=~\"$mode\"}[1h]))", "refId": "A", "legendFormat": "{{status}}" }],
+      "options": { "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] } }
+    },
+    {
+      "type": "timeseries", "title": "HTTP: коды ответов", "id": 14,
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 14 },
+      "targets": [{ "expr": "sum by (code) (rate(eng6_http_requests_total[5m]))", "refId": "A", "legendFormat": "{{code}}" }],
+      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "drawStyle": "bars", "fillOpacity": 60 } }, "overrides": [] }
+    },
+    {
+      "type": "row", "title": "Ресурсы и надёжность", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 22 }, "collapsed": false
+    },
+    {
+      "type": "timeseries", "title": "Память процесса", "id": 20,
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "gridPos": { "h": 7, "w": 8, "x": 0, "y": 23 },
+      "targets": [
+        { "expr": "eng6_process_memory_rss_bytes", "refId": "A", "legendFormat": "RSS" },
+        { "expr": "eng6_process_memory_heap_bytes", "refId": "B", "legendFormat": "heap used" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "bytes", "custom": { "fillOpacity": 10 } }, "overrides": [] }
+    },
+    {
+      "type": "timeseries", "title": "Перезапуски воркеров и ошибки", "id": 21,
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "gridPos": { "h": 7, "w": 8, "x": 8, "y": 23 },
+      "targets": [
+        { "expr": "increase(eng6_worker_restarts_total[5m])", "refId": "A", "legendFormat": "перезапуски {{reason}}" },
+        { "expr": "sum(rate(eng6_plan_total{status=\"ERROR\"}[5m]))", "refId": "B", "legendFormat": "ERROR/с" },
+        { "expr": "sum(rate(eng6_validation_failed_total[5m]))", "refId": "C", "legendFormat": "422/с" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] }
+    },
+    {
+      "type": "timeseries", "title": "Размер запросов и результатов", "id": 22,
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "gridPos": { "h": 7, "w": 8, "x": 16, "y": 23 },
+      "targets": [
+        { "expr": "histogram_quantile(0.95, sum by (le) (rate(eng6_request_payload_bytes_bucket[10m])))", "refId": "A", "legendFormat": "p95 запрос, байт" },
+        { "expr": "histogram_quantile(0.95, sum by (le) (rate(eng6_result_bytes_bucket[10m])))", "refId": "B", "legendFormat": "p95 результат, байт" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "bytes" }, "overrides": [] }
+    },
+    {
+      "type": "table", "title": "Ядро ENG6 (сборка)", "id": 30,
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "gridPos": { "h": 5, "w": 24, "x": 0, "y": 30 },
+      "targets": [{ "expr": "eng6_build_info", "refId": "A", "format": "table", "instant": true }],
+      "transformations": [{ "id": "organize", "options": { "excludeByName": { "Time": true, "Value": true, "__name__": true, "job": true } } }],
+      "description": "Версия сервиса, окружение, версия Node, PID. Контрольная сумма ядра ENG6 доступна в GET /api/v1/meta и в каждой записи журнала аудита."
+    }
+  ]
+}

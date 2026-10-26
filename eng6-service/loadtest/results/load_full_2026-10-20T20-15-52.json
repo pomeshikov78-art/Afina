@@ -1,0 +1,30 @@
+{
+ "meta": {
+  "profile": "full",
+  "at": "2026-10-20T20:11:08.570Z",
+  "node": "v20.20.2",
+  "platform": "linux x64",
+  "cpus": 2,
+  "argv": [
+   "--profile=full",
+   "--only=burst"
+  ],
+  "engine": {
+   "version": "5.1.0",
+   "sha256": "adb610c9eee1ca17b257cbc6087e2278fdde3eef92f3b6a360cfb51968d48b20"
+  }
+ },
+ "core": [],
+ "api": [],
+ "burst": [],
+ "summary": {
+  "error": "сервис не отвечает после нагрузки: HTTP 0 fetch failed",
+  "wallS": 283.8,
+  "memFinal": {
+   "rssMb": 104.9,
+   "heapMb": 13.5,
+   "externalMb": 3.4,
+   "heapTotalMb": 30.3
+  }
+ }
+}

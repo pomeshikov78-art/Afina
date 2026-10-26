@@ -1,0 +1,412 @@
+{
+ "meta": {
+  "profile": "quick",
+  "at": "2026-10-20T19:51:17.211Z",
+  "node": "v20.20.2",
+  "platform": "linux x64",
+  "cpus": 2,
+  "argv": [
+   "--profile=quick"
+  ],
+  "engine": {
+   "version": "5.1.0",
+   "sha256": "adb610c9eee1ca17b257cbc6087e2278fdde3eef92f3b6a360cfb51968d48b20"
+  }
+ },
+ "core": [
+  {
+   "n": 100,
+   "links": 354,
+   "demands": 2,
+   "status": "PARTIAL",
+   "totalMs": 36.1,
+   "phases": {
+    "validate": 3.875,
+    "fleet": 12.708,
+    "physics": 5.104,
+    "graph": 0.539,
+    "backbone": 1.514,
+    "routing": 1.512,
+    "improve": 0.509,
+    "redundancy": 0.515,
+    "survivability": 1.771,
+    "schedule": 1.897,
+    "metrics": 2.116
+   },
+   "metrics": {
+    "linksFeasible": 354,
+    "linksActive": 15,
+    "demandsSatisfied": 1,
+    "demandsRejected": 0,
+    "throughputKbps": 64.69,
+    "utilMaxPct": 100,
+    "connectivityPct": 67.5,
+    "totalCost": 318,
+    "grade": "D",
+    "objectiveValue": 0.53407
+   },
+   "memBefore": {
+    "rssMb": 60.5,
+    "heapMb": 8.6,
+    "externalMb": 2,
+    "heapTotalMb": 12.4
+   },
+   "memAfter": {
+    "rssMb": 64.6,
+    "heapMb": 10.4,
+    "externalMb": 2.2,
+    "heapTotalMb": 17.1
+   },
+   "memDeltaMb": 4.1,
+   "responseBytes": 26468,
+   "physicsMode": "fast"
+  },
+  {
+   "n": 1000,
+   "links": 3565,
+   "demands": 20,
+   "status": "PARTIAL",
+   "totalMs": 214.3,
+   "phases": {
+    "validate": 15.389,
+    "fleet": 5.02,
+    "physics": 70.717,
+    "graph": 5.24,
+    "backbone": 18.212,
+    "routing": 20.252,
+    "improve": 0.046,
+    "redundancy": 61.253,
+    "survivability": 2.833,
+    "schedule": 10.137,
+    "metrics": 2.108
+   },
+   "metrics": {
+    "linksFeasible": 3563,
+    "linksActive": 376,
+    "demandsSatisfied": 9,
+    "demandsRejected": 6,
+    "throughputKbps": 337.86,
+    "utilMaxPct": 100,
+    "connectivityPct": 97.117,
+    "totalCost": 4322,
+    "grade": "D",
+    "objectiveValue": 0.54511
+   },
+   "memBefore": {
+    "rssMb": 72.6,
+    "heapMb": 11.4,
+    "externalMb": 2,
+    "heapTotalMb": 18.3
+   },
+   "memAfter": {
+    "rssMb": 77.6,
+    "heapMb": 13.6,
+    "externalMb": 3.8,
+    "heapTotalMb": 21.1
+   },
+   "memDeltaMb": 5,
+   "responseBytes": 376465,
+   "physicsMode": "fast"
+  },
+  {
+   "n": 5000,
+   "links": 17702,
+   "demands": 100,
+   "status": "PARTIAL",
+   "totalMs": 569.6,
+   "phases": {
+    "validate": 102.105,
+    "fleet": 12.429,
+    "physics": 140.394,
+    "graph": 6.765,
+    "backbone": 20.847,
+    "routing": 192.487,
+    "improve": 0.117,
+    "redundancy": 2.225,
+    "survivability": 15.92,
+    "schedule": 15.485,
+    "metrics": 47.629
+   },
+   "metrics": {
+    "linksFeasible": 17702,
+    "linksActive": 1237,
+    "demandsSatisfied": 21,
+    "demandsRejected": 47,
+    "throughputKbps": 1462.14,
+    "utilMaxPct": 100,
+    "connectivityPct": 88.074,
+    "totalCost": 15618,
+    "grade": "D",
+    "objectiveValue": 0.52153
+   },
+   "memBefore": {
+    "rssMb": 85.3,
+    "heapMb": 17,
+    "externalMb": 2,
+    "heapTotalMb": 25.4
+   },
+   "memAfter": {
+    "rssMb": 89.1,
+    "heapMb": 19.8,
+    "externalMb": 7.7,
+    "heapTotalMb": 28.4
+   },
+   "memDeltaMb": 3.8,
+   "responseBytes": 1167975,
+   "physicsMode": "fast"
+  },
+  {
+   "n": 10000,
+   "links": 35320,
+   "demands": 200,
+   "status": "PARTIAL",
+   "totalMs": 1219,
+   "phases": {
+    "validate": 184.291,
+    "fleet": 62.863,
+    "physics": 245.506,
+    "graph": 72.369,
+    "backbone": 80.317,
+    "routing": 309.922,
+    "improve": 0.158,
+    "redundancy": 10.566,
+    "survivability": 82.315,
+    "schedule": 35.203,
+    "metrics": 9.612
+   },
+   "metrics": {
+    "linksFeasible": 35320,
+    "linksActive": 2364,
+    "demandsSatisfied": 73,
+    "demandsRejected": 88,
+    "throughputKbps": 2452.59,
+    "utilMaxPct": 100,
+    "connectivityPct": 86.92,
+    "totalCost": 27890,
+    "grade": "D",
+    "objectiveValue": 0.53591
+   },
+   "memBefore": {
+    "rssMb": 95.1,
+    "heapMb": 26.7,
+    "externalMb": 2.1,
+    "heapTotalMb": 36.8
+   },
+   "memAfter": {
+    "rssMb": 107.2,
+    "heapMb": 29.3,
+    "externalMb": 13.8,
+    "heapTotalMb": 35.6
+   },
+   "memDeltaMb": 12.1,
+   "responseBytes": 2106353,
+   "physicsMode": "fast"
+  }
+ ],
+ "api": [
+  {
+   "mode": "sync",
+   "nodes": 1000,
+   "requestBytes": 580461,
+   "sent": 96,
+   "wallS": 13,
+   "rps": 7.38,
+   "codes": {
+    "200": 34,
+    "429": 62
+   },
+   "latencyMs": {
+    "p50": 1234.24,
+    "p90": 2943.89,
+    "p95": 3692.64,
+    "p99": 5122.46,
+    "min": 253.99,
+    "max": 5122.46,
+    "avg": 1480.5
+   },
+   "pool": {
+    "workers": 2,
+    "busy": 0,
+    "idle": 2,
+    "ready": 2,
+    "queueLength": 0,
+    "maxQueue": 512,
+    "pending": 0,
+    "stats": {
+     "submitted": 35,
+     "completed": 35,
+     "failed": 0,
+     "timedOut": 0,
+     "rejectedQueueFull": 0,
+     "workerRestarts": 0,
+     "oom": 0
+    },
+    "cpus": 2
+   },
+   "memory": {
+    "rssBytes": 286785536,
+    "heapBytes": 12302736,
+    "uptimeS": 14.07,
+    "loadavg": [
+     0.52,
+     0.13,
+     0.04
+    ]
+   }
+  },
+  {
+   "mode": "async",
+   "nodes": 1000,
+   "submitted": 12,
+   "accepted": 12,
+   "rejected429": 0,
+   "states": {
+    "SUCCEEDED": 12
+   },
+   "e2eMs": {
+    "p50": 9.91,
+    "p95": 205.27,
+    "max": 205.27
+   },
+   "queueWaitMs": {
+    "p50": 652.51,
+    "max": 779.69
+   },
+   "computeMs": {
+    "p50": 89.49,
+    "max": 113.99
+   },
+   "wallS": 1.9
+  }
+ ],
+ "burst": [
+  {
+   "nodes": 2000,
+   "workers": 2,
+   "maxQueue": 16,
+   "concurrency": 40,
+   "asyncCodes": {
+    "202": 26,
+    "429": 14
+   },
+   "asyncCodes2": {
+    "202": 28,
+    "429": 12
+   },
+   "syncCodes": {
+    "200": 9,
+    "429": 21
+   },
+   "junkCodes": [
+    422,
+    422,
+    422
+   ],
+   "accepted": 26,
+   "rejected429": 14,
+   "drained": [
+    {
+     "id": "plan_mvh3mzdg_gbfw_2",
+     "state": "SUCCEEDED",
+     "status": "PARTIAL",
+     "computeMs": 606.98,
+     "queueWaitMs": 432.02
+    },
+    {
+     "id": "plan_mvh3mzpb_6lcq_3",
+     "state": "SUCCEEDED",
+     "status": "PARTIAL",
+     "computeMs": 660.02,
+     "queueWaitMs": 1713.98
+    },
+    {
+     "id": "plan_mvh3mzxu_jb7e_4",
+     "state": "SUCCEEDED",
+     "status": "PARTIAL",
+     "computeMs": 723.77,
+     "queueWaitMs": 1366.23
+    },
+    {
+     "id": "plan_mvh3n01e_f5pu_5",
+     "state": "SUCCEEDED",
+     "status": "PARTIAL",
+     "computeMs": 398.99,
+     "queueWaitMs": 2140.01
+    },
+    {
+     "id": "plan_mvh3n05g_kcqg_6",
+     "state": "SUCCEEDED",
+     "status": "PARTIAL",
+     "computeMs": 475.5,
+     "queueWaitMs": 1934.5
+    },
+    {
+     "id": "plan_mvh3myzx_k5b4_1",
+     "state": "SUCCEEDED",
+     "status": "PARTIAL",
+     "computeMs": 619.38,
+     "queueWaitMs": 889.62
+    },
+    {
+     "id": "plan_mvh3n1y5_goy2_f",
+     "state": "SUCCEEDED",
+     "status": "PARTIAL",
+     "computeMs": 316.24,
+     "queueWaitMs": 5679.76
+    },
+    {
+     "id": "plan_mvh3n3ka_8ekj_o",
+     "state": "SUCCEEDED",
+     "status": "PARTIAL",
+     "computeMs": 325.55,
+     "queueWaitMs": 5875.45
+    }
+   ],
+   "healthAfter": {
+    "status": 200,
+    "readyz": 200,
+    "rssMb": 492.6,
+    "queueLength": 0,
+    "workerRestarts": 0,
+    "completed": 65,
+    "failed": 0,
+    "timedOut": 0
+   },
+   "verdict": "PASS"
+  }
+ ],
+ "summary": {
+  "prometheusSample": {
+   "planTotal": [
+    "eng6_plan_total{mode=\"sync\",status=\"PARTIAL\"} 35",
+    "eng6_plan_total{mode=\"async\",status=\"PARTIAL\"} 12"
+   ],
+   "planDurationCount": [
+    "eng6_plan_duration_ms_count{mode=\"sync\"} 35",
+    "eng6_plan_duration_ms_count{mode=\"async\"} 12"
+   ],
+   "queueLength": [
+    "eng6_queue_length 8"
+   ],
+   "workersBusy": [
+    "eng6_workers_busy 2"
+   ],
+   "requestsTotal": [
+    "eng6_http_requests_total{code=\"200\",method=\"GET\",path=\"GET /api/v1/meta\"} 1",
+    "eng6_http_requests_total{code=\"200\",method=\"POST\",path=\"POST /api/v1/plan/sync\"} 35",
+    "eng6_http_requests_total{code=\"429\",method=\"POST\",path=\"POST /api/v1/plan/sync\"} 62",
+    "eng6_http_requests_total{code=\"200\",method=\"GET\",path=\"GET /healthz\"} 1"
+   ],
+   "memoryRss": [
+    "eng6_process_memory_rss_bytes 271609856"
+   ]
+  },
+  "wallS": 53.6,
+  "memFinal": {
+   "rssMb": 239.6,
+   "heapMb": 95.6,
+   "externalMb": 72,
+   "heapTotalMb": 104.5
+  }
+ }
+}

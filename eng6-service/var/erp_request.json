@@ -1,0 +1,328 @@
+{
+ "meta": {
+  "name": "АСУ-Э «Восток»: узел связи объекта №14 (экспорт из ERP, 2026-10-16)",
+  "author": "ERP-коннектор",
+  "requestId": "erp-export-14-20261016"
+ },
+ "environment": {
+  "clutterType": "open",
+  "terrain": {
+   "source": "synth",
+   "amplitudeM": 60
+  }
+ },
+ "topology": {
+  "nodes": [
+   {
+    "id": "OBJ-14-KP",
+    "type": "cp",
+    "name": "КП объекта №14",
+    "lat": 55.7521,
+    "lng": 37.6182,
+    "status": "active",
+    "parentId": null,
+    "antHeightM": 12
+   },
+   {
+    "id": "OBJ-14-US1",
+    "type": "relay",
+    "name": "Узел связи 1",
+    "lat": 55.7884,
+    "lng": 37.6611,
+    "status": "active",
+    "parentId": "OBJ-14-KP",
+    "antHeightM": 18
+   },
+   {
+    "id": "OBJ-14-ROTA-A",
+    "type": "radio",
+    "name": "Рота А",
+    "lat": 55.7301,
+    "lng": 37.6904,
+    "status": "active",
+    "parentId": "OBJ-14-KP"
+   },
+   {
+    "id": "OBJ-14-ROTA-B",
+    "type": "radio",
+    "name": "Рота Б",
+    "lat": 55.7011,
+    "lng": 37.5522,
+    "status": "active",
+    "parentId": "OBJ-14-KP"
+   },
+   {
+    "id": "OBJ-14-NP1",
+    "type": "observer",
+    "name": "НП-1",
+    "lat": 55.8151,
+    "lng": 37.7203,
+    "status": "active",
+    "parentId": "OBJ-14-US1"
+   },
+   {
+    "id": "OBJ-14-NP2",
+    "type": "observer",
+    "name": "НП-2",
+    "lat": 55.6688,
+    "lng": 37.4801,
+    "status": "active",
+    "parentId": "OBJ-14-ROTA-B"
+   },
+   {
+    "id": "OBJ-14-SPUT",
+    "type": "sat",
+    "name": "Станция спутниковой связи",
+    "lat": 55.7566,
+    "lng": 37.6233,
+    "status": "active",
+    "parentId": "OBJ-14-KP"
+   },
+   {
+    "id": "OBJ-14-REB",
+    "type": "ew_jam",
+    "name": "Расчёт РЭБ",
+    "lat": 55.6402,
+    "lng": 37.7055,
+    "status": "active",
+    "parentId": "OBJ-14-KP"
+   }
+  ],
+  "links": [
+   {
+    "id": "ВОЛС-14-1",
+    "from": "OBJ-14-KP",
+    "to": "OBJ-14-US1",
+    "type": "FOC",
+    "cost": 120,
+    "priority": 2
+   },
+   {
+    "id": "ВОЛС-14-2",
+    "from": "OBJ-14-KP",
+    "to": "OBJ-14-SPUT",
+    "type": "FOC",
+    "cost": 40,
+    "priority": 2
+   },
+   {
+    "id": "УКВ-14-1",
+    "from": "OBJ-14-KP",
+    "to": "OBJ-14-ROTA-A",
+    "type": "VHF",
+    "priority": 2
+   },
+   {
+    "id": "УКВ-14-2",
+    "from": "OBJ-14-KP",
+    "to": "OBJ-14-ROTA-B",
+    "type": "VHF",
+    "priority": 2
+   },
+   {
+    "id": "УКВ-14-3",
+    "from": "OBJ-14-US1",
+    "to": "OBJ-14-NP1",
+    "type": "UHF",
+    "priority": 2
+   },
+   {
+    "id": "УКВ-14-4",
+    "from": "OBJ-14-ROTA-B",
+    "to": "OBJ-14-NP2",
+    "type": "UHF",
+    "priority": 2
+   },
+   {
+    "id": "РРЛ-14-1",
+    "from": "OBJ-14-US1",
+    "to": "OBJ-14-ROTA-A",
+    "type": "RRL",
+    "cost": 90,
+    "priority": 2
+   },
+   {
+    "id": "УКВ-14-5",
+    "from": "OBJ-14-ROTA-A",
+    "to": "OBJ-14-REB",
+    "type": "VHF",
+    "priority": 2
+   },
+   {
+    "id": "СПУТ-14-1",
+    "from": "OBJ-14-KP",
+    "to": "OBJ-14-REB",
+    "type": "SAT",
+    "cost": 60,
+    "priority": 2
+   }
+  ]
+ },
+ "fleet": [
+  {
+   "unitId": "ИНВ-41001-001",
+   "kind": "П-240И (командно-штабная машина)",
+   "nodeType": "cp",
+   "condition": "green",
+   "costDeploy": 30,
+   "deployTimeMin": 45,
+   "powerW": 900,
+   "note": ""
+  },
+  {
+   "unitId": "ИНВ-41001-002",
+   "kind": "Р-419Л1 (радиорелейная станция)",
+   "nodeType": "relay",
+   "condition": "green",
+   "costDeploy": 18,
+   "deployTimeMin": 25,
+   "powerW": 1100,
+   "note": ""
+  },
+  {
+   "unitId": "ИНВ-41001-003",
+   "kind": "Р-168-100К (радиостанция УКВ)",
+   "nodeType": "radio",
+   "condition": "green",
+   "costDeploy": 6,
+   "deployTimeMin": 10,
+   "powerW": 300,
+   "note": ""
+  },
+  {
+   "unitId": "ИНВ-41001-004",
+   "kind": "Р-168-100К (радиостанция УКВ)",
+   "nodeType": "radio",
+   "condition": "yellow",
+   "costDeploy": 6,
+   "deployTimeMin": 12,
+   "powerW": 300,
+   "note": "требуется ЗИП: блок питания"
+  },
+  {
+   "unitId": "ИНВ-41001-005",
+   "kind": "Р-168-100К (радиостанция УКВ)",
+   "nodeType": "radio",
+   "condition": "green",
+   "costDeploy": 6,
+   "deployTimeMin": 10,
+   "powerW": 300,
+   "note": ""
+  },
+  {
+   "unitId": "ИНВ-41001-006",
+   "kind": "1Л261 (пост радионаблюдения)",
+   "nodeType": "observer",
+   "condition": "green",
+   "costDeploy": 4,
+   "deployTimeMin": 15,
+   "powerW": 150,
+   "note": ""
+  },
+  {
+   "unitId": "ИНВ-41001-007",
+   "kind": "1Л261 (пост радионаблюдения)",
+   "nodeType": "observer",
+   "condition": "red",
+   "costDeploy": 4,
+   "deployTimeMin": 15,
+   "powerW": 150,
+   "note": "в ремонте: отказ блока АЦП"
+  },
+  {
+   "unitId": "ИНВ-41001-008",
+   "kind": "Р-438Н «Белозёр»",
+   "nodeType": "sat",
+   "condition": "green",
+   "costDeploy": 60,
+   "deployTimeMin": 60,
+   "powerW": 1500,
+   "note": ""
+  },
+  {
+   "unitId": "ИНВ-41001-009",
+   "kind": "РБ-341В «Леер-3»",
+   "nodeType": "ew_jam",
+   "condition": "green",
+   "costDeploy": 25,
+   "deployTimeMin": 30,
+   "powerW": 2000,
+   "note": ""
+  }
+ ],
+ "demands": [
+  {
+   "id": "НАРЯД-101",
+   "from": "OBJ-14-KP",
+   "to": "OBJ-14-ROTA-A",
+   "rateKbps": 32,
+   "maxDelayMs": 150,
+   "priority": 1,
+   "protected": true
+  },
+  {
+   "id": "НАРЯД-102",
+   "from": "OBJ-14-KP",
+   "to": "OBJ-14-ROTA-B",
+   "rateKbps": 16,
+   "maxDelayMs": 200,
+   "priority": 1,
+   "protected": false
+  },
+  {
+   "id": "НАРЯД-103",
+   "from": "OBJ-14-KP",
+   "to": "OBJ-14-NP1",
+   "rateKbps": 8,
+   "maxDelayMs": 250,
+   "priority": 2,
+   "protected": false
+  },
+  {
+   "id": "НАРЯД-104",
+   "from": "OBJ-14-KP",
+   "to": "OBJ-14-NP2",
+   "rateKbps": 8,
+   "maxDelayMs": 300,
+   "priority": 3,
+   "protected": false
+  },
+  {
+   "id": "НАРЯД-105",
+   "from": "OBJ-14-KP",
+   "to": "OBJ-14-REB",
+   "rateKbps": 512,
+   "maxDelayMs": 200,
+   "priority": 2,
+   "protected": true
+  },
+  {
+   "id": "НАРЯД-106",
+   "from": "OBJ-14-US1",
+   "to": "OBJ-14-ROTA-B",
+   "rateKbps": 64,
+   "maxDelayMs": 250,
+   "priority": 3,
+   "protected": false
+  }
+ ],
+ "constraints": {
+  "minMarginDb": 3,
+  "maxDelayMs": 300,
+  "maxHops": 6,
+  "reserveFactor": 1.3,
+  "maxSimultaneousDeploy": 3,
+  "physics": "auto",
+  "timeLimitMs": 120000,
+  "eng6Analysis": true,
+  "budget": 700,
+  "requireRedundancy": false,
+  "crewSpeedKmh": 40
+ },
+ "weights": {
+  "cost": 0.45,
+  "delay": 0.25,
+  "survivability": 0.2,
+  "margin": 0.1
+ }
+}

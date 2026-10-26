@@ -1,0 +1,249 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# Kubernetes: сервис ENG6-PLAN (namespace, Secret, ConfigMap, Deployment,
+# Service, HPA, PodDisruptionBudget, NetworkPolicy, ServiceMonitor).
+#
+#   kubectl apply -f deploy/k8s/eng6-plan.yaml
+#
+# Ключевые решения:
+#  • один Pod = один пул воркеров; горизонтальное масштабирование по длине
+#    очереди и CPU (HPA), а не по числу потоков внутри пода;
+#  • requests/limits памяти разнесены: расчёт графа 10^5 узлов требует
+#    ~400 МБ на воркер (см. docs/04_TEST_REPORT.md);
+#  • startupProbe ждёт загрузки вендорного ядра ENG6 (~40 мс) и готовности
+#    всех воркеров; readinessProbe не пропускает трафик при полной очереди;
+#  • NetworkPolicy разрешает доступ только из namespace ingress и к Prometheus;
+#  • журнал аудита — на постоянный том ( PVC ), а не в emptyDir.
+# ═══════════════════════════════════════════════════════════════════════════
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: eng6
+  labels: { name: eng6, stage: E6 }
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: eng6-plan-secrets
+  namespace: eng6
+type: Opaque
+stringData:
+  # в промышленном контуре — из внешнего хранилища (Vault/Secret Manager)
+  ENG6_API_KEYS: "change-me-please-32-bytes-minimum"
+  GRAFANA_PASSWORD: "change-me"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eng6-plan-config
+  namespace: eng6
+data:
+  ENG6_ENV: "production"
+  ENG6_HOST: "0.0.0.0"
+  ENG6_PORT: "8080"
+  ENG6_WORKERS: "3"
+  ENG6_MAX_QUEUE: "256"
+  ENG6_MAX_SYNC_CONCURRENCY: "3"
+  ENG6_TASK_TIMEOUT_MS: "300000"
+  ENG6_WORKER_RESTART_AFTER: "200"
+  ENG6_RESULT_TTL_MS: "1800000"
+  ENG6_MAX_STORED_RESULTS: "128"
+  ENG6_LIMIT_NODES: "200000"
+  ENG6_LIMIT_LINKS: "800000"
+  ENG6_LIMIT_DEMANDS: "20000"
+  ENG6_MAX_BODY_BYTES: "67108864"
+  ENG6_RATELIMIT_ENABLED: "true"
+  ENG6_RL_REQUESTS: "240"
+  ENG6_RL_WINDOW_MS: "60000"
+  ENG6_RL_HEAVY_NODES: "5000"
+  ENG6_RL_HEAVY_WEIGHT: "5"
+  ENG6_AUTH_ENABLED: "true"
+  ENG6_REQUIRE_REQUESTOR: "true"
+  ENG6_AUDIT_ENABLED: "true"
+  ENG6_AUDIT_FILE: "/var/eng6/audit.ndjson"
+  ENG6_AUDIT_LOG_PAYLOAD: "false"
+  ENG6_METRICS_ENABLED: "true"
+  ENG6_TLS_ENABLED: "false" # TLS терминируется на ingress/Service Mesh
+  TZ: "Europe/Moscow"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eng6-plan
+  namespace: eng6
+  labels: { app: eng6-plan, component: api }
+spec:
+  replicas: 2
+  revisionHistoryLimit: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: { maxSurge: 1, maxUnavailable: 0 }
+  selector:
+    matchLabels: { app: eng6-plan }
+  template:
+    metadata:
+      labels: { app: eng6-plan, component: api }
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: default
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+        seccompProfile: { type: RuntimeDefault }
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: api
+          image: eng6-plan:1.0.0
+          imagePullPolicy: IfNotPresent
+          args: ["node", "--max-old-space-size=1536", "api/main.mjs"]
+          ports:
+            - { name: http, containerPort: 8080, protocol: TCP }
+          envFrom:
+            - configMapRef: { name: eng6-plan-config }
+            - secretRef: { name: eng6-plan-secrets }
+          resources:
+            requests: { cpu: "1", memory: 1Gi }
+            limits: { cpu: "4", memory: 6Gi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: ["ALL"] }
+          startupProbe:
+            httpGet: { path: /healthz, port: http }
+            failureThreshold: 30
+            periodSeconds: 2
+          readinessProbe:
+            httpGet: { path: /readyz, port: http }
+            periodSeconds: 10
+            timeoutSeconds: 4
+            failureThreshold: 3
+          livenessProbe:
+            httpGet: { path: /healthz, port: http }
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+          volumeMounts:
+            - { name: audit, mountPath: /var/eng6 }
+            - { name: tmp, mountPath: /tmp }
+      volumes:
+        - name: audit
+          persistentVolumeClaim: { claimName: eng6-plan-audit }
+        - name: tmp
+          emptyDir: { sizeLimit: 128Mi }
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: eng6-plan-audit
+  namespace: eng6
+spec:
+  accessModes: [ReadWriteOnce]
+  resources: { requests: { storage: 5Gi } }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eng6-plan
+  namespace: eng6
+  labels: { app: eng6-plan }
+spec:
+  type: ClusterIP
+  selector: { app: eng6-plan }
+  ports:
+    - { name: http, port: 8080, targetPort: http, protocol: TCP }
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: eng6-plan
+  namespace: eng6
+spec:
+  scaleTargetRef: { apiVersion: apps/v1, kind: Deployment, name: eng6-plan }
+  minReplicas: 2
+  maxReplicas: 8
+  metrics:
+    - type: Resource
+      resource: { name: cpu, target: { type: Utilization, averageUtilization: 70 } }
+    # масштабирование по длине очереди расчёта (требует prometheus-adapter)
+    - type: Pods
+      pods:
+        metric: { name: eng6_queue_length }
+        target: { type: AverageValue, averageValue: "8" }
+  behavior:
+    scaleUp: { stabilizationWindowSeconds: 30, policies: [{ type: Pods, value: 2, periodSeconds: 60 }] }
+    scaleDown: { stabilizationWindowSeconds: 300, policies: [{ type: Pods, value: 1, periodSeconds: 120 }] }
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: eng6-plan
+  namespace: eng6
+spec:
+  minAvailable: 1
+  selector: { matchLabels: { app: eng6-plan } }
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: eng6-plan
+  namespace: eng6
+spec:
+  podSelector: { matchLabels: { app: eng6-plan } }
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - namespaceSelector: { matchLabels: { name: ingress } }
+        - namespaceSelector: { matchLabels: { name: monitoring } }
+      ports: [{ protocol: TCP, port: 8080 }]
+  egress:
+    # ядро ENG6-PLAN работает headless: внешние соединения не требуются.
+    # Разрешены только DNS и сбор метрик — это и есть «изоляция ядра» на уровне сети.
+    - to: [{ namespaceSelector: {} } ]
+      ports: [{ protocol: UDP, port: 53 }, { protocol: TCP, port: 53 }]
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: eng6-plan
+  namespace: eng6
+  labels: { release: prometheus }
+spec:
+  selector: { matchLabels: { app: eng6-plan } }
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 10s
+      scrapeTimeout: 8s
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: eng6-plan
+  namespace: eng6
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true" # NFR-02: только TLS
+    nginx.ingress.kubernetes.io/proxy-body-size: "64m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      add_header X-Content-Type-Options nosniff always;
+      add_header X-Frame-Options DENY always;
+      add_header Referrer-Policy no-referrer always;
+      add_header Cache-Control no-store always;
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts: [eng6.example.internal]
+      secretName: eng6-plan-tls
+  rules:
+    - host: eng6.example.internal
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend: { service: { name: eng6-plan, port: { number: 8080 } } }
