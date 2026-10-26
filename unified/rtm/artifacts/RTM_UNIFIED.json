@@ -1,6 +1,6 @@
 {
  "document": "RTM_UNIFIED — единая матрица трассируемости требований",
- "generated_at": "2026-10-26 20:36:09",
+ "generated_at": "2026-10-26 20:44:51",
  "sources": {
   "A": "afina/data/Афина_RTM_машиночитаемая.csv (83)",
   "B": "unified/rtm/seed_dopolnenie2.json (77)",
@@ -1664,9 +1664,9 @@
    "priority": "P1",
    "text": "Единый CI: матрица Python 3.11 × Node 20; 145 + 125 + 37 тестов; conformance; selfcheck; смоуки; XVER; E2E; сборка Docker",
    "acceptance_criteria": "все джобы зелёные на push/PR; протоколы — артефакты CI",
-   "tests": ".github/workflows/unified-ci.yml (включён в репозиторий 26.10.2026; источник — unified/ci/)",
+   "tests": "unified/ci/unified-ci.yml (готов 26.10.2026); публикация .github/workflows/ отклонена GitHub — PAT без scope workflow (OBS-09)",
    "protocols": "",
-   "status": "включён в репозиторий; первый прогон — на стороне GitHub Actions"
+   "status": "скрипт готов; включение — через веб-интерфейс GitHub или токеном со scope workflow"
   },
   {
    "source": "UNIF:совмещённая платформа",
@@ -1754,9 +1754,9 @@
    "priority": "P2",
    "text": "Корневая гигиена git: .gitignore корня (var/, __pycache__, node_modules, *.db), CI в .github/workflows/",
    "acceptance_criteria": "служебные файлы вне индекса; workflow обнаруживается GitHub",
-   "tests": ".gitignore (корень), .github/workflows/unified-ci.yml",
+   "tests": ".gitignore (корень, вкл. .github/ до активации CI)",
    "protocols": "",
-   "status": "подтверждено коммитом 26.10.2026; эффект — на стороне GitHub"
+   "status": "подтверждено коммитом 26.10.2026"
   },
   {
    "source": "UNIF:совмещённая платформа",

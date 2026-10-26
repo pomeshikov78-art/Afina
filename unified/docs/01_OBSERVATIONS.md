@@ -83,3 +83,16 @@ minMarginDb = 3), но зафиксировано честно: сетка XVER 
 передача уже сериализованной строки даёт двойное кодирование. Клиент моста
 (`scenario_export`) передаёт dict; `_attrs()` defensively разворачивает двойное
 кодирование для legacy-строк. Рекомендуется внести в API-спецификацию линии A.
+
+## OBS-09 · GitHub отклоняет запись .github/workflows/ токеном без scope «workflow»
+
+При синхронизации прохода №2 push был отклонён: «refusing to allow a Personal
+Access Token to create or update workflow .github/workflows/unified-ci.yml
+without `workflow` scope». Это штатная защита GitHub, не дефект репозитория.
+Решение (выбрано): workflow-файл исключён из git-истории (источник истины —
+`unified/ci/unified-ci.yml`), локальная копия `.github/` — вне индекса
+(.gitignore). Активация CI: создать `.github/workflows/unified-ci.yml` через
+веб-интерфейс GitHub (скопировав содержимое источника) либо выполнить push
+токеном со scope `workflow`. Урок процесса: fine-grained PAT для синхронизации
+выдавать с правами Contents:RW **и** Workflows:RW, либо не включать workflow-
+файлы в автоматические push.

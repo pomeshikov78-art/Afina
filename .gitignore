@@ -7,3 +7,9 @@ unified/var/
 *.db-journal
 *.tmp
 eng6-service/var/audit-smoke.ndjson
+
+# активация CI на GitHub требует scope «workflow» (PAT отклоняет запись .github/)
+# локальная копия держится вне индекса; источник истины — unified/ci/unified-ci.yml;
+# включение: создать .github/workflows/unified-ci.yml через веб-интерфейс GitHub
+# (скопировать содержимое unified/ci/unified-ci.yml) либо push токеном с scope workflow.
+.github/

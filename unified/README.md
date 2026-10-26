@@ -55,7 +55,7 @@ unified/
 │   ├── build_unified_rtm.py    единый RTM: 83 (Прил. А) + 77 (Доп. №2) + 18 (UNIF) = 178
 │   ├── build_unified_manifest.py единый манифест поставки: sha256-пересчёт трёх разделов (UNIF-16)
 │   └── artifacts/RTM_UNIFIED.{csv,json} + MANIFEST_UNIFIED.json
-├── ci/unified-ci.yml           единый CI (ВКЛЮЧЁН: .github/workflows/unified-ci.yml)
+├── ci/unified-ci.yml           единый CI (готов; включение — через веб-интерфейс GitHub, см. WORKPLAN шаг 3 / OBS-09)
 ├── deploy/                     Dockerfile.platform + docker-compose.unified.yml
 │                               (platform + engine + Prometheus + Grafana) + prometheus.unified.yml
 ├── protocols/                  протоколы, сгенерированные прогонами (XVER, UNIF-E2E) — доказательства
