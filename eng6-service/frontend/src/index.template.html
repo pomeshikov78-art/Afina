@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ENG6 · Визуальный картографический планировщик системы связи</title>
+<!--
+  Дополнение к ТЗ №1 (ГОСТ 34.602) — модуль «Визуальный картографический планировщик».
+  Сборка: scripts/build_frontend.mjs (инлайн CSS + JS + демо-данные расчёта ядра).
+  NFR-02: внешние ресурсы не загружаются (default-src 'none'), координаты НЕ
+          сохраняются в localStorage/IndexedDB/sessionStorage — только в памяти вкладки.
+  NFR-01: рендеринг Canvas2D + батчинг, ≥30 FPS при 1000 тактических знаков (замер в UI).
+  NFR-03: координаты хранятся и передаются с точностью 6 знаков после запятой.
+-->
+<style>/*__CSS__*/</style>
+</head>
+<body>
+<div id="topbar">
+  <h1>ENG6<span>·</span>Планировщик связи</h1>
+  <div class="tb-sep"></div>
+  <div class="tb-group">
+    <span class="tb-lbl">Сценарий</span>
+    <select id="scenarioSel" title="Демонстрационные сценарии"></select>
+    <button class="tb-btn" id="btnNew" title="Очистить рабочее пространство">Новый</button>
+    <button class="tb-btn" id="btnImport" title="Загрузить JSON/CSV (FR-UI-01)">Импорт</button>
+    <button class="tb-btn" id="btnExport" title="Выгрузить сценарий в JSON">Экспорт</button>
+    <input type="file" id="fileInput" accept=".json,.csv,application/json,text/csv" hidden />
+  </div>
+  <div class="tb-sep"></div>
+  <div class="tb-group">
+    <span class="tb-lbl">Ядро</span>
+    <input id="apiBase" class="tb-inp" value="/api/v1" title="Базовый URL API ENG6-PLAN" />
+    <button class="tb-btn accent" id="btnCalc" title="POST /plan/sync — быстрый расчёт">▶ Расчёт (sync)</button>
+    <button class="tb-btn" id="btnCalcAsync" title="POST /plan/async — тяжёлая задача в очередь">⇶ Очередь (async)</button>
+    <select id="physicsSel" title="Режим физики: fast — аналитический, full — ENG6.calcLink с рельефом">
+      <option value="auto">physics: auto</option>
+      <option value="fast">physics: fast</option>
+      <option value="full">physics: full</option>
+    </select>
+  </div>
+  <div class="tb-sep"></div>
+  <div class="tb-group">
+    <span class="tb-lbl">Инструмент</span>
+    <button class="tb-btn tool active" data-tool="select" title="Выбор и перемещение (V)">⬚ Выбор</button>
+    <button class="tb-btn tool" data-tool="link" title="Линия связи: ЛКМ по двум объектам (L)">✎ Линия</button>
+    <button class="tb-btn tool" data-tool="node" title="Группировать выделенное в «Узел связи» (FR-MAP-04)">⌘ Узел связи</button>
+    <button class="tb-btn tool" data-tool="measure" title="Измерение расстояния (M)">↔ Измерить</button>
+  </div>
+  <div class="tb-sep"></div>
+  <div class="tb-group">
+    <span id="connState" class="chip chip-dim" title="Состояние канала с ядром">ядро: —</span>
+    <span id="perfChip" class="chip" title="NFR-01: частота кадров и число знаков">— FPS · 0 зн.</span>
+    <button class="tb-btn" id="btnPanel" title="Свернуть/развернуть правую панель (FR-UI-01)">⇥ Панель</button>
+    <button class="tb-btn" id="btnHelp" title="Справка и требования ТЗ">?</button>
+  </div>
+</div>
+
+<div id="workspace">
+  <div id="mapzone">
+    <canvas id="map"></canvas>
+    <div id="mapOverlays">
+      <div id="legend" class="glass"></div>
+      <div id="scaleBar" class="glass"></div>
+      <div id="zoomCtl" class="glass">
+        <button data-z="1" title="Приблизить">+</button>
+        <button data-z="-1" title="Отдалить">−</button>
+        <button data-z="0" title="Вписать все объекты">⤢</button>
+      </div>
+      <div id="layerCtl" class="glass">
+        <label><input type="checkbox" id="lyBase" checked /> Геоподложка</label>
+        <label><input type="checkbox" id="lyCoverage" checked /> Зоны покрытия</label>
+        <label><input type="checkbox" id="lyLinks" checked /> Линии связи</label>
+        <label><input type="checkbox" id="lyRejected"> Отклонённые</label>
+        <label><input type="checkbox" id="lyLabels" checked /> Подписи</label>
+        <label><input type="checkbox" id="lyGrid" checked /> Координатная сетка</label>
+      </div>
+      <div id="hint" class="glass"></div>
+    </div>
+    <div id="statusbar">
+      <span id="sbCoords">—</span>
+      <span id="sbZoom">z —</span>
+      <span id="sbScale">—</span>
+      <span id="sbGen">генерализация: —</span>
+      <span id="sbSel">выделено: 0</span>
+      <span id="sbMsg">готов</span>
+    </div>
+  </div>
+
+  <div id="rightpanel">
+    <div id="rpTabs">
+      <button class="rpt active" data-tab="osh">ОШС и ресурсы</button>
+      <button class="rpt" data-tab="res">Результаты</button>
+      <button class="rpt" data-tab="log">Журнал</button>
+    </div>
+
+    <div class="rp-body" id="tab-osh">
+      <div class="rp-search">
+        <input id="resSearch" placeholder="Поиск: инв. №, тип, подразделение…" />
+        <div class="filters">
+          <select id="fltBand" title="FR-RES-04: фильтр по типу связи">
+            <option value="">Все диапазоны</option>
+            <option value="КВ">КВ</option><option value="УКВ">УКВ</option>
+            <option value="РТ">РТ (радиорелейная)</option><option value="СПУТНИК">Спутниковая</option><option value="ВОЛС">ВОЛС</option>
+          </select>
+          <select id="fltCond" title="FR-RES-03: фильтр по состоянию">
+            <option value="">Любое состояние</option>
+            <option value="green">🟢 Исправна</option>
+            <option value="yellow">🟡 Ограниченно пригодна</option>
+            <option value="red">🔴 Неисправна</option>
+          </select>
+        </div>
+      </div>
+      <div id="oshTree" class="tree"></div>
+      <div class="rp-foot">
+        <span id="oshCount">—</span>
+        <button class="tb-btn" id="btnAutoPlace" title="Автоматически разместить исправную технику по штатным позициям">Авторазмещение</button>
+      </div>
+    </div>
+
+    <div class="rp-body hidden" id="tab-res">
+      <div id="resSummary"></div>
+      <div id="resMetrics"></div>
+      <div id="resRoutes"></div>
+      <div id="resIssues"></div>
+      <div id="resSchedule"></div>
+      <div id="resSurvivability"></div>
+    </div>
+
+    <div class="rp-body hidden" id="tab-log">
+      <div id="logList" class="loglist"></div>
+      <div class="rp-foot"><button class="tb-btn" id="btnLogClear">Очистить</button><span id="logCount"></span></div>
+    </div>
+  </div>
+</div>
+
+<div id="ctxmenu" class="hidden"></div>
+
+<div id="modal" class="hidden">
+  <div class="modal-card">
+    <div class="modal-head"><span id="modalTitle">Свойства</span><button id="modalClose" title="Закрыть">✕</button></div>
+    <div id="modalTabs" class="modal-tabs"></div>
+    <div id="modalBody" class="modal-body"></div>
+    <div id="modalFoot" class="modal-foot"></div>
+  </div>
+</div>
+
+<div id="toasts"></div>
+<div id="dragGhost" class="hidden"></div>
+<script id="demo-data" type="application/json">/*__DEMO_DATA__*/</script>
+<script>/*__JS__*/</script>
+</body>
+</html>

@@ -1,0 +1,1040 @@
+openapi: 3.1.0
+info:
+  title: ENG6-PLAN · Сервис планирования систем связи
+  version: 1.0.0
+  description: |
+    Headless-вычислительное ядро ENG6-PLAN: распределение ресурсов, маршруты
+    и расписание развертывания системы связи.
+
+    Математическая модель — `docs/01_MATH_MODEL.md`; архитектура — `docs/02_ARCHITECTURE.md`;
+    отчёт об испытаниях — `docs/04_TEST_REPORT.md`.
+
+    Ядро детерминировано: одинаковый вход даёт побайтово одинаковый выход (NFR-DET-01).
+  contact:
+    name: Группа разработки изделия «Планировщик связи» (этап E6)
+  license:
+    name: Проприетарная лицензия (служебное пользование)
+servers:
+  - url: https://eng6.example.internal/api/v1
+    description: Промышленный контур (TLS обязателен, NFR-02)
+  - url: http://localhost:8080/api/v1
+    description: Локальная разработка
+tags:
+  - name: plan
+    description: Расчёт плана развертывания
+  - name: tasks
+    description: Асинхронные задачи
+  - name: service
+    description: Служебные эндпоинты (метаданные, конформанс, аудит, здоровье)
+security:
+  - bearerAuth: []
+  - apiKeyAuth: []
+
+paths:
+  /plan/sync:
+    post:
+      tags: [plan]
+      operationId: planSync
+      summary: Синхронный расчёт (быстрые задачи, до ~5 000 узлов)
+      description: |
+        Выполняет расчёт в одном HTTP-цикле. При занятости всех синхронных слотов
+        возвращает `429 SYNC_BUSY` с подсказкой уйти в `/plan/async`.
+      parameters:
+        - $ref: '#/components/parameters/Requestor'
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/ResultFormat'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PlanRequest' }
+      responses:
+        '200':
+          description: Расчёт выполнен (статус плана — в поле `status`)
+          headers:
+            X-Compute-Ms: { schema: { type: number }, description: Время расчёта в ядре }
+            X-Queue-Wait-Ms: { schema: { type: number }, description: Ожидание слота }
+            X-ENG6-Core-Sha256: { schema: { type: string } }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PlanResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '413': { $ref: '#/components/responses/PayloadTooLarge' }
+        '422':
+          description: Вход не прошёл валидацию — расчёт не запускался
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PlanResponse' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+        '500': { $ref: '#/components/responses/ServerError' }
+        '503': { $ref: '#/components/responses/MemoryBackpressure' }
+        '504': { $ref: '#/components/responses/TaskTimeout' }
+
+  /plan/async:
+    post:
+      tags: [plan]
+      operationId: planAsync
+      summary: Постановка тяжёлой задачи в очередь
+      description: |
+        Немедленно возвращает `202 Accepted` и `Location`. Расчёт выполняется
+        в пуле воркеров; результат запрашивается через `/tasks/{id}`.
+        При переполнении очереди — `429 QUEUE_FULL` с `Retry-After`.
+      parameters:
+        - $ref: '#/components/parameters/Requestor'
+        - $ref: '#/components/parameters/RequestId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PlanRequest' }
+      responses:
+        '202':
+          description: Задача принята в очередь
+          headers:
+            Location:
+              description: URL статуса задачи
+              schema: { type: string, example: /api/v1/tasks/plan_mva3q0eq_2q2f_3 }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TaskAccepted' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '413': { $ref: '#/components/responses/PayloadTooLarge' }
+        '422': { $ref: '#/components/responses/ValidationRejected' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+        '503': { $ref: '#/components/responses/MemoryBackpressure' }
+
+  /tasks/{taskId}:
+    parameters:
+      - name: taskId
+        in: path
+        required: true
+        schema: { type: string, maxLength: 128 }
+    get:
+      tags: [tasks]
+      operationId: getTask
+      summary: Статус и результат задачи
+      parameters:
+        - $ref: '#/components/parameters/Requestor'
+        - $ref: '#/components/parameters/ResultFormat'
+      responses:
+        '200':
+          description: Текущее состояние задачи
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TaskView' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404':
+          description: Задача не найдена или результат удалён по TTL
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+    delete:
+      tags: [tasks]
+      operationId: cancelTask
+      summary: Отмена задачи в очереди
+      responses:
+        '200':
+          description: Задача отменена
+          content:
+            application/json:
+              schema: { type: object, properties: { taskId: { type: string }, state: { type: string, enum: [CANCELLED] } } }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: Задача уже выполняется — отмена невозможна
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /tasks:
+    get:
+      tags: [tasks]
+      operationId: listTasks
+      summary: Список задач
+      parameters:
+        - name: state
+          in: query
+          schema: { type: string, enum: [QUEUED, RUNNING, SUCCEEDED, FAILED, TIMEOUT, CANCELLED] }
+        - name: actor
+          in: query
+          schema: { type: string }
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 500, default: 50 }
+      responses:
+        '200':
+          description: Список задач и счётчики по состояниям
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total: { type: integer }
+                  byState: { type: object, additionalProperties: { type: integer } }
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/TaskMeta' }
+
+  /meta:
+    get:
+      tags: [service]
+      operationId: getMeta
+      summary: Контракт, лимиты, версия ядра
+      security: []
+      responses:
+        '200':
+          description: Метаданные сервиса
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ServiceMeta' }
+
+  /conformance:
+    get:
+      tags: [service]
+      operationId: getConformance
+      summary: Протокол конформанса ядра ENG6
+      description: selfTest (33 эталонные проверки) + 5 регрессионных сценариев.
+      security: []
+      parameters:
+        - name: refresh
+          in: query
+          schema: { type: string, enum: ['0', '1'] }
+      responses:
+        '200':
+          description: Результат конформанс-контроля
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Conformance' }
+
+  /audit:
+    get:
+      tags: [service]
+      operationId: getAudit
+      summary: Журнал аудита (требование Военпреда)
+      description: В production доступен только при включённой аутентификации.
+      parameters:
+        - $ref: '#/components/parameters/Requestor'
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 1000, default: 50 }
+        - name: requestId
+          in: query
+          schema: { type: string }
+        - name: actor
+          in: query
+          schema: { type: string }
+        - name: status
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          description: Записи журнала
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total: { type: integer }
+                  stats: { type: object }
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/AuditEntry' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: API-KEY }
+    apiKeyAuth: { type: apiKey, in: header, name: X-Api-Key }
+
+  parameters:
+    Requestor:
+      name: X-Requestor
+      in: header
+      required: true
+      description: Кто запросил расчёт (аудит). Кириллица — в percent-encoding.
+      schema: { type: string, maxLength: 256, example: '%D0%98%D0%B2%D0%B0%D0%BD%D0%BE%D0%B2%20%D0%98.%D0%98.' }
+    RequestId:
+      name: X-Request-Id
+      in: header
+      required: false
+      schema: { type: string, pattern: '^[A-Za-z0-9._-]{8,128}$' }
+    ResultFormat:
+      name: X-Result-Format
+      in: header
+      required: false
+      schema: { type: string, enum: [full, summary, none], default: full }
+
+  responses:
+    BadRequest:
+      description: Некорректный запрос (не JSON, пустое тело, нет X-Requestor)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Unauthorized:
+      description: Требуется действительный API-ключ
+      headers:
+        WWW-Authenticate: { schema: { type: string, example: Bearer } }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Forbidden:
+      description: Доступ запрещён конфигурацией
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    NotFound:
+      description: Не найдено
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    PayloadTooLarge:
+      description: Тело запроса больше ENG6_MAX_BODY_BYTES
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    ValidationRejected:
+      description: Превышены лимиты экземпляра задачи (узлы/рёбра/заявки)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    TooManyRequests:
+      description: Rate limit, заняты sync-слоты или переполнена очередь
+      headers:
+        Retry-After: { schema: { type: integer }, description: Пауза перед повтором, сек }
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Error'
+              - type: object
+                properties:
+                  error:
+                    type: object
+                    properties:
+                      details:
+                        type: object
+                        properties:
+                          queueLength: { type: integer }
+                          maxQueue: { type: integer }
+                          busy: { type: integer }
+                          workers: { type: integer }
+                          suggest: { type: string, example: 'POST /api/v1/plan/async' }
+    MemoryBackpressure:
+      description: Исчерпан лимит памяти «в полёте»
+      headers:
+        Retry-After: { schema: { type: integer } }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    ServerError:
+      description: Внутренняя ошибка (сбой ядра, воркера, OOM)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    TaskTimeout:
+      description: Превышен ENG6_TASK_TIMEOUT_MS
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              example: QUEUE_FULL
+              description: Стабильный машинный код
+            message: { type: string }
+            details: { type: [object, 'null'] }
+
+    # ── вход ────────────────────────────────────────────────────────────────
+    PlanRequest:
+      type: object
+      required: [topology]
+      properties:
+        meta:
+          type: object
+          properties:
+            name: { type: string, maxLength: 256 }
+            author: { type: string, maxLength: 256 }
+            requestId: { type: [string, 'null'] }
+            seed: { type: integer, minimum: 0, maximum: 2147483647 }
+            description: { type: string }
+        environment: { $ref: '#/components/schemas/Environment' }
+        topology:
+          type: object
+          required: [nodes, links]
+          properties:
+            nodes:
+              type: array
+              minItems: 1
+              maxItems: 200000
+              items: { $ref: '#/components/schemas/Node' }
+            links:
+              type: array
+              maxItems: 800000
+              items: { $ref: '#/components/schemas/Link' }
+        fleet:
+          type: array
+          maxItems: 50000
+          items: { $ref: '#/components/schemas/FleetUnit' }
+        demands:
+          type: array
+          maxItems: 20000
+          items: { $ref: '#/components/schemas/Demand' }
+        threats:
+          type: array
+          maxItems: 5000
+          items: { type: object }
+        constraints: { $ref: '#/components/schemas/Constraints' }
+        weights: { $ref: '#/components/schemas/Weights' }
+
+    Environment:
+      type: object
+      properties:
+        terrain:
+          type: object
+          properties:
+            source:
+              type: string
+              enum: [synth, flat, dem, online]
+              default: synth
+              description: 'dem/online в headless-режиме принудительно заменяются на synth'
+            amplitudeM: { type: number, minimum: 0, maximum: 5000, default: 60 }
+        clutterType: { type: string, enum: [open, forest, urban, dense_urban], default: open }
+        weather:
+          type: object
+          properties:
+            rainRateMmHr: { type: number, minimum: 0, maximum: 300, default: 0 }
+            fogDensity: { type: number, minimum: 0, maximum: 10, default: 0 }
+            temperatureC: { type: number, minimum: -80, maximum: 60, default: 15 }
+            humidityPercent: { type: number, minimum: 0, maximum: 100, default: 60 }
+        ionosphere:
+          type: object
+          properties:
+            timeOfDay: { type: number, minimum: 0, maximum: 23, default: 12 }
+            season: { type: string, enum: [equinox, summer, winter], default: equinox }
+            solarActivity: { type: string, enum: [low, medium, high], default: medium }
+        miscLossDb: { type: number, minimum: 0, maximum: 40, default: 2 }
+
+    Node:
+      type: object
+      required: [id, type, lat, lng]
+      properties:
+        id: { type: string, minLength: 1, maxLength: 256 }
+        type: { type: string, enum: [cp, relay, radio, sat, observer, ew_jam, ew_rlr, ew_rer] }
+        name: { type: string, maxLength: 256 }
+        lat: { type: number, minimum: -90, maximum: 90, description: 'WGS-84, 6 знаков (NFR-03)' }
+        lng: { type: number, minimum: -180, maximum: 180 }
+        status: { type: string, enum: [active, planned, failed], default: active }
+        parentId: { type: [string, 'null'], description: Иерархия ОШС (для расписания) }
+        unitId: { type: [string, 'null'], description: Привязка к единице техники }
+        children:
+          type: array
+          items: { type: string }
+          description: "Для «узла связи» (FR-MAP-04): идентификаторы входящих объектов"
+        mobility: { type: string, enum: [static, portable, mobile, vehicle] }
+        txPowerDbm: { type: number, minimum: -30, maximum: 90 }
+        txGainDbi: { type: number, minimum: -20, maximum: 60 }
+        rxGainDbi: { type: number, minimum: -20, maximum: 60 }
+        rxSensDbm: { type: number, minimum: -160, maximum: 0 }
+        antHeightM: { type: number, minimum: 0, maximum: 500 }
+        freqMhz: { type: number, minimum: 0.001, maximum: 100000 }
+        feederLossDb: { type: number, minimum: 0, maximum: 30 }
+        noiseFigureDb: { type: number, minimum: 0, maximum: 30 }
+        deployTimeMin: { type: number, minimum: 0, maximum: 100000 }
+        costDeploy: { type: number, minimum: 0, maximum: 1e9 }
+
+    Link:
+      type: object
+      required: [id, from, to, type]
+      properties:
+        id: { type: string, minLength: 1, maxLength: 256 }
+        from: { type: string }
+        to: { type: string }
+        type: { type: string, enum: [VHF, UHF, HF, RRL, SAT, FOC] }
+        freqMhz: { type: number, minimum: 0.001, maximum: 100000 }
+        bwKhz: { type: number, minimum: 0.5, maximum: 1e7 }
+        mod: { type: string, enum: [BPSK, QPSK, GMSK, PI4DQPSK, 8PSK, 16QAM, 64QAM, 256QAM] }
+        fec: { type: string, enum: [none, 1/2, 2/3, 3/4, conv1/2, conv2/3, conv3/4, conv7/8, turbo1/3, turbo1/2, turbo3/4, ldpc1/4, ldpc1/2, ldpc3/4] }
+        priority: { type: integer, minimum: 1, maximum: 5, default: 2 }
+        isBackup: { type: boolean, default: false }
+        cost: { type: number, minimum: 0, maximum: 1e9, description: 'При отсутствии — из таблиц стоимости по типу и длине' }
+        reqSnrDb: { type: [number, string, 'null'], minimum: -20, maximum: 60 }
+
+    FleetUnit:
+      type: object
+      required: [unitId, condition]
+      properties:
+        unitId: { type: string, minLength: 1, maxLength: 256 }
+        kind: { type: string, description: 'Образец техники (например, Р-168-100К)' }
+        nodeType: { type: string, enum: [cp, relay, radio, sat, observer, ew_jam, ew_rlr, ew_rer] }
+        condition:
+          type: string
+          enum: [green, yellow, red]
+          description: 'FR-RES-03: 🟢 исправна, 🟡 ограниченно пригодна, 🔴 неисправна (не размещается)'
+        costDeploy: { type: number, minimum: 0, maximum: 1e9 }
+        deployTimeMin: { type: number, minimum: 0, maximum: 100000 }
+        powerW: { type: number, minimum: 0, maximum: 1e6 }
+        massKg: { type: number, minimum: 0, maximum: 1e6 }
+        note: { type: string, maxLength: 256 }
+
+    Demand:
+      type: object
+      required: [id, from, to, rateKbps]
+      properties:
+        id: { type: string, minLength: 1, maxLength: 256 }
+        from: { type: string }
+        to: { type: string }
+        rateKbps: { type: number, exclusiveMinimum: 0, maximum: 1e9 }
+        maxDelayMs: { type: number, minimum: 0.1, maximum: 60000 }
+        maxHops: { type: integer, minimum: 1, maximum: 64 }
+        priority: { type: integer, minimum: 1, maximum: 5, default: 3, description: '1 — наивысший' }
+        minAvailabilityPct: { type: number, minimum: 0, maximum: 100 }
+        protected: { type: boolean, default: false, description: Требовать два непересекающихся пути }
+
+    Constraints:
+      type: object
+      properties:
+        budget: { type: [number, 'null'], minimum: 0, maximum: 1e12, description: 'null — без ограничения' }
+        minMarginDb: { type: number, minimum: -20, maximum: 60, default: 3 }
+        maxDelayMs: { type: number, minimum: 0.1, maximum: 60000, default: 250 }
+        maxHops: { type: integer, minimum: 1, maximum: 64, default: 8 }
+        reserveFactor: { type: number, minimum: 1, maximum: 10, default: 1.3 }
+        maxSimultaneousDeploy: { type: integer, minimum: 1, maximum: 100000, default: 4 }
+        crewSpeedKmh: { type: number, minimum: 0.1, maximum: 300, default: 40 }
+        maxUtilizationPct: { type: number, minimum: 1, maximum: 1000, default: 85 }
+        requireRedundancy: { type: boolean, default: false }
+        allowYellowUnits: { type: boolean, default: true }
+        allowRedUnits: { type: boolean, default: false, description: 'true нарушает FR-RES-03' }
+        physics: { type: string, enum: [auto, fast, full], default: auto }
+        quality: { type: string, enum: [fast, balanced, accurate], default: fast }
+        fastMarginPenaltyDb: { type: number, minimum: 0, maximum: 40, default: 6 }
+        timeLimitMs: { type: number, minimum: 100, maximum: 600000, default: 30000 }
+        frameKbit: { type: number, minimum: 0.001, maximum: 1000, default: 1 }
+        hopProcessingMs: { type: number, minimum: 0, maximum: 1000, default: 2 }
+        utilPenaltyMs: { type: number, minimum: 0, maximum: 10000, default: 10 }
+        upgradeFactor: { type: number, minimum: 0, maximum: 10, default: 0.5 }
+        upgradeCostRatio: { type: number, minimum: 0, maximum: 10, default: 0.25 }
+        backbone: { type: string, enum: [none, cp, terminals], default: cp }
+        forbidLinkTypes:
+          type: array
+          items: { type: string, enum: [VHF, UHF, HF, RRL, SAT, FOC] }
+        eng6Analysis: { type: boolean, default: true, description: Перекрёстная проверка плана полным ядром ENG6 }
+        crossCheckQuality: { type: string, enum: [fast, balanced, accurate], default: balanced }
+        crossCheckMaxNodes: { type: integer, minimum: 0, maximum: 20000, default: 400 }
+        crossCheckMaxLinks: { type: integer, minimum: 0, maximum: 20000, default: 600 }
+
+    Weights:
+      type: object
+      description: Веса целевой функции (нормируются к сумме 1)
+      properties:
+        cost: { type: number, minimum: 0, maximum: 100, default: 0.4 }
+        delay: { type: number, minimum: 0, maximum: 100, default: 0.3 }
+        survivability: { type: number, minimum: 0, maximum: 100, default: 0.2 }
+        margin: { type: number, minimum: 0, maximum: 100, default: 0.1 }
+
+    # ── выход ───────────────────────────────────────────────────────────────
+    PlanResponse:
+      type: object
+      required: [status, statusReasons, timings, core]
+      properties:
+        status:
+          type: string
+          enum: [OPTIMAL, FEASIBLE, PARTIAL, INFEASIBLE, INVALID, TIMEOUT, ERROR]
+        statusReasons:
+          type: array
+          items:
+            type: object
+            properties:
+              code: { type: string }
+              message: { type: string }
+              count: { type: integer }
+        plan:
+          type: [object, 'null']
+          properties:
+            deployedUnits: { type: array, items: { $ref: '#/components/schemas/DeployedUnit' } }
+            deployedUnitsTotal: { type: integer }
+            activeLinks: { type: array, items: { $ref: '#/components/schemas/ActiveLink' } }
+            activeLinksTotal: { type: integer }
+            routes: { type: array, items: { $ref: '#/components/schemas/Route' } }
+            routesTotal: { type: integer }
+            schedule: { $ref: '#/components/schemas/Schedule' }
+            rejectedLinks: { type: array, items: { $ref: '#/components/schemas/RejectedLink' } }
+            rejectedLinksHistogram: { type: object, additionalProperties: { type: integer } }
+            survivability: { $ref: '#/components/schemas/Survivability' }
+            truncation:
+              type: object
+              description: Признаки усечения крупных массивов в ответе
+              properties:
+                links: { type: [string, 'null'] }
+                routes: { type: [string, 'null'] }
+                nodes: { type: [string, 'null'] }
+            redundancyAdded: { type: integer }
+        metrics: { $ref: '#/components/schemas/Metrics' }
+        diagnostics: { $ref: '#/components/schemas/Diagnostics' }
+        timings:
+          type: object
+          properties:
+            validateMs: { type: number }
+            fleetMs: { type: number }
+            physicsMs: { type: number }
+            graphMs: { type: number }
+            backboneMs: { type: number }
+            routingMs: { type: number }
+            improveMs: { type: number }
+            redundancyMs: { type: number }
+            survivabilityMs: { type: number }
+            scheduleMs: { type: number }
+            metricsMs: { type: number }
+            eng6Ms: { type: number }
+            totalMs: { type: number }
+        core:
+          type: object
+          properties:
+            engine: { type: string, example: ENG6 }
+            engineVersion: { type: string, example: 5.1.0 }
+            engineSha256: { type: string, pattern: '^[0-9a-f]{64}$' }
+            planner: { type: string, example: 1.0.0 }
+            physics: { type: string, enum: [fast, full] }
+        requestId: { type: string }
+        taskId: { type: string }
+
+    DeployedUnit:
+      type: object
+      properties:
+        nodeId: { type: string }
+        nodeType: { type: string }
+        unitId: { type: [string, 'null'] }
+        condition: { type: string }
+        lat: { type: number, description: '6 знаков (NFR-03)' }
+        lng: { type: number }
+        cost: { type: number }
+        deployMin: { type: number }
+        wave: { type: [integer, 'null'] }
+        startMin: { type: [number, 'null'] }
+
+    ActiveLink:
+      type: object
+      properties:
+        id: { type: string }
+        from: { type: string }
+        to: { type: string }
+        type: { type: string }
+        distKm: { type: number }
+        marginDb: { type: number, description: 'SINR − reqSNR (семантика ENG6)' }
+        sensMarginDb: { type: number, description: 'rxPower − rxSens' }
+        capacityKbps: { type: number }
+        loadKbps: { type: number }
+        utilPct: { type: number }
+        delayMs: { type: number }
+        availabilityPct: { type: number }
+        cost: { type: number }
+        role: { type: string, enum: [primary, backup] }
+        physics:
+          type: object
+          properties:
+            plDb: { type: number }
+            rxDbm: { type: number }
+            snrDb: { type: number }
+            sensMarginDb: { type: number }
+            theoreticalKbps: { type: number }
+            los: { type: boolean }
+            type: { type: string }
+
+    RejectedLink:
+      type: object
+      properties:
+        id: { type: string }
+        from: { type: [string, 'null'] }
+        to: { type: [string, 'null'] }
+        type: { type: [string, 'null'] }
+        code:
+          type: string
+          enum: [NODE_NOT_FOUND, COINCIDENT_NODES, UNKNOWN_LINK_TYPE, BELOW_MARGIN,
+                 OUT_OF_RANGE, NO_LOS_REQUIRED, FORBIDDEN_TYPE, UNIT_NOT_READY,
+                 CAPACITY_ZERO, DELAY_EXCEEDED, PHYSICS_ERROR]
+        reason: { type: string }
+        distKm: { type: number }
+        marginDb: { type: number }
+        capKbps: { type: number }
+        delayMs: { type: number }
+
+    Route:
+      type: object
+      properties:
+        demandId: { type: string }
+        from: { type: string }
+        to: { type: string }
+        requestedKbps: { type: number }
+        grantedKbps: { type: number }
+        deficitKbps: { type: number }
+        status: { type: string, enum: [ROUTED, PARTIAL, REJECTED, NOT_PROCESSED] }
+        reason:
+          type: string
+          enum: [OK, SELF, NO_PATH, NO_PATH_CAPACITY, CAPACITY_SHORTAGE, HOP_LIMIT,
+                 DELAY_EXCEEDED, NET_DISCONNECTED, UNIT_NOT_READY, NODE_NOT_FOUND,
+                 BUDGET_EXCEEDED, TIMEOUT, NOT_PROCESSED]
+        delayMs: { type: [number, 'null'] }
+        maxDelayMs: { type: [number, 'null'] }
+        hops: { type: [integer, 'null'] }
+        marginDb: { type: [number, 'null'] }
+        availabilityPct: { type: [number, 'null'] }
+        utilMaxPct: { type: [number, 'null'] }
+        redundant: { type: [boolean, 'null'] }
+        path: { type: array, items: { type: string } }
+        links: { type: array, items: { type: string } }
+        backupPath:
+          type: [object, 'null']
+          properties:
+            nodes: { type: array, items: { type: string } }
+            links: { type: array, items: { type: string } }
+            delayMs: { type: number }
+        bestEffort:
+          type: [object, 'null']
+          description: Что получилось бы без учёта ограничений — для диагностики
+          properties:
+            delayMs: { type: number }
+            hops: { type: integer }
+            deficitKbps: { type: number }
+            bottleneckEdge: { type: integer }
+
+    Schedule:
+      type: object
+      properties:
+        waves:
+          type: array
+          items:
+            type: object
+            properties:
+              index: { type: integer }
+              tStartMin: { type: number }
+              tEndMin: { type: number }
+              durationMin: { type: number }
+              crewsUsed: { type: integer }
+              items:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id: { type: string }
+                    nodeId: { type: string }
+                    unitId: { type: [string, 'null'] }
+                    kind: { type: [string, 'null'] }
+                    crew: { type: integer }
+                    startMin: { type: number }
+                    endMin: { type: number }
+        makespanMin: { type: number }
+        crews: { type: integer }
+        crewUtilPct: { type: number }
+        criticalPath:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              nodeId: { type: string }
+              startMin: { type: number }
+              endMin: { type: number }
+        referencePoint:
+          type: object
+          properties: { lat: { type: number }, lng: { type: number } }
+        violations: { type: array, items: { type: string } }
+        jobs: { type: array, items: { type: object } }
+        jobsTotal: { type: integer }
+
+    Survivability:
+      type: object
+      properties:
+        componentsCount: { type: integer }
+        candidateComponentsCount: { type: [integer, 'null'] }
+        connectivityPct: { type: number }
+        largestComponentPct: { type: number }
+        spofNodes: { type: array, items: { type: string } }
+        spofCount: { type: integer }
+        bridgeLinks: { type: array, items: { type: string } }
+        bridgeCount: { type: integer }
+        minCutKbps: { type: [number, 'null'] }
+        minCutPair: { type: [array, 'null'], items: { type: string } }
+        computed: { type: array, items: { type: string } }
+
+    Metrics:
+      type: object
+      properties:
+        objectiveValue: { type: number }
+        grade: { type: string, enum: [A, B, C, D, F] }
+        nodesTotal: { type: integer }
+        nodesDeployed: { type: integer }
+        linksCandidate: { type: integer }
+        linksFeasible: { type: integer }
+        linksActive: { type: integer }
+        totalCost: { type: number }
+        budget: { type: [number, 'null'] }
+        budgetUsedPct: { type: [number, 'null'] }
+        demandsTotal: { type: integer }
+        demandsSatisfied: { type: integer }
+        demandsPartial: { type: integer }
+        demandsRejected: { type: integer }
+        demandServedPct: { type: number }
+        throughputKbps: { type: number }
+        capacityTotalKbps: { type: number }
+        loadTotalKbps: { type: number }
+        utilMaxPct: { type: number }
+        utilAvgPct: { type: number }
+        avgDelayMs: { type: number }
+        maxDelayMs: { type: number }
+        delayViolations: { type: integer }
+        minAvailabilityPct: { type: [number, 'null'] }
+        connectivityPct: { type: number }
+        componentsCount: { type: integer }
+        candidateComponentsCount: { type: [integer, 'null'] }
+        largestComponentPct: { type: number }
+        spofNodes: { type: integer }
+        bridgeLinks: { type: integer }
+        minCutKbps: { type: [number, 'null'] }
+        avgMarginDb: { type: number }
+        minMarginDb: { type: [number, 'null'] }
+        linksBelow10Db: { type: integer }
+        marginHistogram: { type: object, additionalProperties: { type: integer } }
+        redundancyAdded: { type: integer }
+        scheduleMakespanMin: { type: number }
+        scheduleWaves: { type: integer }
+        crewUtilPct: { type: number }
+
+    Diagnostics:
+      type: object
+      properties:
+        validation:
+          type: object
+          properties:
+            ok: { type: boolean }
+            errors: { type: array, items: { $ref: '#/components/schemas/ValidationIssue' } }
+            warnings: { type: array, items: { $ref: '#/components/schemas/ValidationIssue' } }
+            truncated: { type: boolean }
+        issues:
+          type: array
+          items:
+            type: object
+            properties:
+              sev: { type: string, enum: [crit, warn, info, rec] }
+              code: { type: string }
+              obj: { type: object }
+              title: { type: string }
+              text: { type: string }
+        recommendations:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              priority: { type: integer }
+              target: { type: object }
+              title: { type: string }
+              text: { type: string }
+        infeasibility:
+          type: [object, 'null']
+          properties:
+            causes:
+              type: array
+              items:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum: [NET_DISCONNECTED, BUDGET_EXCEEDED, CAPACITY_SHORTAGE,
+                           DELAY_UNREACHABLE, UNIT_SHORTAGE, LINK_REF_BROKEN,
+                           DEMAND_REF_BROKEN, DEMANDS_UNSATISFIED, NO_LINKS, NO_FEASIBLE_LINK]
+                  message: { type: string }
+            disconnectedComponents:
+              type: array
+              items:
+                type: object
+                properties:
+                  index: { type: integer }
+                  size: { type: integer }
+                  nodeIds: { type: array, items: { type: string } }
+                  centroid:
+                    type: object
+                    properties: { lat: { type: number }, lng: { type: number } }
+            minimalRelaxations:
+              type: array
+              items:
+                type: object
+                properties:
+                  code: { type: string, enum: [ADD_RELAY, RAISE_BUDGET, RELAX_MAX_DELAY_MS, ADD_CAPACITY, RELAX_MARGIN_DB] }
+                  at:
+                    type: object
+                    properties: { lat: { type: number }, lng: { type: number } }
+                  value: { type: number }
+                  linkId: { type: string }
+                  count: { type: integer }
+                  wouldConnect: { type: array, items: { type: integer } }
+                  spanKm: { type: number }
+                  requiredEirpDbm: { type: number }
+                  nearestPair: { type: array, items: { type: string } }
+                  reason: { type: string }
+            partialSolution:
+              type: object
+              properties:
+                demandsServed: { type: integer }
+                demandsTotal: { type: integer }
+                throughputKbps: { type: number }
+                cost: { type: number }
+                linksActivated: { type: integer }
+                nodesDeployed: { type: integer }
+                note: { type: string }
+        rejectedLinksHistogram: { type: object, additionalProperties: { type: integer } }
+        approximation:
+          type: object
+          properties:
+            physics: { type: string, enum: [fast, full] }
+            steiner: { type: string, enum: [metric_closure_mst, shortest_path_tree, none, empty, single] }
+            routing: { type: string }
+            knapsack: { type: string }
+            schedule: { type: string }
+        eng6Analysis:
+          type: object
+          description: Перекрёстная проверка построенного плана полным ядром ENG6
+          properties:
+            skipped: { type: boolean }
+            reason: { type: string, enum: [SIZE_GUARD, TIMEOUT, DISABLED, ERROR] }
+            quality: { type: string }
+            verdict: { type: string, enum: [CONSISTENT, DEGRADED, REJECTED_BY_ENG6] }
+            comparison: { type: object }
+            ratings: { type: object }
+            network: { type: object }
+            issues: { type: array, items: { type: object } }
+            recommendations: { type: array, items: { type: object } }
+            assumptions: { type: array, items: { type: string } }
+            models: { type: array, items: { type: string } }
+        lowerBoundCost: { type: [number, 'null'] }
+
+    ValidationIssue:
+      type: object
+      properties:
+        code: { type: string, enum: [REQUIRED, TYPE, RANGE, ENUM, DUPLICATE, REF, LIMIT, CROSS, FINITE, UNKNOWN_FIELD, TRUNCATED, ENG6] }
+        path: { type: string, description: 'JSON-путь к проблемному полю' }
+        message: { type: string }
+
+    TaskAccepted:
+      type: object
+      properties:
+        taskId: { type: string }
+        state: { type: string, enum: [QUEUED] }
+        statusUrl: { type: string }
+        cancelUrl: { type: string }
+        position: { type: integer }
+        estimatedWaitMs: { type: integer }
+        inputSha256: { type: string, pattern: '^[0-9a-f]{64}$' }
+        sizes:
+          type: object
+          properties: { nodes: { type: integer }, links: { type: integer }, demands: { type: integer } }
+        requestId: { type: string }
+
+    TaskMeta:
+      type: object
+      properties:
+        taskId: { type: string }
+        state: { type: string, enum: [QUEUED, RUNNING, SUCCEEDED, FAILED, TIMEOUT, CANCELLED] }
+        status: { type: [string, 'null'] }
+        actor: { type: string }
+        requestId: { type: string }
+        mode: { type: string, enum: [sync, async] }
+        inputSha256: { type: string }
+        inputBytes: { type: integer }
+        sizes: { type: object }
+        createdAt: { type: string, format: date-time }
+        startedAt: { type: [string, 'null'], format: date-time }
+        finishedAt: { type: [string, 'null'], format: date-time }
+        queueWaitMs: { type: [number, 'null'] }
+        computeMs: { type: [number, 'null'] }
+        durationMs: { type: [number, 'null'] }
+        workerId: { type: [integer, 'null'] }
+        resultBytes: { type: integer }
+        progress: { type: object }
+        error: { type: [object, 'null'] }
+
+    TaskView:
+      allOf:
+        - $ref: '#/components/schemas/TaskMeta'
+        - type: object
+          properties:
+            result: { $ref: '#/components/schemas/PlanResponse' }
+            resultAvailable: { type: boolean }
+            resultExpired: { type: boolean }
+            position: { type: integer }
+            estimatedWaitMs: { type: integer }
+
+    ServiceMeta:
+      type: object
+      properties:
+        service: { type: string }
+        version: { type: string }
+        env: { type: string }
+        planner: { type: string }
+        core:
+          type: object
+          properties:
+            name: { type: string }
+            version: { type: string }
+            sha256: { type: string }
+            keys: { type: integer }
+            meta: { type: object }
+        limits: { type: object }
+        apiLimits: { type: object }
+        pool: { type: object }
+        rateLimit: { type: object }
+        audit: { type: object }
+        endpoints: { type: array, items: { type: object } }
+        headers: { type: object }
+        statuses: { type: array, items: { type: string } }
+
+    Conformance:
+      type: object
+      properties:
+        ok: { type: boolean }
+        selfTestTotal: { type: integer, example: 33 }
+        selfTestFailed: { type: array, items: { type: object } }
+        regressionTotal: { type: integer, example: 5 }
+        regressionFailed: { type: array, items: { type: object } }
+        regression: { type: array, items: { type: object } }
+        coreSha256: { type: string }
+        cached: { type: boolean }
+        cacheAgeS: { type: integer }
+
+    AuditEntry:
+      type: object
+      properties:
+        ts: { type: string, format: date-time }
+        event:
+          type: string
+          enum: [plan_queued, plan_started, plan_finished, plan_failed, plan_rejected,
+                 rate_limited, queue_full, memory_backpressure, sync_overloaded,
+                 task_cancelled, internal_error]
+        mode: { type: string, enum: [sync, async] }
+        taskId: { type: string }
+        actor: { type: string }
+        clientId: { type: string }
+        requestId: { type: string }
+        inputSha256: { type: string }
+        inputBytes: { type: integer }
+        sizes: { type: object }
+        status: { type: [string, 'null'] }
+        computeMs: { type: [number, 'null'] }
+        queueWaitMs: { type: [number, 'null'] }
+        workerId: { type: [integer, 'null'] }
+        resultBytes: { type: [integer, 'null'] }
+        httpStatus: { type: [integer, 'null'] }
+        code: { type: [string, 'null'] }
+        message: { type: [string, 'null'] }
+        service: { type: string }
+        version: { type: string }
+        env: { type: string }
+        pid: { type: integer }
