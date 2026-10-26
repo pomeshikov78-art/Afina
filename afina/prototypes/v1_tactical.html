@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>СПО «Афина» — Прототип 1 «Тактический КП»</title>
+<style>
+  :root{
+    --bg:#14180f; --panel:#1d2416; --panel2:#232b1a; --line:#3a4530;
+    --txt:#c9d4b8; --dim:#8a9674; --accent:#9db86a; --amber:#d9a441;
+    --red:#c96a5a; --cyan:#7fb5a8;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;font-family:"Consolas","Courier New",monospace}
+  body{background:var(--bg);color:var(--txt);font-size:12px;overflow:hidden;height:100vh;display:flex;flex-direction:column}
+  /* Меню */
+  .menubar{background:var(--panel);border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 8px;height:26px;gap:2px;flex-shrink:0}
+  .logo{color:var(--accent);font-weight:bold;letter-spacing:2px;margin-right:14px;font-size:13px}
+  .logo span{color:var(--amber)}
+  .menubar a{color:var(--dim);text-decoration:none;padding:4px 9px;cursor:pointer}
+  .menubar a:hover{background:var(--panel2);color:var(--txt)}
+  .menubar .right{margin-left:auto;display:flex;gap:10px;align-items:center}
+  .mode-chip{border:1px solid var(--amber);color:var(--amber);padding:1px 7px;font-size:10px;letter-spacing:1px}
+  .user-chip{color:var(--dim)}
+  /* Панель инструментов */
+  .toolbar{background:var(--panel2);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:6px;padding:5px 8px;flex-shrink:0;flex-wrap:wrap}
+  .btn{background:var(--panel);border:1px solid var(--line);color:var(--txt);padding:3px 10px;cursor:pointer;font-size:11px}
+  .btn:hover{border-color:var(--accent);color:var(--accent)}
+  .btn.primary{border-color:var(--accent);color:var(--accent)}
+  .sep{width:1px;height:18px;background:var(--line);margin:0 4px}
+  .sel{background:var(--panel);border:1px solid var(--line);color:var(--amber);padding:3px 6px;font-size:11px;font-family:inherit}
+  .phys{display:flex;border:1px solid var(--line)}
+  .phys button{background:var(--panel);border:none;color:var(--dim);padding:3px 9px;cursor:pointer;font-size:11px;font-family:inherit}
+  .phys button.on{background:var(--accent);color:#14180f;font-weight:bold}
+  /* Компоновка */
+  .main{flex:1;display:flex;min-height:0}
+  .col-left{width:230px;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;flex-shrink:0}
+  .col-center{flex:1;display:flex;flex-direction:column;min-width:0}
+  .col-right{width:270px;background:var(--panel);border-left:1px solid var(--line);display:flex;flex-direction:column;flex-shrink:0}
+  .ph{background:var(--panel2);border-bottom:1px solid var(--line);padding:4px 8px;color:var(--accent);font-size:10px;letter-spacing:2px;text-transform:uppercase;display:flex;justify-content:space-between}
+  /* Каталог */
+  .search{margin:6px;display:flex}
+  .search input{flex:1;background:var(--bg);border:1px solid var(--line);color:var(--txt);padding:4px 6px;font-family:inherit;font-size:11px}
+  .cat{overflow-y:auto;flex:1;padding:0 6px 8px}
+  .cat-group{color:var(--amber);margin:8px 0 3px;font-size:10px;letter-spacing:1px}
+  .cat-item{display:flex;align-items:center;gap:6px;padding:3px 5px;cursor:grab;border:1px solid transparent}
+  .cat-item:hover{background:var(--panel2);border-color:var(--line)}
+  .cat-item .ico{width:18px;height:18px;border:1px solid var(--dim);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--accent);flex-shrink:0}
+  .cat-item .nm{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cat-item .cd{color:var(--dim);font-size:9px}
+  /* Сцена */
+  .scene-wrap{flex:1;position:relative;background:#0e120a;min-height:0}
+  canvas{position:absolute;inset:0;width:100%;height:100%}
+  .scene-ovl{position:absolute;top:8px;left:8px;background:rgba(20,24,15,.85);border:1px solid var(--line);padding:5px 9px;font-size:10px;color:var(--dim);line-height:1.7}
+  .scene-ovl b{color:var(--txt)}
+  .legend{position:absolute;bottom:8px;right:8px;background:rgba(20,24,15,.9);border:1px solid var(--line);padding:6px 9px;font-size:10px}
+  .legend .t{color:var(--accent);letter-spacing:1px;margin-bottom:4px;font-size:9px}
+  .legend .row{display:flex;align-items:center;gap:6px;margin:2px 0;color:var(--dim)}
+  .legend .sw{width:26px;height:8px}
+  .calc-badge{position:absolute;top:8px;right:8px;background:rgba(217,164,65,.15);border:1px solid var(--amber);color:var(--amber);padding:4px 10px;font-size:10px;letter-spacing:1px;display:flex;gap:8px;align-items:center}
+  .spin{width:9px;height:9px;border:2px solid var(--amber);border-top-color:transparent;border-radius:50%;animation:sp 1s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  /* Слои */
+  .layers{background:var(--panel);border-top:1px solid var(--line);padding:5px 8px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;flex-shrink:0}
+  .layers .lb{color:var(--dim);font-size:10px;letter-spacing:1px}
+  .lay{display:flex;align-items:center;gap:4px;cursor:pointer;color:var(--dim);font-size:11px}
+  .lay input{accent-color:var(--accent)}
+  .lay.on{color:var(--txt)}
+  /* Инспектор */
+  .insp{overflow-y:auto;flex:1;padding:8px}
+  .insp h3{color:var(--amber);font-size:12px;margin-bottom:2px}
+  .insp .sub{color:var(--dim);font-size:10px;margin-bottom:8px}
+  .kv{display:flex;justify-content:space-between;border-bottom:1px dotted var(--line);padding:3px 0;font-size:11px}
+  .kv .k{color:var(--dim)}
+  .ts{display:inline-block;border:1px solid;padding:1px 6px;font-size:10px;letter-spacing:1px}
+  .ts1{color:var(--accent);border-color:var(--accent)}
+  .ts2{color:var(--amber);border-color:var(--amber)}
+  .ts0{color:var(--dim);border-color:var(--dim)}
+  .sec{color:var(--accent);font-size:10px;letter-spacing:2px;margin:10px 0 4px;border-bottom:1px solid var(--line);padding-bottom:2px}
+  .note{background:var(--panel2);border-left:2px solid var(--amber);padding:5px 7px;font-size:10px;color:var(--dim);margin-top:8px;line-height:1.5}
+  /* Статус-бар */
+  .statusbar{background:var(--panel2);border-top:1px solid var(--line);display:flex;align-items:center;gap:16px;padding:3px 10px;font-size:10px;color:var(--dim);flex-shrink:0}
+  .statusbar b{color:var(--txt);font-weight:normal}
+  .statusbar .ok{color:var(--accent)}
+  .statusbar .warn{color:var(--amber)}
+  .statusbar .right{margin-left:auto;display:flex;gap:16px}
+  .bar{display:inline-block;width:50px;height:6px;background:var(--bg);border:1px solid var(--line);vertical-align:middle}
+  .bar i{display:block;height:100%;background:var(--accent)}
+</style>
+</head>
+<body>
+  <div class="menubar">
+    <div class="logo">▲ АФИНА<span>·КП</span></div>
+    <a>Файл</a><a>Правка</a><a>Вид</a><a>Задачи</a><a>База</a><a>Параметры</a><a>Окно</a><a>Справка</a>
+    <div class="right">
+      <span class="mode-chip">РЕЖИМ Б · AIR-GAP</span>
+      <span class="user-chip">оператор: ИНЖ-РАСЧЁТЧИК / Смирнов А.В.</span>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn primary">[ Сценарий: Новый ]</button>
+    <button class="btn">Импорт</button><button class="btn">Экспорт</button>
+    <div class="sep"></div>
+    <button class="btn primary">▶ Расчёт</button>
+    <button class="btn">⇶ Очередь (3)</button>
+    <div class="sep"></div>
+    <span style="color:var(--dim)">Физика:</span>
+    <div class="phys"><button>Быстро</button><button class="on">Авто</button><button>Полная</button></div>
+    <div class="sep"></div>
+    <span style="color:var(--dim)">Профиль:</span>
+    <select class="sel"><option>Тактический</option><option>RF-Инженер</option><option>Сетевой Архитектор</option><option>3D-Планировщик</option><option>ИИ-Оператор</option></select>
+    <div class="sep"></div>
+    <button class="btn">Сценарий ОО</button><button class="btn">Выбор по семантике</button><button class="btn">Профиль и зоны</button><button class="btn">Граф дорог</button><button class="btn">Статус-маркер</button>
+  </div>
+
+  <div class="main">
+    <!-- Каталог -->
+    <div class="col-left">
+      <div class="ph"><span>Каталог активов · КСИМ-ДД</span><span>1 284</span></div>
+      <div class="search"><input placeholder="Поиск по коду / наименованию…"></div>
+      <div class="cat">
+        <div class="cat-group">▸ COM — Средства связи</div>
+        <div class="cat-item"><div class="ico">▣</div><div class="nm">Р-444 «Пересвет»</div><div class="cd">COM-014</div></div>
+        <div class="cat-item"><div class="ico">▣</div><div class="nm">Радиорелейная станция Р-419ЛМ</div><div class="cd">COM-021</div></div>
+        <div class="cat-item"><div class="ico">▣</div><div class="nm">Комплекс спутниковой связи</div><div class="cd">COM-033</div></div>
+        <div class="cat-group">▸ ANT — Антенны</div>
+        <div class="cat-item"><div class="ico">⌇</div><div class="nm">АШ-2,5 (штыревая 27 МГц)</div><div class="cd">ANT-002</div></div>
+        <div class="cat-item"><div class="ico">⌇</div><div class="nm">Параболическая 0,6 м</div><div class="cd">ANT-017</div></div>
+        <div class="cat-item"><div class="ico">⌇</div><div class="nm">Секторная 5G 65°</div><div class="cd">ANT-041</div></div>
+        <div class="cat-group">▸ PWR — Электропитание</div>
+        <div class="cat-item"><div class="ico">⚡</div><div class="nm">ИБП 10 кВА · АД-30</div><div class="cd">PWR-005</div></div>
+        <div class="cat-item"><div class="ico">⚡</div><div class="nm">АКБ-накопитель 48 В</div><div class="cd">PWR-011</div></div>
+        <div class="cat-group">▸ NET — Сетевое</div>
+        <div class="cat-item"><div class="ico">⇄</div><div class="nm">Коммутатор L3 управляемый</div><div class="cd">NET-008</div></div>
+        <div class="cat-item"><div class="ico">⇄</div><div class="nm">Маршрутизатор полевой</div><div class="cd">NET-012</div></div>
+        <div class="cat-group">▸ STR — Сооружения</div>
+        <div class="cat-item"><div class="ico">⌂</div><div class="nm">Мачта 25 м решётчатая</div><div class="cd">STR-003</div></div>
+        <div class="cat-item"><div class="ico">⌂</div><div class="nm">КУНГ КМ131 (мобильный узел)</div><div class="cd">STR-009</div></div>
+        <div class="cat-group" style="color:var(--dim)">▸ SENS · NAV-TIME · OBS · EW · PHY-THREAT · PROTECT · SW · VEH · TOOL · ENV · THREAT-PROFILE · MODEL …</div>
+      </div>
+    </div>
+
+    <!-- Сцена -->
+    <div class="col-center">
+      <div class="scene-wrap">
+        <canvas id="scene"></canvas>
+        <div class="scene-ovl">
+          <b>СЦЕНА:</b> Узел связи «Заря-4» · вариант BL-2026.03-A<br>
+          <b>CRS:</b> МСК-50, зона 1 · <b>Рельеф:</b> MTW, шаг 20 м<br>
+          <b>Объектов:</b> 34 · <b>Линков:</b> 11 · <b>Базовая линия:</b> утверждена 12.09.2026
+        </div>
+        <div class="calc-badge"><div class="spin"></div>Выполняется точный расчёт RF-03 (Покрытие)…</div>
+        <div class="legend">
+          <div class="t">ПОКРЫТИЕ УКВ, дБм</div>
+          <div class="row"><div class="sw" style="background:linear-gradient(90deg,#3f7a34,#9db86a)"></div> ≥ −85 (устойчивое)</div>
+          <div class="row"><div class="sw" style="background:linear-gradient(90deg,#9db86a,#d9a441)"></div> −95…−85 (граничное)</div>
+          <div class="row"><div class="sw" style="background:linear-gradient(90deg,#d9a441,#c96a5a)"></div> < −95 (вне зоны)</div>
+          <div class="row" style="margin-top:4px;border-top:1px dotted var(--line);padding-top:4px">⚠ модель: SPM, L1 · предварительный результат</div>
+        </div>
+      </div>
+      <div class="layers">
+        <span class="lb">СЛОИ:</span>
+        <label class="lay on"><input type="checkbox" checked>Геоподложка</label>
+        <label class="lay on"><input type="checkbox" checked>Зоны покрытия</label>
+        <label class="lay on"><input type="checkbox" checked>Линии связи</label>
+        <label class="lay"><input type="checkbox">Отклонённые</label>
+        <label class="lay on"><input type="checkbox" checked>Подписи</label>
+        <label class="lay"><input type="checkbox">Сетка</label>
+        <label class="lay on"><input type="checkbox" checked>Z-рельеф</label>
+        <span class="lb" style="margin-left:12px">ФИЛЬТРЫ:</span>
+        <label class="lay on"><input type="checkbox" checked>УКВ</label>
+        <label class="lay"><input type="checkbox">КВ</label>
+        <label class="lay"><input type="checkbox">РТ</label>
+        <label class="lay"><input type="checkbox">Спутник</label>
+        <label class="lay"><input type="checkbox">ВОЛС</label>
+        <span class="lb" style="margin-left:12px">СОСТОЯНИЯ:</span>
+        <span style="color:var(--accent)">● Исправна</span><span style="color:var(--amber)">● Ограниченно</span><span style="color:var(--red)">● Неисправна</span><span style="color:var(--dim)">○ Не оценено</span>
+      </div>
+    </div>
+
+    <!-- Инспектор -->
+    <div class="col-right">
+      <div class="ph"><span>Инспектор · Паспорт объекта</span><span>ID: 8F3A-0012</span></div>
+      <div class="insp">
+        <h3>Узел связи «Заря-4»</h3>
+        <div class="sub">ASSET · владелец: 14-й узел связи · ОШС v.2026-02</div>
+        <div class="sec">ТЕХНИЧЕСКОЕ СОСТОЯНИЕ (TS)</div>
+        <div class="kv"><span class="k">Состояние</span><span class="ts ts1">TS-1 ИСПРАВНО</span></div>
+        <div class="kv"><span class="k">Основание</span><span>Акт ТО-2 №114 от 03.10.2026</span></div>
+        <div class="kv"><span class="k">Ответственный</span><span>Козлов Д.И.</span></div>
+        <div class="sec">КАЧЕСТВО ДАННЫХ (DAT)</div>
+        <div class="kv"><span class="k">Статус</span><span class="ts ts2">ПОДТВЕРЖДЕНО ИЗМЕРЕНИЕМ</span></div>
+        <div class="kv"><span class="k">Актуальность</span><span>03.10.2026 · срок 90 сут</span></div>
+        <div class="sec">ЭЛЕКТРИЧЕСКИЕ ПАРАМЕТРЫ</div>
+        <div class="kv"><span class="k">Питание</span><span>220 В / 50 Гц + АД-30 (резерв)</span></div>
+        <div class="kv"><span class="k">Потребление</span><span>4,2 кВт <span style="color:var(--dim)">(измерено)</span></span></div>
+        <div class="kv"><span class="k">Автономность АКБ</span><span>2 ч 40 мин <span style="color:var(--dim)">(паспорт)</span></span></div>
+        <div class="sec">РАДИОТЕХНИЧЕСКИЕ</div>
+        <div class="kv"><span class="k">Диапазон</span><span>146–174 МГц (УКВ)</span></div>
+        <div class="kv"><span class="k">Мощность</span><span>50 Вт <span style="color:var(--dim)">(режим: непрерывный, точка: выход ПА)</span></span></div>
+        <div class="kv"><span class="k">Антенна</span><span>АШ-2,5 · h=12 м</span></div>
+        <div class="note">⚠ Чувствительность приёмника: значение «не измерено». Расчёт RF-07 выполняется по паспортному значению — результат маркирован как предварительный (EQP-001).</div>
+        <div class="sec">ЦИФРОВОЙ ДВОЙНИК</div>
+        <div class="kv"><span class="k">Уровень зрелости</span><span>DT-3 · сопоставление с измерениями</span></div>
+        <div class="kv"><span class="k">Последний расчёт</span><span>RF-03 · 15.10.2026 09:12 · <span style="color:var(--amber)">в очереди</span></span></div>
+        <div class="kv"><span class="k">Паспорт расчёта</span><span style="color:var(--accent);cursor:pointer">CALC-2026-4471 ↗</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="statusbar">
+    <span>FPS: <b class="ok">58</b></span>
+    <span>Генерализация: <b>LOD-2</b></span>
+    <span>Выделено: <b>1 объект · 3 линка</b></span>
+    <span>Статус: <b class="ok">Готов</b></span>
+    <span>Ошибки и ресурсы: <b class="warn">2 пред. · 0 крит.</b></span>
+    <div class="right">
+      <span>Очередь: <b>3 расчёта</b></span>
+      <span>CPU <span class="bar"><i style="width:42%"></i></span> 42%</span>
+      <span>GPU <span class="bar"><i style="width:76%;background:var(--amber)"></i></span> 76%</span>
+    </div>
+  </div>
+
+<script>
+const cv=document.getElementById('scene'),ctx=cv.getContext('2d');
+function resize(){cv.width=cv.clientWidth;cv.height=cv.clientHeight;draw();}
+window.addEventListener('resize',resize);
+let t=0;
+function draw(){
+  const W=cv.width,H=cv.height;t+=0.01;
+  ctx.fillStyle='#0e120a';ctx.fillRect(0,0,W,H);
+  // рельеф (псевдо-горизонтали)
+  ctx.strokeStyle='rgba(90,110,70,.22)';ctx.lineWidth=1;
+  for(let i=1;i<=9;i++){
+    ctx.beginPath();
+    for(let x=0;x<=W;x+=6){
+      const y=H*0.5+Math.sin(x*0.008+i*1.3)*38+Math.cos(x*0.004+i*0.7)*26+(i-5)*26;
+      x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  }
+  // сетка координат
+  ctx.strokeStyle='rgba(120,140,95,.08)';
+  for(let x=0;x<W;x+=64){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=64){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  // зоны покрытия (предварительные, пульсируют)
+  const st=[{x:W*0.3,y:H*0.4,r:Math.min(W,H)*0.34,c:'157,184,106'},{x:W*0.68,y:H*0.35,r:Math.min(W,H)*0.28,c:'127,181,168'},{x:W*0.55,y:H*0.72,r:Math.min(W,H)*0.24,c:'217,164,65'}];
+  st.forEach((s,i)=>{
+    const g=ctx.createRadialGradient(s.x,s.y,10,s.x,s.y,s.r*(1+Math.sin(t+i)*0.02));
+    g.addColorStop(0,'rgba('+s.c+',.22)');g.addColorStop(0.7,'rgba('+s.c+',.10)');g.addColorStop(1,'rgba('+s.c+',0)');
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,7);ctx.fill();
+    ctx.strokeStyle='rgba('+s.c+',.5)';ctx.setLineDash([6,5]);ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,7);ctx.stroke();ctx.setLineDash([]);
+  });
+  // линии связи
+  const pts=[{x:W*0.3,y:H*0.4,n:'ЗАРЯ-4'},{x:W*0.68,y:H*0.35,n:'ЗАРЯ-7'},{x:W*0.55,y:H*0.72,n:'МАЯК-2'},{x:W*0.15,y:H*0.65,n:'П-14'},{x:W*0.85,y:H*0.6,n:'КУПОЛ'}];
+  ctx.strokeStyle='rgba(201,212,184,.55)';ctx.lineWidth=1.4;
+  [[0,1],[0,2],[1,2],[0,3],[2,4],[1,4]].forEach(([a,b])=>{
+    ctx.beginPath();ctx.moveTo(pts[a].x,pts[a].y);ctx.lineTo(pts[b].x,pts[b].y);ctx.stroke();
+    // бегущий пакет
+    const p=((t*0.5+a*0.3)%1);
+    ctx.fillStyle='#d9a441';ctx.beginPath();
+    ctx.arc(pts[a].x+(pts[b].x-pts[a].x)*p,pts[a].y+(pts[b].y-pts[a].y)*p,2,0,7);ctx.fill();
+  });
+  // условные знаки
+  pts.forEach((p,i)=>{
+    ctx.strokeStyle=i===0?'#9db86a':'#c9d4b8';ctx.lineWidth=1.6;ctx.fillStyle='#14180f';
+    if(i<3){ // узел связи — квадрат с молнией
+      ctx.fillRect(p.x-9,p.y-9,18,18);ctx.strokeRect(p.x-9,p.y-9,18,18);
+      ctx.strokeStyle='#d9a441';ctx.beginPath();ctx.moveTo(p.x+2,p.y-6);ctx.lineTo(p.x-3,p.y+1);ctx.lineTo(p.x+1,p.y+1);ctx.lineTo(p.x-2,p.y+7);ctx.stroke();
+    }else{ // полевой пункт — треугольник
+      ctx.beginPath();ctx.moveTo(p.x,p.y-10);ctx.lineTo(p.x+9,p.y+7);ctx.lineTo(p.x-9,p.y+7);ctx.closePath();ctx.fill();ctx.stroke();
+    }
+    ctx.fillStyle='#c9d4b8';ctx.font='10px Consolas,monospace';ctx.textAlign='center';
+    ctx.fillText(p.n,p.x,p.y-14);
+    ctx.fillStyle=i===0?'#9db86a':'#8a9674';ctx.fillText(i<3?'TS-1':'TS-0 не оценено',p.x,p.y+22);
+  });
+  // профиль "предварительно"
+  ctx.fillStyle='rgba(217,164,65,.9)';ctx.font='9px Consolas,monospace';ctx.textAlign='left';
+  ctx.fillText('◌ покрытие — PREVIEW (physics: fast), точный расчёт в очереди',12,H-14);
+  requestAnimationFrame(()=>{});
+}
+setInterval(()=>{t+=0.02;draw();},50);
+resize();
+</script>
+</body>
+</html>

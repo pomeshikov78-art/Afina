@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>СПО «Афина NextGen» — 7 прототипов интерфейса</title>
+<style>
+  :root{--bg:#0f1117;--card:#171a23;--line:#262b38;--txt:#e8ebf2;--dim:#94a0b4;--acc:#5b9dd9;--gold:#e0b34c}
+  *{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",Arial,sans-serif}
+  body{background:var(--bg);color:var(--txt);min-height:100vh;padding:34px 26px}
+  .head{max-width:1280px;margin:0 auto 26px}
+  .head h1{font-size:26px;font-weight:800;letter-spacing:.5px}
+  .head h1 span{color:var(--gold)}
+  .head p{color:var(--dim);margin-top:7px;font-size:14px;line-height:1.6;max-width:900px}
+  .grid{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:16px}
+  a.card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;text-decoration:none;color:var(--txt);display:flex;flex-direction:column;transition:.15s}
+  a.card:hover{border-color:var(--acc);transform:translateY(-2px)}
+  .prev{height:190px;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+  .num{position:absolute;top:10px;left:12px;background:rgba(0,0,0,.55);border-radius:7px;padding:2px 10px;font-size:11px;letter-spacing:1px;color:var(--gold);font-weight:700;z-index:2}
+  .body{padding:14px 16px 16px}
+  .body h2{font-size:16px;margin-bottom:5px}
+  .body .st{color:var(--dim);font-size:12.5px;line-height:1.55;margin-bottom:9px}
+  .tags{display:flex;gap:5px;flex-wrap:wrap}
+  .tag{font-size:10px;border:1px solid var(--line);border-radius:9px;padding:2px 9px;color:var(--dim)}
+  .open{margin-top:10px;font-size:12px;color:var(--acc);font-weight:600}
+  .foot{max-width:1280px;margin:26px auto 0;color:var(--dim);font-size:12.5px;line-height:1.7;border-top:1px solid var(--line);padding-top:16px}
+</style>
+</head>
+<body>
+<div class="head">
+  <h1>СПО «Афина NextGen» — <span>7 прототипов интерфейса</span></h1>
+  <p>Каждый прототип — самодостаточный HTML-файл без внешних зависимостей (работает в изолированном контуре, AUT-002). Общая структура по ТЗ §10.2 соблюдена во всех вариантах: меню · тулбар (Расчёт/Очередь/Физика/Профиль) · каталог — сцена — инспектор · слои и фильтры · статус-бар с индикатором «Ошибки и ресурсы». Различается визуальный язык, целевой профиль и способ подачи инженерной семантики.</p>
+  <p style="margin-top:10px"><a href="../Афина_v12.html" style="display:inline-block;background:linear-gradient(135deg,#a78bfa,#f472b6);color:#fff;text-decoration:none;font-weight:700;border-radius:9px;padding:9px 20px;font-size:14px">✦ Открыть «Афина_v12» — текущая версия (ИИ-Оператор) →</a>
+  <a href="../Афина_v11.html" style="display:inline-block;border:1px solid #3a3458;color:#94a0b4;text-decoration:none;font-weight:600;border-radius:9px;padding:9px 16px;font-size:13px;margin-left:8px">v11</a>
+  <a href="../CHANGELOG.md" style="display:inline-block;border:1px solid #3a3458;color:#94a0b4;text-decoration:none;font-weight:600;border-radius:9px;padding:9px 16px;font-size:13px;margin-left:8px">CHANGELOG</a></p>
+</div>
+<div class="grid">
+
+  <a class="card" href="v1_tactical.html">
+    <div class="prev" style="background:radial-gradient(400px 200px at 30% 40%,#2a3420,#0e120a)"><span class="num">ПРОТОТИП 1</span>
+      <svg viewBox="0 0 380 190" width="100%" height="100%">
+        <circle cx="120" cy="90" r="70" fill="rgba(157,184,106,.12)" stroke="rgba(157,184,106,.6)" stroke-dasharray="5 4"/>
+        <circle cx="250" cy="70" r="52" fill="rgba(127,181,168,.12)" stroke="rgba(127,181,168,.6)" stroke-dasharray="5 4"/>
+        <line x1="120" y1="90" x2="250" y2="70" stroke="rgba(201,212,184,.6)"/>
+        <line x1="120" y1="90" x2="200" y2="150" stroke="rgba(201,212,184,.6)"/>
+        <rect x="112" y="82" width="16" height="16" fill="#14180f" stroke="#9db86a" stroke-width="1.5"/>
+        <rect x="242" y="62" width="16" height="16" fill="#14180f" stroke="#c9d4b8" stroke-width="1.5"/>
+        <path d="M200 142 l8 16 l-16 0 z" fill="#14180f" stroke="#c9d4b8" stroke-width="1.5"/>
+        <text x="120" y="72" fill="#c9d4b8" font-size="9" text-anchor="middle" font-family="monospace">ЗАРЯ-4</text>
+        <text x="250" y="52" fill="#c9d4b8" font-size="9" text-anchor="middle" font-family="monospace">ЗАРЯ-7</text>
+        <text x="14" y="24" fill="#8a9674" font-size="8" font-family="monospace">REЖИМ Б · AIR-GAP</text>
+      </svg>
+    </div>
+    <div class="body">
+      <h2>Тактический КП</h2>
+      <div class="st">Военизированный монохромно-оливковый терминал. Карта обстановки с условными знаками, пульсирующие зоны покрытия УКВ, бегущие пакеты по линиям связи. Профиль «Тактический», сценарии .OSC.</div>
+      <div class="tags"><span class="tag">тёмная olive-тема</span><span class="tag">monospace</span><span class="tag">2D-обстановка</span><span class="tag">оператор узла связи</span></div>
+      <div class="open">Открыть прототип →</div>
+    </div>
+  </a>
+
+  <a class="card" href="v2_cad.html">
+    <div class="prev" style="background:linear-gradient(#f6f8fa,#e8edf2)"><span class="num" style="color:#0b5cab;background:rgba(255,255,255,.8)">ПРОТОТИП 2</span>
+      <svg viewBox="0 0 380 190" width="100%" height="100%">
+        <path d="M110 70 L60 20 A120 120 0 0 1 160 20 Z" fill="rgba(30,125,67,.35)" stroke="#0b5cab"/>
+        <path d="M110 70 L160 20 A120 120 0 0 1 220 100 Z" fill="rgba(143,191,63,.4)"/>
+        <path d="M110 70 L220 100 A120 120 0 0 1 60 140 Z" fill="rgba(224,160,48,.3)"/>
+        <circle cx="110" cy="70" r="6" fill="#0b5cab" stroke="#fff" stroke-width="2"/>
+        <circle cx="240" cy="46" r="5" fill="none" stroke="#b02a1f" stroke-width="2"/>
+        <line x1="234" y1="46" x2="246" y2="46" stroke="#b02a1f" stroke-width="1.5"/><line x1="240" y1="40" x2="240" y2="52" stroke="#b02a1f" stroke-width="1.5"/>
+        <line x1="110" y1="70" x2="240" y2="46" stroke="#0b5cab" stroke-dasharray="4 3"/>
+        <text x="252" y="40" fill="#b02a1f" font-size="8">CPE-07 · −82,9 дБм</text>
+        <rect x="280" y="120" width="86" height="52" rx="4" fill="#fff" stroke="#c8d0d8"/>
+        <text x="288" y="134" fill="#63727f" font-size="7">RSRP, дБм</text>
+        <rect x="288" y="140" width="70" height="7" fill="url(#g2)"/>
+        <defs><linearGradient id="g2" x1="0" x2="1"><stop offset="0" stop-color="#b02a1f"/><stop offset=".4" stop-color="#e0a030"/><stop offset=".7" stop-color="#8fbf3f"/><stop offset="1" stop-color="#1e7d43"/></linearGradient></defs>
+      </svg>
+    </div>
+    <div class="body">
+      <h2>RF-Инженер · CAD</h2>
+      <div class="st">Светлый инженерный стиль «чертёжного пакета». Тепловая карта RSRP с секторами 5G, вкладки расчётных видов, полный бюджет радиолинии RF-07 в инспекторе, очередь асинхронных расчётов поверх сцены.</div>
+      <div class="tags"><span class="tag">светлая тема</span><span class="tag">тепловые карты</span><span class="tag">бюджет линии</span><span class="tag">инженер-расчётчик</span></div>
+      <div class="open">Открыть прототип →</div>
+    </div>
+  </a>
+
+  <a class="card" href="v3_hud.html">
+    <div class="prev" style="background:radial-gradient(400px 220px at 60% 30%,#0b1a30,#05070d)"><span class="num" style="color:#40dcff">ПРОТОТИП 3</span>
+      <svg viewBox="0 0 380 190" width="100%" height="100%">
+        <g stroke="rgba(64,220,255,.14)">
+          <line x1="40" y1="150" x2="190" y2="60"/><line x1="90" y1="170" x2="240" y2="80"/><line x1="140" y1="185" x2="300" y2="95"/>
+          <line x1="60" y1="70" x2="240" y2="170"/><line x1="130" y1="45" x2="320" y2="150"/>
+        </g>
+        <line x1="190" y1="140" x2="190" y2="40" stroke="#d7e7f5" stroke-width="2"/>
+        <rect x="182" y="28" width="5" height="12" fill="#40dcff"/><rect x="193" y="28" width="5" height="12" fill="#40dcff"/><rect x="204" y="28" width="5" height="12" fill="#40dcff"/>
+        <ellipse cx="190" cy="145" rx="90" ry="34" fill="none" stroke="rgba(47,245,192,.55)" stroke-dasharray="5 4"/>
+        <ellipse cx="190" cy="145" rx="55" ry="21" fill="none" stroke="rgba(64,220,255,.5)" stroke-dasharray="4 4"/>
+        <rect x="228" y="130" width="20" height="14" fill="rgba(255,181,71,.5)" stroke="#ffb547"/>
+        <text x="228" y="124" fill="#ffb547" font-size="8" font-family="monospace">ИБП · TS-2</text>
+        <text x="150" y="18" fill="#40dcff" font-size="9" font-family="monospace" letter-spacing="2">ЦИФРОВОЙ ДВОЙНИК · DT-4</text>
+      </svg>
+    </div>
+    <div class="body">
+      <h2>Цифровой двойник · HUD</h2>
+      <div class="st">Неоновый «стеклянный» интерфейс цифрового двойника. Изометрическая 3D-сцена с сканирующей волной, дерево слоёв двойника (каждый слой со своей версией), телеметрия и прогноз раздельно, шкала зрелости DT-0…DT-5.</div>
+      <div class="tags"><span class="tag">тёмная neon-тема</span><span class="tag">изометрия</span><span class="tag">телеметрия live</span><span class="tag">эксплуатация ЦД</span></div>
+      <div class="open">Открыть прототип →</div>
+    </div>
+  </a>
+
+  <a class="card" href="v4_dashboard.html">
+    <div class="prev" style="background:linear-gradient(#f8fafc,#edf1f6)"><span class="num" style="color:#1552a0;background:rgba(255,255,255,.85)">ПРОТОТИП 4</span>
+      <svg viewBox="0 0 380 190" width="100%" height="100%">
+        <rect x="20" y="20" width="100" height="46" rx="7" fill="#fff" stroke="#e4e9ef"/><rect x="20" y="20" width="100" height="3" fill="#188a4c"/>
+        <text x="30" y="40" fill="#7c8a99" font-size="7">ГОТОВНОСТЬ</text><text x="30" y="58" fill="#188a4c" font-size="15" font-weight="800">78 %</text>
+        <rect x="132" y="20" width="100" height="46" rx="7" fill="#fff" stroke="#e4e9ef"/><rect x="132" y="20" width="100" height="3" fill="#3b82d6"/>
+        <text x="142" y="40" fill="#7c8a99" font-size="7">РЕАЛИЗАЦИЯ</text><text x="142" y="58" fill="#22303f" font-size="15" font-weight="800">84 %</text>
+        <rect x="244" y="20" width="100" height="46" rx="7" fill="#fff" stroke="#e4e9ef"/><rect x="244" y="20" width="100" height="3" fill="#c07800"/>
+        <text x="254" y="40" fill="#7c8a99" font-size="7">ЗАМЕЧАНИЯ</text><text x="254" y="58" fill="#c07800" font-size="15" font-weight="800">17</text>
+        <rect x="20" y="80" width="212" height="86" rx="7" fill="#fff" stroke="#e4e9ef"/>
+        <g font-size="7" fill="#7c8a99"><text x="30" y="98">14-й узел · укомплект.</text><text x="30" y="118">14-й узел · техн. TS-1/2</text><text x="30" y="138">7-я рота · техн. TS-1/2</text></g>
+        <rect x="140" y="91" width="80" height="7" rx="3" fill="#e6f5ec"/><rect x="140" y="91" width="74" height="7" rx="3" fill="#188a4c"/>
+        <rect x="140" y="111" width="80" height="7" rx="3" fill="#eef0f3"/><rect x="140" y="111" width="57" height="7" rx="3" fill="#3b82d6"/>
+        <rect x="140" y="131" width="80" height="7" rx="3" fill="#eef0f3"/><rect x="140" y="131" width="43" height="7" rx="3" fill="#3b82d6"/>
+        <circle cx="300" cy="122" r="34" fill="none" stroke="#eef0f3" stroke-width="10"/>
+        <circle cx="300" cy="122" r="34" fill="none" stroke="#188a4c" stroke-width="10" stroke-dasharray="98 116" stroke-dashoffset="53"/>
+        <circle cx="300" cy="122" r="34" fill="none" stroke="#c07800" stroke-width="10" stroke-dasharray="58 156" stroke-dashoffset="-45"/>
+        <circle cx="300" cy="122" r="34" fill="none" stroke="#3b82d6" stroke-width="10" stroke-dasharray="38 176" stroke-dashoffset="-103"/>
+      </svg>
+    </div>
+    <div class="body">
+      <h2>Панель руководителя</h2>
+      <div class="st">Светлый корпоративный дашборд: KPI-плитки, рубежи G0–G5, ОШС/факт/состояние по подразделениям, донат подтверждённости возможностей, ВТ-05 готовность к предъявлению, лента уведомлений NTF с жизненным циклом.</div>
+      <div class="tags"><span class="tag">корпоративный стиль</span><span class="tag">KPI и графики</span><span class="tag">ГОЗ / ВТ-08</span><span class="tag">руководитель программы</span></div>
+      <div class="open">Открыть прототип →</div>
+    </div>
+  </a>
+
+  <a class="card" href="v5_bim.html">
+    <div class="prev" style="background:linear-gradient(#26282c,#1c1e22)"><span class="num" style="color:#e8833a">ПРОТОТИП 5</span>
+      <svg viewBox="0 0 380 190" width="100%" height="100%">
+        <g stroke="rgba(91,157,217,.55)" fill="rgba(91,157,217,.10)">
+          <path d="M120 150 L240 90 L330 135 L210 190 Z" transform="translate(0,-30)"/>
+          <path d="M120 150 L240 90 L330 135 L210 190 Z" transform="translate(0,-58)"/>
+        </g>
+        <g stroke="#e8833a" stroke-width="1.8" fill="rgba(232,131,58,.25)">
+          <path d="M120 150 L240 90 L330 135 L210 190 Z" transform="translate(0,-86)"/>
+        </g>
+        <path d="M120 120 L120 60 M240 60 L240 4 M330 105 L330 49 M210 160 L210 104" stroke="rgba(91,157,217,.4)"/>
+        <circle cx="180" cy="60" r="4" fill="#e8833a"/><circle cx="230" cy="42" r="4" fill="#e8833a"/><circle cx="275" cy="66" r="4" fill="#e8833a"/>
+        <circle cx="230" cy="42" r="11" fill="none" stroke="rgba(232,131,58,.6)" stroke-dasharray="3 2"/>
+        <line x1="110" y1="150" x2="110" y2="30" stroke="#6fbf73" stroke-width="2"/>
+        <text x="40" y="30" fill="#9aa0a6" font-size="8" font-family="monospace">Z-СРЕЗ · ЭТАЖ 2 (активен)</text>
+        <text x="40" y="176" fill="#9aa0a6" font-size="8" font-family="monospace">RISER-1 · кабели в BIM</text>
+      </svg>
+    </div>
+    <div class="body">
+      <h2>3D-Планировщик · BIM</h2>
+      <div class="st">Профессиональный CAD в тёмно-серой гамме с ribbon-лентой. Четыре синхронных вида (3D / план / разрез), полоса Z-срезов этажей, дерево IFC-структуры, indoor-покрытие Wi-Fi 6E, автопрокладка кабеля с радиусом изгиба.</div>
+      <div class="tags"><span class="tag">ribbon-интерфейс</span><span class="tag">мультивидовая сцена</span><span class="tag">BIM / IFC</span><span class="tag">indoor-планирование</span></div>
+      <div class="open">Открыть прототип →</div>
+    </div>
+  </a>
+
+  <a class="card" href="v6_ai.html">
+    <div class="prev" style="background:radial-gradient(400px 220px at 30% 30%,#1c1830,#0d0b16)"><span class="num" style="color:#f472b6">ПРОТОТИП 6</span>
+      <svg viewBox="0 0 380 190" width="100%" height="100%">
+        <rect x="20" y="30" width="130" height="130" rx="10" fill="#151222" stroke="#2c2745"/>
+        <circle cx="42" cy="52" r="9" fill="url(#orb)"/>
+        <defs><radialGradient id="orb" cx=".3" cy=".3"><stop offset="0" stop-color="#f472b6"/><stop offset="1" stop-color="#a78bfa"/></radialGradient></defs>
+        <rect x="58" y="46" width="78" height="5" rx="2" fill="#a78bfa" opacity=".8"/>
+        <rect x="58" y="55" width="54" height="4" rx="2" fill="#3a3458"/>
+        <rect x="32" y="72" width="104" height="26" rx="6" fill="#1c1830" stroke="#2c2745"/>
+        <rect x="38" y="79" width="86" height="4" rx="2" fill="#4a4470"/><rect x="38" y="87" width="60" height="4" rx="2" fill="#4a4470"/>
+        <rect x="52" y="106" width="86" height="22" rx="6" fill="rgba(167,139,250,.15)" stroke="#3a3458"/>
+        <rect x="58" y="113" width="70" height="4" rx="2" fill="#6d5a9e"/>
+        <rect x="32" y="136" width="106" height="14" rx="7" fill="#0d0b16" stroke="#3a3458"/>
+        <rect x="175" y="36" width="180" height="118" rx="8" fill="#12101e" stroke="#2c2745"/>
+        <rect x="175" y="36" width="180" height="118" rx="8" fill="none" stroke="rgba(103,232,249,.4)" stroke-dasharray="6 5"/>
+        <circle cx="255" cy="88" r="30" fill="rgba(74,222,128,.1)" stroke="rgba(74,222,128,.6)"/>
+        <circle cx="255" cy="88" r="4" fill="#4ade80"/>
+        <text x="255" y="76" fill="#4ade80" font-size="8" text-anchor="middle">M-02 ★</text>
+        <g stroke="rgba(248,113,113,.7)"><line x1="200" y1="52" x2="210" y2="62"/><line x1="210" y1="52" x2="200" y2="62"/><line x1="310" y1="118" x2="320" y2="128"/><line x1="320" y1="118" x2="310" y2="128"/></g>
+        <text x="185" y="148" fill="#8f88ad" font-size="7" font-family="monospace">⊞ умная рамка: 7 кандидатов · 3 допустимо</text>
+      </svg>
+    </div>
+    <div class="body">
+      <h2>ИИ-Оператор</h2>
+      <div class="st">Фиолетово-розовая тёмная тема с чатом локального ИИ-помощника во всю левую колонку. Каждый ответ — с источниками, версиями и ограничениями (AI-001); на сцене «умная рамка» с кандидатами и причинами отклонения; панель запретов ИИ.</div>
+      <div class="tags"><span class="tag">AI-чат + RAG</span><span class="tag">градиентная тёмная тема</span><span class="tag">источники в ответах</span><span class="tag">автопланирование</span></div>
+      <div class="open">Открыть прототип →</div>
+    </div>
+  </a>
+
+  <a class="card" href="v7_minimal.html">
+    <div class="prev" style="background:linear-gradient(#ffffff,#f2f3f5)"><span class="num" style="color:#111;background:rgba(0,0,0,.06)">ПРОТОТИП 7</span>
+      <svg viewBox="0 0 380 190" width="100%" height="100%">
+        <rect x="24" y="24" width="332" height="22" fill="#111"/>
+        <text x="34" y="39" fill="#fff" font-size="9" font-weight="800" letter-spacing="2">АФИНА / данные</text>
+        <rect x="24" y="56" width="72" height="112" rx="5" fill="#fff" stroke="#e2e2e2"/>
+        <rect x="26" y="64" width="68" height="8" fill="#eef2ff"/><rect x="26" y="64" width="2" height="8" fill="#1a56db"/>
+        <rect x="34" y="66" width="44" height="4" fill="#c7cfdd"/>
+        <rect x="34" y="80" width="50" height="4" fill="#e2e2e2"/><rect x="34" y="92" width="42" height="4" fill="#e2e2e2"/><rect x="34" y="104" width="48" height="4" fill="#e2e2e2"/>
+        <rect x="104" y="56" width="252" height="112" rx="5" fill="#fff" stroke="#e2e2e2"/>
+        <rect x="104" y="56" width="252" height="14" fill="#fafafa" stroke="#e2e2e2"/>
+        <g font-size="6" fill="#767676" font-family="monospace">
+          <text x="112" y="66">ID</text><text x="160" y="66">НАИМЕНОВАНИЕ</text><text x="252" y="66">TS</text><text x="284" y="66">DAT</text><text x="322" y="66">DQ</text>
+        </g>
+        <rect x="104" y="76" width="252" height="14" fill="#eef2ff"/>
+        <g fill="#181818" font-size="7" font-family="monospace">
+          <text x="112" y="86">8F3A-0012</text><text x="160" y="86">Узел «Заря-4»</text>
+          <text x="112" y="104">9C21-0007</text><text x="160" y="104">ИБП-10 кВА</text>
+          <text x="112" y="122">6A02-0044</text><text x="160" y="122">Антенна АШ-2,5</text>
+          <text x="112" y="140">4E77-0101</text><text x="160" y="140">ГЛОНАСС/GPS</text>
+        </g>
+        <g><rect x="252" y="80" width="6" height="6" fill="#0d7a3e"/><rect x="252" y="98" width="6" height="6" fill="#9a6700"/><rect x="252" y="116" width="6" height="6" fill="none" stroke="#767676"/><rect x="252" y="134" width="6" height="6" fill="#9a6700"/></g>
+        <g><rect x="284" y="80" width="6" height="6" fill="#1a56db"/><rect x="284" y="98" width="6" height="6" fill="#1a56db"/><rect x="284" y="116" width="6" height="6" fill="#b42318"/><rect x="284" y="134" width="6" height="6" fill="#1a56db"/></g>
+        <g fill="#e2e2e2"><rect x="320" y="81" width="26" height="4" rx="1"/><rect x="320" y="99" width="26" height="4" rx="1"/><rect x="320" y="117" width="26" height="4" rx="1"/><rect x="320" y="135" width="26" height="4" rx="1"/></g>
+        <g fill="#0d7a3e"><rect x="320" y="81" width="22" height="4" rx="1"/><rect x="320" y="99" width="16" height="4" rx="1"/><rect x="320" y="135" width="10" height="4" rx="1"/></g>
+      </svg>
+    </div>
+    <div class="body">
+      <h2>Данные · Минимализм</h2>
+      <div class="st">Плотный «швейцарский» интерфейс реестров: чёрно-белая база, monospace-идентификаторы, колонки TS и DAT раздельно, индикаторы качества данных, RTM-панель, битемпоральные записи происхождения и арбитраж конфликтов. Карта — как контекст, а не главный герой.</div>
+      <div class="tags"><span class="tag">data-first</span><span class="tag">плотные таблицы</span><span class="tag">RTM / аудит</span><span class="tag">верификатор · админ данных</span></div>
+      <div class="open">Открыть прототип →</div>
+    </div>
+  </a>
+
+</div>
+<div class="foot">
+  Все 7 прототипов: единый каркас по ТЗ §10.2 (меню → тулбар «Расчёт / Очередь / Физика / Профиль» → каталог · сцена · инспектор → слои/фильтры/состояния → статус-бар «FPS · Генерализация · Выделено · Статус · Ошибки и ресурсы»), русскоязычный интерфейс (§10.1), раздельные статусы TS / DAT / DT (§1.5), маркировка «предварительно vs точный расчёт» (3DM-004), указание режима автономности. Файлы работают офлайн без внешних ресурсов.<br><br>
+  <b style="color:var(--txt)">Рекомендация к выбору:</b> 1 — для полевого/оперативного звена; 2 — основной рабочий инструмент радиопланирования; 3 — демонстрация цифровых двойников руководству; 4 — управленческий контур (ВТ-08); 5 — indoor/BIM-проектирование; 6 — ИИ-сценарии (G4); 7 — реестры, верификация и аудит данных. Возможно развитие гибрида (например, каркас 2 + панель 4 + реестры 7).
+</div>
+</body>
+</html>

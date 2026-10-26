@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>СПО «Афина» — Прототип 3 «Цифровой двойник · HUD»</title>
+<style>
+  :root{
+    --bg:#05070d; --panel:rgba(12,20,34,.82); --line:rgba(64,220,255,.18); --line2:rgba(64,220,255,.35);
+    --txt:#d7e7f5; --dim:#5f7d99; --cyan:#40dcff; --teal:#2ff5c0; --violet:#a78bfa;
+    --amber:#ffb547; --red:#ff5f6d;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI","Arial",sans-serif}
+  body{background:radial-gradient(1200px 700px at 70% -10%,#0b1a30 0%,var(--bg) 60%);color:var(--txt);font-size:12px;overflow:hidden;height:100vh;display:flex;flex-direction:column}
+  .menubar{display:flex;align-items:center;height:34px;padding:0 14px;background:var(--panel);border-bottom:1px solid var(--line);backdrop-filter:blur(6px);flex-shrink:0}
+  .logo{font-weight:800;letter-spacing:3px;color:var(--cyan);text-shadow:0 0 12px rgba(64,220,255,.6);margin-right:18px;font-size:14px}
+  .logo em{font-style:normal;color:var(--violet)}
+  .menubar a{color:var(--dim);text-decoration:none;padding:6px 10px;cursor:pointer;font-size:12px}
+  .menubar a:hover{color:var(--cyan)}
+  .menubar .right{margin-left:auto;display:flex;gap:10px;align-items:center}
+  .chip{border:1px solid var(--line2);border-radius:12px;padding:2px 11px;font-size:10px;color:var(--teal);letter-spacing:1px;background:rgba(47,245,192,.06)}
+  .chip.v{color:var(--violet);border-color:rgba(167,139,250,.4);background:rgba(167,139,250,.07)}
+  .toolbar{display:flex;align-items:center;gap:8px;padding:7px 14px;background:rgba(8,14,24,.6);border-bottom:1px solid var(--line);flex-shrink:0;flex-wrap:wrap}
+  .gbtn{background:linear-gradient(180deg,rgba(64,220,255,.12),rgba(64,220,255,.04));border:1px solid var(--line2);color:var(--cyan);border-radius:6px;padding:5px 14px;cursor:pointer;font-size:12px;letter-spacing:.5px}
+  .gbtn:hover{box-shadow:0 0 14px rgba(64,220,255,.35);background:rgba(64,220,255,.16)}
+  .gbtn.v{border-color:rgba(167,139,250,.45);color:var(--violet);background:rgba(167,139,250,.08)}
+  .sep{width:1px;height:20px;background:var(--line)}
+  select{background:#0a1322;border:1px solid var(--line2);color:var(--cyan);border-radius:5px;padding:4px 8px;font-size:11px}
+  .phys{display:flex;gap:0;border:1px solid var(--line2);border-radius:6px;overflow:hidden}
+  .phys button{background:transparent;border:none;color:var(--dim);padding:4px 11px;cursor:pointer;font-size:11px}
+  .phys button.on{background:rgba(64,220,255,.18);color:var(--cyan);text-shadow:0 0 8px rgba(64,220,255,.8)}
+  .main{flex:1;display:flex;min-height:0;gap:0}
+  .col-left{width:236px;display:flex;flex-direction:column;background:var(--panel);border-right:1px solid var(--line);backdrop-filter:blur(6px);flex-shrink:0}
+  .col-center{flex:1;display:flex;flex-direction:column;min-width:0;position:relative}
+  .col-right{width:298px;display:flex;flex-direction:column;background:var(--panel);border-left:1px solid var(--line);backdrop-filter:blur(6px);flex-shrink:0}
+  .ph{padding:8px 12px;font-size:10px;font-weight:700;letter-spacing:2.4px;color:var(--cyan);text-transform:uppercase;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;text-shadow:0 0 10px rgba(64,220,255,.5)}
+  .ph span:last-child{color:var(--dim);text-shadow:none}
+  /* дерево двойника */
+  .tree{overflow-y:auto;flex:1;padding:8px 6px}
+  .tnode{padding:4px 8px;border-radius:5px;cursor:pointer;display:flex;gap:7px;align-items:center;font-size:12px;color:var(--txt)}
+  .tnode:hover{background:rgba(64,220,255,.07)}
+  .tnode.on{background:rgba(64,220,255,.13);border:1px solid var(--line2);color:var(--cyan)}
+  .tnode .st{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+  .tnode .sub{margin-left:20px;font-size:10.5px;color:var(--dim)}
+  .tlev{padding:3px 8px 3px 22px;font-size:10.5px;color:var(--dim);border-left:1px dashed var(--line2);margin-left:14px;cursor:pointer}
+  .tlev:hover{color:var(--teal)}
+  .tlev .k{color:var(--txt);opacity:.8}
+  /* сцена */
+  .scene{flex:1;position:relative;min-height:0}
+  canvas{position:absolute;inset:0;width:100%;height:100%}
+  .corner{position:absolute;width:26px;height:26px;border-color:var(--cyan);opacity:.7}
+  .c1{top:8px;left:8px;border-top:2px solid;border-left:2px solid}
+  .c2{top:8px;right:8px;border-top:2px solid;border-right:2px solid}
+  .c3{bottom:8px;left:8px;border-bottom:2px solid;border-left:2px solid}
+  .c4{bottom:8px;right:8px;border-bottom:2px solid;border-right:2px solid}
+  .scene-title{position:absolute;top:16px;left:50%;transform:translateX(-50%);text-align:center;pointer-events:none}
+  .scene-title .t{font-size:15px;letter-spacing:4px;color:var(--txt);text-shadow:0 0 16px rgba(64,220,255,.6);font-weight:300}
+  .scene-title .s{font-size:10px;color:var(--dim);letter-spacing:2px;margin-top:2px}
+  .gauge{position:absolute;background:var(--panel);border:1px solid var(--line2);border-radius:8px;padding:8px 12px;backdrop-filter:blur(8px);font-size:10px;color:var(--dim);line-height:1.8}
+  .gauge b{color:var(--teal);font-weight:600}
+  .gauge .h{color:var(--cyan);letter-spacing:1.5px;font-size:9px;text-transform:uppercase;margin-bottom:2px}
+  .g-l{top:60px;left:16px}
+  .g-r{top:60px;right:16px;text-align:right}
+  .live{position:absolute;bottom:14px;left:16px;display:flex;gap:14px;align-items:center;background:var(--panel);border:1px solid var(--line2);border-radius:8px;padding:7px 14px;font-size:10px;color:var(--dim);backdrop-filter:blur(8px)}
+  .live .pulse{width:8px;height:8px;border-radius:50%;background:var(--teal);box-shadow:0 0 10px var(--teal);animation:pl 1.6s infinite}
+  @keyframes pl{0%,100%{opacity:1}50%{opacity:.25}}
+  .dt-level{position:absolute;bottom:14px;right:16px;display:flex;gap:4px;background:var(--panel);border:1px solid var(--line2);border-radius:8px;padding:7px 12px;align-items:center;font-size:10px;color:var(--dim)}
+  .dtb{width:30px;height:5px;border-radius:3px;background:rgba(64,220,255,.15)}
+  .dtb.on{background:var(--cyan);box-shadow:0 0 8px rgba(64,220,255,.9)}
+  /* слои */
+  .layers{background:rgba(8,14,24,.7);border-top:1px solid var(--line);padding:6px 14px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:11px;flex-shrink:0}
+  .lb{color:var(--dim);font-size:9px;letter-spacing:2px}
+  .lay{display:flex;gap:5px;align-items:center;color:var(--dim);cursor:pointer}
+  .lay input{accent-color:var(--cyan)}
+  .lay.on{color:var(--cyan)}
+  /* инспектор */
+  .insp{overflow-y:auto;flex:1;padding:10px}
+  .panel{border:1px solid var(--line);border-radius:8px;margin-bottom:10px;background:rgba(10,18,32,.5);overflow:hidden}
+  .panel .ph2{padding:6px 11px;font-size:9px;letter-spacing:2px;color:var(--violet);border-bottom:1px solid var(--line);text-transform:uppercase}
+  .panel .pb{padding:8px 11px;font-size:11px}
+  .kv{display:flex;justify-content:space-between;padding:2.5px 0;color:var(--dim)}
+  .kv b{color:var(--txt);font-weight:500}
+  .spark{display:flex;gap:2px;align-items:flex-end;height:34px;margin-top:6px}
+  .spark i{flex:1;background:linear-gradient(180deg,var(--cyan),rgba(64,220,255,.15));border-radius:1px 1px 0 0}
+  .state{display:inline-block;border:1px solid;border-radius:10px;padding:1px 9px;font-size:9.5px;letter-spacing:1px}
+  .s-ok{color:var(--teal);border-color:rgba(47,245,192,.5);background:rgba(47,245,192,.08)}
+  .s-warn{color:var(--amber);border-color:rgba(255,181,71,.5);background:rgba(255,181,71,.08)}
+  .s-obs{color:var(--violet);border-color:rgba(167,139,250,.5);background:rgba(167,139,250,.08)}
+  .statusbar{display:flex;align-items:center;gap:18px;padding:4px 14px;background:rgba(8,14,24,.85);border-top:1px solid var(--line);font-size:10px;color:var(--dim);flex-shrink:0}
+  .statusbar b{color:var(--txt);font-weight:500}
+  .statusbar .right{margin-left:auto;display:flex;gap:16px}
+  .nbar{display:inline-block;width:50px;height:5px;background:rgba(64,220,255,.1);border-radius:3px;vertical-align:middle;overflow:hidden}
+  .nbar i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--teal));box-shadow:0 0 6px rgba(64,220,255,.8)}
+</style>
+</head>
+<body>
+  <div class="menubar">
+    <div class="logo">ATHENA <em>// ЦИФРОВОЙ ДВОЙНИК</em></div>
+    <a>Файл</a><a>Правка</a><a>Вид</a><a>Задачи</a><a>База</a><a>Параметры</a><a>Окно</a>
+    <div class="right">
+      <span class="chip">DT-4 · ОЦЕНКА СОСТОЯНИЯ</span>
+      <span class="chip v">РЕЖИМ Б · AIR-GAP</span>
+      <span style="color:var(--dim);font-size:11px">Оператор: руководитель программы</span>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <button class="gbtn">▶ Расчёт</button>
+    <button class="gbtn">⇶ Очередь (2)</button>
+    <div class="sep"></div>
+    <span style="color:var(--dim);font-size:11px">Физика:</span>
+    <div class="phys"><button>Быстро</button><button class="on">Авто</button><button>Полная</button></div>
+    <div class="sep"></div>
+    <span style="color:var(--dim);font-size:11px">Профиль:</span>
+    <select><option>3D-Планировщик</option><option>Тактический</option><option>RF-Инженер</option><option>Сетевой Архитектор</option><option>ИИ-Оператор</option></select>
+    <div class="sep"></div>
+    <button class="gbtn v">◈ Слои двойника</button>
+    <button class="gbtn v">↻ Сопоставить проект ↔ факт</button>
+    <button class="gbtn v">⌛ История состояний</button>
+  </div>
+
+  <div class="main">
+    <div class="col-left">
+      <div class="ph"><span>Структура двойника</span><span>DT-4</span></div>
+      <div class="tree">
+        <div class="tnode on"><span class="st" style="background:var(--teal);box-shadow:0 0 6px var(--teal)"></span>⬢ Узел «Заря-4»</div>
+        <div class="tlev"><span class="k">Геометрический слой</span> · v3.2 · подтверждён</div>
+        <div class="tlev"><span class="k">Конструкционный</span> · v1.8 · подтверждён</div>
+        <div class="tlev"><span class="k">Электрический</span> · v2.1 · <span style="color:var(--amber)">телеметрия 12:04</span></div>
+        <div class="tlev"><span class="k">Радиотехнический</span> · v2.4 · подтверждён</div>
+        <div class="tlev"><span class="k">Сетевой</span> · v1.9 · подтверждён</div>
+        <div class="tlev"><span class="k">Измерительный</span> · v4.0 · наблюдаемое</div>
+        <div class="tlev"><span class="k">Расчётный</span> · v2.2 · <span style="color:var(--cyan)">пересчёт в очереди</span></div>
+        <div class="tnode"><span class="st" style="background:var(--cyan)"></span>⬡ Мачта М-25</div>
+        <div class="tnode"><span class="st" style="background:var(--teal)"></span>⬡ АФУ сектор A</div>
+        <div class="tnode"><span class="st" style="background:var(--amber)"></span>⬡ ИБП-10кВА</div>
+        <div class="tnode"><span class="st" style="background:var(--teal)"></span>⬡ Коммутатор L3</div>
+        <div class="tnode"><span class="st" style="background:var(--dim)"></span>⬡ Кондиционер К-1 <span style="font-size:10px;color:var(--dim)">TS-0</span></div>
+        <div class="ph" style="margin-top:10px;border-top:1px solid var(--line)"><span>Жизненный цикл ЦД</span></div>
+        <div style="padding:8px 12px;display:flex;gap:4px;flex-wrap:wrap;font-size:9px">
+          <span class="state s-ok">DESIGN</span><span class="state s-ok">APPROVED</span><span class="state s-ok">AS_BUILT</span><span class="state s-obs">OBSERVED</span><span class="state s-warn">DIAGNOSED</span><span style="border:1px dashed var(--line2);border-radius:10px;padding:1px 9px;color:var(--dim)">PREDICTED</span><span style="border:1px dashed var(--line2);border-radius:10px;padding:1px 9px;color:var(--dim)">RESTORED</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-center">
+      <div class="scene">
+        <canvas id="scene"></canvas>
+        <div class="corner c1"></div><div class="corner c2"></div><div class="corner c3"></div><div class="corner c4"></div>
+        <div class="scene-title">
+          <div class="t">УЗЕЛ СВЯЗИ «ЗАРЯ-4»</div>
+          <div class="s">AS_BUILT + OBSERVED · телеметрия 12:04:33 · базовая линия BL-2026.03-A</div>
+        </div>
+        <div class="gauge g-l">
+          <div class="h">Наблюдаемое состояние</div>
+          Питание: <b>221 В · 50 Гц ✓</b><br>
+          Потребление: <b>4,31 кВт</b> (+2,4 % к паспорту)<br>
+          АКБ резерв: <b>98 %</b><br>
+          Температура шкафа: <b>+31 °C</b> <span style="color:var(--amber)">▲ порог +35</span><br>
+          Канал РРЛ: <b>−74 дБм · BER 1e-9 ✓</b>
+        </div>
+        <div class="gauge g-r">
+          <div class="h">Прогноз (оценка, не факт)</div>
+          Деградация АКБ: <b>−0,8 %/мес</b><br>
+          Горизонт: <b>12 мес · доверие 0,72</b><br>
+          Ресурс вентилятора ИБП: <b>~9 400 ч</b><br>
+          <span style="color:var(--dim)">Основание: DT-4, модель PRED-07<br>Неопределённость: ±15 % · требуется<br>независимая проверка (AI-ограничение)</span>
+        </div>
+        <div class="live"><span class="pulse"></span> ТЕЛЕМЕТРИЯ · внутренний канал · 1 Гц · расхождений с базовой линией: <b style="color:var(--amber);margin-left:4px">2 (протокол DGT-003)</b></div>
+        <div class="dt-level">УРОВЕНЬ ЗРЕЛОСТИ ДВОЙНИКА
+          <span class="dtb on"></span><span class="dtb on"></span><span class="dtb on"></span><span class="dtb on"></span><span class="dtb"></span>
+          <b style="color:var(--cyan);margin-left:6px">DT-4</b>
+        </div>
+      </div>
+      <div class="layers">
+        <span class="lb">СЛОИ</span>
+        <label class="lay on"><input type="checkbox" checked>Геоподложка</label>
+        <label class="lay on"><input type="checkbox" checked>Зоны покрытия</label>
+        <label class="lay on"><input type="checkbox" checked>Линии связи</label>
+        <label class="lay"><input type="checkbox">Отклонённые</label>
+        <label class="lay on"><input type="checkbox" checked>Подписи</label>
+        <label class="lay"><input type="checkbox">Сетка</label>
+        <label class="lay on"><input type="checkbox" checked>Z-рельеф</label>
+        <span class="lb" style="margin-left:12px">СОСТОЯНИЯ</span>
+        <span style="color:var(--teal)">● Исправна</span><span style="color:var(--amber)">● Ограниченно</span><span style="color:var(--red)">● Неисправна</span><span style="color:var(--dim)">○ Не оценено (TS-0)</span>
+      </div>
+    </div>
+
+    <div class="col-right">
+      <div class="ph"><span>Инспектор · IBП-10кВА</span><span>ID 9C21-0007</span></div>
+      <div class="insp">
+        <div class="panel">
+          <div class="ph2">Раздельные статусы (не подменяют друг друга)</div>
+          <div class="pb">
+            <div class="kv">Техн. состояние TS <span class="state s-warn">TS-2 · ИСПРАВНО С ОГРАНИЧЕНИЯМИ</span></div>
+            <div class="kv">Качество данных DAT <span class="state s-ok">ПОДТВЕРЖДЕНО ИЗМЕРЕНИЕМ</span></div>
+            <div class="kv">Ограничение <b>нагрузка ≤ 70 % до замены вентилятора</b></div>
+            <div class="kv">Основание <b>дефектная ведомость ДВ-2026-088</b></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="ph2">Телеметрия · 24 ч (наблюдаемое)</div>
+          <div class="pb">
+            <div class="spark" id="spark"></div>
+            <div class="kv" style="margin-top:4px">Загрузка <b>63 % средн. · пик 71 %</b></div>
+            <div class="kv">Выброс 02:14 <b style="color:var(--teal)">не отбракован — в пределах методики</b></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="ph2">Паспорт vs измерение (EQP-002)</div>
+          <div class="pb">
+            <div class="kv">КПД паспорт <b>94,0 %</b></div>
+            <div class="kv">КПД измерен 12.10 <b>92,1 % ±0,6</b></div>
+            <div class="kv">Средство измерения <b>СИ-044 · поверка до 03.2027 ✓</b></div>
+            <div class="kv">Оба значения <b style="color:var(--teal)">сохранены раздельно</b></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="ph2">Co-Simulation · цепочка THM-01</div>
+          <div class="pb" style="line-height:1.8;color:var(--dim);font-size:10.5px">
+            мощность → тепловыделение → температура → допустимость работы → доступность<br>
+            <span style="color:var(--cyan)">Расчёт в очереди · сценарий CS-118 · решатели: PWR/THM/REL согласованы ✓</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="statusbar">
+    <span>FPS: <b>60</b></span>
+    <span>Генерализация: <b>LOD-2</b></span>
+    <span>Выделено: <b>ИБП-10кВА</b></span>
+    <span>Статус: <b style="color:var(--teal)">Наблюдение · расчёт в очереди</b></span>
+    <span>Ошибки и ресурсы: <b style="color:var(--amber)">1 пред.</b></span>
+    <div class="right">
+      <span>CPU <span class="nbar"><i style="width:29%"></i></span> 29%</span>
+      <span>GPU <span class="nbar"><i style="width:54%"></i></span> 54%</span>
+      <span>RPO/RTO: <b>0 / 11 мин</b></span>
+    </div>
+  </div>
+
+<script>
+// спарклайн
+const sp=document.getElementById('spark');
+for(let i=0;i<48;i++){const v=40+Math.sin(i*0.5)*18+Math.random()*14+(i===22?26:0);
+  const el=document.createElement('i');el.style.height=Math.min(100,v)+'%';sp.appendChild(el);}
+
+const cv=document.getElementById('scene'),ctx=cv.getContext('2d');
+function resize(){cv.width=cv.clientWidth;cv.height=cv.clientHeight;}
+window.addEventListener('resize',resize);resize();
+let t=0;
+// изометрическая сетка + мачта + здания
+function iso(x,y,z){const W=cv.width,H=cv.height;return [W/2+(x-y)*0.9,H*0.62+(x+y)*0.45-z];}
+function draw(){
+  const W=cv.width,H=cv.height;t+=0.016;
+  ctx.clearRect(0,0,W,H);
+  // изосетка
+  ctx.strokeStyle='rgba(64,220,255,.09)';
+  for(let i=-8;i<=8;i++){
+    let a=iso(i*40,-320,0),b=iso(i*40,320,0);
+    ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke();
+    a=iso(-320,i*40,0);b=iso(320,i*40,0);
+    ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke();
+  }
+  // пульсирующие зоны покрытия на земле
+  [[0,-140,150,'64,220,255'],[-180,120,110,'167,139,250'],[200,140,95,'47,245,192']].forEach(([x,y,r,c],i)=>{
+    const [px,py]=iso(x,y,0);
+    const rr=r*(1+Math.sin(t*1.2+i)*0.04);
+    ctx.save();ctx.translate(px,py);ctx.scale(1,0.5);
+    const g=ctx.createRadialGradient(0,0,5,0,0,rr);
+    g.addColorStop(0,'rgba('+c+',.25)');g.addColorStop(1,'rgba('+c+',0)');
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,rr,0,7);ctx.fill();
+    ctx.strokeStyle='rgba('+c+',.5)';ctx.setLineDash([4,4]);ctx.beginPath();ctx.arc(0,0,rr,0,7);ctx.stroke();ctx.setLineDash([]);
+    ctx.restore();
+  });
+  // здания (кубы)
+  function box(x,y,z,w,d,h,col){
+    const p=[[x,y,z+h],[x+w,y,z+h],[x+w,y+d,z+h],[x,y+d,z+h],[x,y,z],[x+w,y,z],[x+w,y+d,z],[x,y+d,z]];
+    const s=p.map(q=>iso(q[0],q[1],q[2]));
+    const faces=[[0,1,5,4,'rgba(20,40,60,.9)'],[1,2,6,5,'rgba(14,28,46,.95)'],[3,0,4,7,'rgba(26,48,72,.85)'],[0,1,2,3,col]];
+    faces.forEach(f=>{
+      ctx.beginPath();ctx.moveTo(s[f[0]][0],s[f[0]][1]);
+      for(let i=1;i<4;i++)ctx.lineTo(s[f[i]][0],s[f[i]][1]);
+      ctx.closePath();ctx.fillStyle=f[4];ctx.fill();
+      ctx.strokeStyle='rgba(64,220,255,.4)';ctx.lineWidth=1;ctx.stroke();
+    });
+  }
+  box(-260,-60,0,70,70,42,'rgba(30,60,90,.9)');
+  box(150,-220,0,90,60,55,'rgba(30,60,90,.9)');
+  box(90,180,0,60,60,34,'rgba(30,60,90,.9)');
+  // мачта
+  const base=iso(0,0,0),top=iso(0,0,230);
+  ctx.strokeStyle='rgba(215,231,245,.85)';ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.moveTo(base[0],base[1]);ctx.lineTo(top[0],top[1]);ctx.stroke();
+  for(let z=30;z<230;z+=40){const a=iso(-9,0,z),b=iso(9,0,z);
+    ctx.strokeStyle='rgba(64,220,255,.35)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke();}
+  // антенны наверху
+  [-1,0,1].forEach(k=>{
+    const a=iso(k*26,0,205);
+    ctx.fillStyle='rgba(64,220,255,.9)';ctx.fillRect(a[0]-4,a[1]-16,8,20);
+    ctx.shadowColor='rgba(64,220,255,.9)';ctx.shadowBlur=8;ctx.fillRect(a[0]-4,a[1]-16,8,20);ctx.shadowBlur=0;
+  });
+  // сканирующая волна от мачты
+  const sw=((t*0.35)%1);
+  ctx.strokeStyle='rgba(47,245,192,'+(1-sw)*0.7+')';ctx.lineWidth=2;
+  ctx.save();ctx.translate(top[0],top[1]);ctx.scale(1,0.42);
+  ctx.beginPath();ctx.arc(0,0,sw*Math.min(W,H)*0.5,0,7);ctx.stroke();ctx.restore();
+  // выбранный объект ИБП — подсветка
+  const ib=iso(46,44,0);
+  box(46,44,0,34,26,22,'rgba(255,181,71,.55)');
+  ctx.strokeStyle='rgba(255,181,71,'+(0.6+Math.sin(t*4)*0.3)+')';ctx.setLineDash([3,3]);
+  ctx.beginPath();ctx.arc(ib[0],ib[1]-14,26,0,7);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='var(--amber)';ctx.font='11px Segoe UI';ctx.textAlign='center';
+  ctx.fillStyle='#ffb547';ctx.fillText('ИБП-10кВА · TS-2',ib[0]+2,ib[1]-46);
+  ctx.fillStyle='#40dcff';ctx.fillText('Мачта М-25 · TS-1',top[0],top[1]-26);
+}
+setInterval(draw,40);
+</script>
+</body>
+</html>

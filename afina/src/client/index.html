@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>СПО «Афина NextGen» — рабочий клиент (release-линия)</title>
+<style>
+  :root{--bg:#0d0b16;--panel:#151222;--panel2:#1c1830;--line:#2c2745;--line2:#3a3458;
+    --txt:#e7e3f5;--dim:#8f88ad;--violet:#a78bfa;--pink:#f472b6;--cyan:#67e8f9;
+    --green:#4ade80;--amber:#fbbf24;--red:#f87171}
+  *{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",Arial,sans-serif}
+  body{background:var(--bg);color:var(--txt);font-size:12.5px;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+  .top{background:var(--panel);border-bottom:1px solid var(--line);height:40px;display:flex;align-items:center;padding:0 12px;gap:10px;flex-shrink:0}
+  .logo{font-weight:800;background:linear-gradient(90deg,var(--violet),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent;font-size:14px;letter-spacing:1px}
+  .tabs{display:flex;gap:2px;overflow-x:auto}
+  .tabs button{background:transparent;border:none;color:var(--dim);padding:8px 12px;cursor:pointer;font-size:12px;border-radius:6px}
+  .tabs button:hover{background:var(--panel2);color:var(--txt)}
+  .tabs button.on{background:var(--panel2);color:var(--violet);font-weight:700}
+  .top .right{margin-left:auto;display:flex;gap:8px;align-items:center;font-size:11px;color:var(--dim)}
+  .chip{border:1px solid var(--line2);border-radius:11px;padding:2px 10px;font-size:10px}
+  .chip.g{color:var(--green);border-color:rgba(74,222,128,.4)}
+  .main{flex:1;display:flex;min-height:0}
+  .view{flex:1;display:none;flex-direction:column;min-width:0}
+  .view.on{display:flex}
+  .content{flex:1;overflow-y:auto;padding:12px 16px}
+  .side{width:340px;background:var(--panel);border-left:1px solid var(--line);display:flex;flex-direction:column;flex-shrink:0}
+  .ph{padding:8px 12px;font-size:10px;letter-spacing:2px;color:var(--pink);text-transform:uppercase;border-bottom:1px solid var(--line);flex-shrink:0}
+  .panelbox{background:var(--panel);border:1px solid var(--line);border-radius:10px;margin-bottom:12px;overflow:hidden}
+  .panelbox .ph2{padding:9px 13px;border-bottom:1px solid var(--line);font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+  .panelbox .ph2 small{color:var(--dim);font-weight:400;font-size:10.5px}
+  table{width:100%;border-collapse:collapse;font-size:11.5px}
+  th{text-align:left;padding:6px 12px;color:var(--dim);font-size:9px;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid var(--line);background:var(--panel2)}
+  td{padding:6px 12px;border-bottom:1px solid var(--line)}
+  tbody tr:hover td{background:var(--panel2)}
+  .mono{font-family:Consolas,monospace;font-size:10.5px;color:var(--cyan)}
+  .btn{background:var(--panel2);border:1px solid var(--line2);color:var(--txt);border-radius:6px;padding:5px 12px;cursor:pointer;font-size:11.5px}
+  .btn:hover{border-color:var(--violet);color:var(--violet)}
+  .btn.pri{background:linear-gradient(90deg,rgba(167,139,250,.25),rgba(244,114,182,.18));border-color:var(--violet);color:var(--violet);font-weight:700}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  input,select{background:var(--bg);border:1px solid var(--line2);border-radius:6px;padding:6px 9px;color:var(--txt);font-size:12px;font-family:inherit}
+  input:focus,select:focus{outline:none;border-color:var(--violet)}
+  .st{display:inline-block;border-radius:9px;padding:1px 8px;font-size:9.5px;font-weight:700;white-space:nowrap}
+  .st-g{background:rgba(74,222,128,.12);color:var(--green);border:1px solid rgba(74,222,128,.35)}
+  .st-a{background:rgba(251,191,36,.1);color:var(--amber);border:1px solid rgba(251,191,36,.3)}
+  .st-r{background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.3)}
+  .st-v{background:rgba(167,139,250,.12);color:var(--violet);border:1px solid rgba(167,139,250,.35)}
+  .st-c{background:rgba(103,232,249,.1);color:var(--cyan);border:1px solid rgba(103,232,249,.3)}
+  .st-c{background:rgba(103,232,249,.1);color:var(--cyan);border:1px solid rgba(103,232,249,.3)}
+  .st-n{background:rgba(143,136,173,.1);color:var(--dim);border:1px solid var(--line2)}
+  .scene{flex:1;position:relative;min-height:0;background:radial-gradient(900px 560px at 50% 40%,#171328 0%,var(--bg) 75%)}
+  .scene canvas{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair}
+  .ovl{position:absolute;background:rgba(21,18,34,.9);border:1px solid var(--line2);border-radius:9px;padding:9px 12px;font-size:11px;color:var(--dim);line-height:1.7;backdrop-filter:blur(6px)}
+  .ovl b{color:var(--txt)}
+  .login{max-width:380px;margin:12vh auto;background:var(--panel);border:1px solid var(--line2);border-radius:14px;padding:22px}
+  .login h1{font-size:17px;margin-bottom:4px;background:linear-gradient(90deg,var(--violet),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .login .fld{margin-top:12px;display:flex;flex-direction:column;gap:5px}
+  .login label{font-size:10.5px;color:var(--dim)}
+  .login .btn{width:100%;margin-top:14px;padding:9px}
+  .chat{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px}
+  .msg{max-width:95%;border-radius:10px;padding:8px 11px;font-size:12px;line-height:1.55}
+  .msg.u{align-self:flex-end;background:linear-gradient(135deg,rgba(167,139,250,.22),rgba(244,114,182,.14));border:1px solid var(--line2)}
+  .msg.a{align-self:flex-start;background:var(--panel2);border:1px solid var(--line)}
+  .msg .src{margin-top:6px;display:flex;flex-wrap:wrap;gap:4px}
+  .sref{font-size:9.5px;border:1px solid var(--line2);border-radius:9px;padding:1px 8px;color:var(--cyan)}
+  .lim{margin-top:6px;font-size:10px;color:var(--dim);border-top:1px dashed var(--line2);padding-top:5px}
+  .lim b{color:var(--amber)}
+  .statusbar{background:var(--panel2);border-top:1px solid var(--line);padding:4px 12px;display:flex;gap:18px;font-size:10.5px;color:var(--dim);flex-shrink:0}
+  .statusbar b{color:var(--txt);font-weight:500}
+  .statusbar .right{margin-left:auto;display:flex;gap:16px}
+  .toast{position:fixed;bottom:40px;right:14px;background:var(--panel);border:1px solid var(--line2);border-left:3px solid var(--violet);border-radius:9px;padding:10px 13px;font-size:11.5px;max-width:360px;z-index:99;box-shadow:0 10px 34px rgba(0,0,0,.5);line-height:1.5}
+  .toast.err{border-left-color:var(--red)}
+  .toast.ok{border-left-color:var(--green)}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .kv{display:flex;justify-content:space-between;gap:8px;padding:2.5px 0;color:var(--dim);font-size:11.5px}
+  .kv b{color:var(--txt);font-weight:500;text-align:right}
+  .legend{position:absolute;right:10px;top:10px}
+</style>
+</head>
+<body>
+<div id="app" style="display:none;flex:1;flex-direction:column;min-height:0">
+  <div class="top">
+    <div class="logo">✦ АФИНА · рабочий клиент</div>
+    <div class="tabs" id="tabs">
+      <button data-v="scene" class="on">Сцена · RF-03</button>
+      <button data-v="gl">3D · WebGL</button>
+      <button data-v="catalog">Каталог КСИМ-ДД</button>
+      <button data-v="registry">Реестры</button>
+      <button data-v="lc">Жизненный цикл · G3</button>
+      <button data-v="g4">Расширение · G4</button>
+      <button data-v="ntf">Уведомления</button>
+      <button data-v="audit">Аудит</button>
+      <button data-v="ai">ИИ-помощник</button>
+    </div>
+    <div class="right">
+      <span class="chip g" id="connChip">API: …</span>
+      <span class="chip" id="userChip">—</span>
+      <button class="btn" onclick="logout()">Выход</button>
+    </div>
+  </div>
+  <div class="main">
+    <!-- СЦЕНА -->
+    <div class="view on" id="view-scene">
+      <div class="scene">
+        <canvas id="cv" onclick="placeBS(event)"></canvas>
+        <div class="ovl" style="top:10px;left:10px;max-width:320px">
+          <b>Реальный расчёт RF-03 через ENG6+ API</b><br>
+          Клик по карте — размещение БС (POST /objects + блокировка).<br>
+          «▶ Рассчитать» — POST /api/v1/calc {RF-03}, опрос очереди ⇶,<br>
+          отрисовка ФАКТИЧЕСКОЙ сетки уровней из результата.<br>
+          <span style="color:var(--dim)">модель: Окамура–Хата L1 · порог −95 дБм · паспорт в правой панели</span>
+        </div>
+        <div class="ovl legend" id="legendBox" style="display:none">
+          <b style="color:var(--cyan)">RSRP, дБм (расчёт ENG6+)</b><br>
+          <span style="display:inline-block;width:90px;height:8px;background:linear-gradient(90deg,#b02a1f,#e0a030,#8fbf3f,#1e7d43);border-radius:2px"></span><br>
+          −120 … −70 · покрытие: <b id="covPct">—</b>
+        </div>
+        <div class="ovl" style="bottom:10px;left:10px;right:10px;display:flex;gap:8px;align-items:center">
+          <button class="btn pri" id="calcBtn" onclick="runRF03()">▶ Рассчитать RF-03 (⇶ очередь)</button>
+          <button class="btn" onclick="clearBS()">Очистить БС</button>
+          <span id="calcStatus" style="color:var(--dim)">БС: 0</span>
+        </div>
+      </div>
+    </div>
+    <!-- 3D WEBGL -->
+    <div class="view" id="view-gl">
+      <div class="scene">
+        <canvas id="glc"></canvas>
+        <div class="ovl" style="top:10px;left:10px;max-width:330px">
+          <b>WebGL-конвейер (собственный, без внешних библиотек — AUT-002)</b><br>
+          Рельеф: матрица высот с сервера (MTW-модуль, demo-набор маркирован).<br>
+          Покрытие: наложение ФАКТИЧЕСКОЙ сетки RF-03 из результата расчёта.<br>
+          <span style="color:var(--dim)">ЛКМ-drag — орбита, колесо — зум. LOD сетки отображения ≠ шаг расчёта (3DM-006).</span>
+        </div>
+        <div class="ovl" style="bottom:10px;left:10px;display:flex;gap:8px">
+          <button class="btn" onclick="glToggleCov()" id="glCovBtn">Наложить покрытие RF-03</button>
+          <span id="glInfo" style="color:var(--dim);align-self:center">—</span>
+        </div>
+      </div>
+    </div>
+    <!-- КАТАЛОГ -->
+    <div class="view" id="view-catalog">
+      <div class="content">
+        <div class="panelbox">
+          <div class="ph2">Каталог средств связи 1940 → 2036 <small>БД КСИМ-ДД · честная маркировка качества данных (DAT §1.5) · прогноз НЕ выдаётся за факт</small>
+            <span class="row">
+              <input id="eqQ" placeholder="поиск: Азарт, Р-105, 5G, Микран…" style="width:240px" onkeydown="if(event.key==='Enter')loadCatalog()">
+              <select id="eqFrom" onchange="loadCatalog()"><option value="">год от…</option></select>
+              <button class="btn" onclick="loadCatalog()">Найти</button>
+            </span>
+          </div>
+          <div style="max-height:64vh;overflow-y:auto">
+          <table><thead><tr><th>ID</th><th>Наименование</th><th>Изготовитель</th><th>Годы</th><th>Диапазоны</th><th>Статус</th><th>Качество данных</th></tr></thead>
+          <tbody id="eqBody"></tbody></table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- РЕЕСТРЫ -->
+    <div class="view" id="view-registry">
+      <div class="content">
+        <div class="panelbox">
+          <div class="ph2">Объекты проекта <small>POST /objects · блокировки совместной сессии · SEC-004 экспорт</small>
+            <span class="row"><button class="btn" onclick="loadObjects()">⟳ Обновить</button><button class="btn" onclick="exportObjects()">⇡ Экспорт (SEC-004)</button></span></div>
+          <table><thead><tr><th>ID</th><th>Класс</th><th>Имя</th><th>X / Y</th><th>TS</th><th>DAT</th><th>Источник</th></tr></thead><tbody id="objBody"></tbody></table>
+        </div>
+        <div class="panelbox">
+          <div class="ph2">Замечания <small>цепочка статусов · Maker–Checker контролируется СЕРВЕРОМ (SEC-005)</small></div>
+          <table><thead><tr><th>ID</th><th>Описание</th><th>Критичность</th><th>Статус</th><th>Действие</th></tr></thead><tbody id="zamBody"></tbody></table>
+          <div class="row" style="padding:9px 13px">
+            <input id="zamTitle" placeholder="новое замечание…" style="flex:1">
+            <select id="zamCrit"><option>Критический</option><option>Значительный</option><option selected>Минорный</option><option>Рекомендация</option></select>
+            <button class="btn pri" onclick="createZam()">＋ Создать</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ЖИЗНЕННЫЙ ЦИКЛ G3 -->
+    <div class="view" id="view-lc">
+      <div class="content">
+        <div class="panelbox">
+          <div class="ph2">Цифровой двойник объекта <small>DGT-001…005 · уровень DT — по проверяемым критериям, телеметрия базовую линию НЕ изменяет</small></div>
+          <div class="row" style="padding:9px 13px">
+            <input id="twOid" placeholder="ID объекта (напр. BS-1)" style="width:180px">
+            <button class="btn pri" onclick="showTwin()">Показать двойника</button>
+            <button class="btn" onclick="twinDivergence()">Протокол отклонений</button>
+            <button class="btn" onclick="twinCalib()">Калибровка (МНК)</button>
+            <button class="btn" onclick="twinPredict()">Прогноз (оценка)</button>
+          </div>
+          <div style="padding:0 13px 10px" id="twOut"><span style="color:var(--dim)">данные двойника не загружены</span></div>
+          <div class="row" style="padding:0 13px 10px">
+            <textarea id="twJson" style="flex:1;height:52px;font-family:monospace;font-size:10px" spellcheck="false">{"project":{"power_w":50.0}, "points":[[1,2.9],[2,5.1],[3,7.0],[4,8.9]], "history":[[1,10],[2,12.1],[3,13.9],[4,16.2]], "horizon":6}</textarea>
+          </div>
+        </div>
+        <div class="panelbox">
+          <div class="ph2">Изменения конфигурации <small>CFG-002/003 · анализ влияния ДО утверждения · Maker–Checker (SEC-005) · линия фиксируется до изменения</small>
+            <button class="btn" onclick="loadChanges()">⟳</button></div>
+          <div class="row" style="padding:9px 13px">
+            <input id="crTitle" placeholder="суть изменения…" style="flex:2">
+            <input id="crReason" placeholder="причина…" style="flex:1">
+            <input id="crTarget" placeholder="цель (ID объекта)" style="width:150px">
+            <button class="btn pri" onclick="createCR()">＋ Предложить изменение</button>
+          </div>
+          <table><thead><tr><th>ID</th><th>Суть</th><th>Статус</th><th>Затронуто</th><th>Версия КФГ</th><th>Действие</th></tr></thead><tbody id="crBody"></tbody></table>
+        </div>
+        <div class="panelbox">
+          <div class="ph2">Инженерные правила <small>CFG-004 · правила — данные (id/версия/класс/обоснование/автор), не код · пропуск поля ≠ соответствие</small>
+            <button class="btn pri" onclick="checkRules()">▶ Проверить контекст</button></div>
+          <div class="row" style="padding:9px 13px">
+            <textarea id="ruleCtx" style="flex:1;height:40px;font-family:monospace;font-size:10px" spellcheck="false">{"szz_margin_m":12,"szz_required_m":10,"f1_block_pct":20,"poe_drop_pct":2,"redundancy_ok":true}</textarea>
+          </div>
+          <div id="ruleOut" style="padding:0 13px 10px"></div>
+          <table><thead><tr><th>ID</th><th>Правило</th><th>Класс</th><th>Версия</th><th>Обоснование</th><th>Автор</th></tr></thead><tbody id="ruleBody"></tbody></table>
+        </div>
+        <div class="panelbox">
+          <div class="ph2">Качество данных <small>DAT-002 валидация · DAT-004 конфликты: все значения хранятся, решает уполномоченный с основанием · дубликаты → арбитраж</small></div>
+          <div class="row" style="padding:9px 13px">
+            <textarea id="valJson" style="flex:1;height:44px;font-family:monospace;font-size:10px" spellcheck="false">{"id":"X1","class":"COM","name":"Р-1","attrs":{"power_w":5000,"масса_кг":10,"транспортная_масса_кг":5}}</textarea>
+            <button class="btn" onclick="validateObjUI()">✓ Валидировать</button>
+          </div>
+          <div id="valOut" style="padding:0 13px 6px"></div>
+          <div class="row" style="padding:9px 13px">
+            <input id="cfOid" placeholder="объект" style="width:120px">
+            <input id="cfField" placeholder="поле" style="width:120px">
+            <input id="cfVals" value='[{"value":50,"source_id":"паспорт"},{"value":44,"source_id":"измерение"}]' style="flex:1;font-family:monospace;font-size:10px">
+            <button class="btn pri" onclick="createConflict()">⚡ Конфликт</button>
+          </div>
+          <table><thead><tr><th>ID</th><th>Объект.поле</th><th>Значения (происхождение)</th><th>Статус</th><th>Арбитраж</th></tr></thead><tbody id="cfBody"></tbody></table>
+        </div>
+      </div>
+    </div>
+    <!-- РАСШИРЕНИЕ G4 -->
+    <div class="view" id="view-g4">
+      <div class="content">
+        <div class="panelbox">
+          <div class="ph2">Панель руководителя · ВТ-08 <small>8 разделов из первичных реестров · готовность — оценка формальная, комиссия не подменяется (§4.9)</small>
+            <button class="btn" onclick="loadG4()">⟳</button></div>
+          <div id="vtPanel" style="padding:9px 13px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font-size:10.5px"></div>
+          <div id="vtReady" style="padding:0 13px 8px"></div>
+          <div id="trendBox" style="padding:0 13px 10px"></div>
+        </div>
+        <div class="panelbox">
+          <div class="ph2">Сценарное моделирование · DT-5 <small>результат ВСЕГДА «оценка (не факт)» · DT-5 — только после независимой проверки сценария · базовая линия не изменяется (DGT-002)</small></div>
+          <div class="row" style="padding:9px 13px">
+            <input id="scOid" placeholder="ID объекта" style="width:130px">
+            <select id="scKind" style="width:190px">
+              <option value="param">param — what-if, %</option>
+              <option value="trend">trend — прогноз тренда</option>
+              <option value="degradation">degradation — REL-01</option>
+            </select>
+            <input id="scParams" value='{"metric":"load_pct","delta_pct":15,"limit":80}' style="flex:1;font-family:monospace;font-size:10px">
+            <button class="btn pri" onclick="runScenario()">▶ Сценарий</button>
+            <button class="btn" onclick="aiSuggest()">ИИ: предложить</button>
+          </div>
+          <div id="scOut" style="padding:0 13px 8px"></div>
+          <table><thead><tr><th>ID</th><th>Объект</th><th>Вид</th><th>Параметры</th><th>Статус</th><th>Проверен</th><th>Действие</th></tr></thead><tbody id="scBody"></tbody></table>
+        </div>
+        <div class="panelbox">
+          <div class="ph2">Оптимизация OPT-01 · LCC-01 <small>ENG-006: нарушитель жёсткого ограничения не может быть «лучшим» · Парето и взвешенная оценка — раздельно</small></div>
+          <div class="row" style="padding:9px 13px">
+            <textarea id="optJson" style="flex:1;height:64px;font-family:monospace;font-size:10px" spellcheck="false">{"variants":[{"id":"В1","cost":100,"cover":80,"vendor":"РФ"},{"id":"В2","cost":40,"cover":97,"vendor":"неизвестен"},{"id":"В3","cost":130,"cover":74,"vendor":"РФ"}],
+"criteria":[{"key":"cost","name":"Стоимость","direction":"min","weight":2,"hard_max":150},{"key":"cover","name":"Покрытие %","direction":"max","weight":1,"hard_min":60}],
+"constraints":[{"type":"subset_of","field":"vendor","values":["РФ"]}]}</textarea>
+            <button class="btn pri" onclick="runOpt()">▶ OPT-01</button>
+            <button class="btn" onclick="runLcc()">LCC-01 (демо)</button>
+          </div>
+          <div id="optOut" style="padding:0 13px 10px"></div>
+        </div>
+        <div class="panelbox">
+          <div class="ph2">Co-Simulation ENG-005 · Суррогаты MOD-006 <small>ID сценария, единицы, версии решателей; суррогат маркируется и не равен физическому решателю</small></div>
+          <div class="row" style="padding:9px 13px">
+            <input id="cosimSeed" value='{"w_nom":2500,"w_peak":4200,"t_ambient_c":30,"t_limit_c":40,"cooling_w":2400,"mtbf_h":9000,"mttr_h":5}' style="flex:1;font-family:monospace;font-size:10px">
+            <button class="btn pri" onclick="runCosim()">▶ COSIM-01</button>
+            <button class="btn" onclick="demoTrain()">Обучить суррогат на RF-01</button>
+          </div>
+          <div id="cosimOut" style="padding:0 13px 8px"></div>
+          <div class="row" style="padding:0 13px 9px">
+            <input id="surId" placeholder="SUR-RF01-OKUMURA_HATA" style="width:200px">
+            <input id="surX" value="900,5,60,2" placeholder="f_mhz,d_km,h_bs,h_ms" style="width:170px;font-family:monospace;font-size:10px">
+            <button class="btn" onclick="surPredict()">Предсказать (суррогат)</button>
+          </div>
+          <table><thead><tr><th>ID</th><th>Ссылка решателя</th><th>Статус</th><th>Отключён</th></tr></thead><tbody id="surBody"></tbody></table>
+        </div>
+        <div class="panelbox">
+          <div class="ph2">Военно-технический профиль · ВТ-01…07 <small>этап закрывает ТОЛЬКО комиссия при готовых материалах · просроченная поверка СИ блокирует согласование (§4.8.4)</small></div>
+          <div class="row" style="padding:9px 13px">
+            <input id="stTitle" placeholder="название этапа" style="flex:1">
+            <input id="stContract" placeholder="контракт" style="width:130px">
+            <button class="btn pri" onclick="vtStageCreate()">＋ Этап</button>
+            <button class="btn" onclick="vtLoadAll()">⟳ Реестры ВТ</button>
+          </div>
+          <table><thead><tr><th>Этап</th><th>Материалы (изделие/док/исп/комплект)</th><th>Статус</th><th>Действия</th></tr></thead><tbody id="vtStageBody"></tbody></table>
+          <div id="vtAging" style="padding:6px 13px;font-size:10.5px"></div>
+          <div id="vtUni" style="padding:0 13px 10px;font-size:10.5px"></div>
+        </div>
+        <div class="panelbox">
+          <div class="ph2">Полигон · Миссии · Баллы · §4.11 <small>баллы только за проверяемый результат; переход по полигону — по инженерным критериям, не по очкам</small></div>
+          <div id="polyBox" style="padding:9px 13px"></div>
+          <div class="row" style="padding:0 13px 9px">
+            <select id="missionSel" style="width:250px"></select>
+            <input id="missionSeed" value="42" style="width:60px" title="seed">
+            <button class="btn pri" onclick="missionStart()">▶ Миссия</button>
+            <input id="missionAns" placeholder="ответ…" style="flex:1">
+            <button class="btn" onclick="missionCheck()">Проверить</button>
+            <button class="btn" onclick="missionHint(1)">Подсказка 1</button>
+            <button class="btn" onclick="missionHint(2)">2</button>
+            <button class="btn" onclick="missionHint(3)">3</button>
+          </div>
+          <div id="missionBox" style="padding:0 13px 8px;font-size:11px"></div>
+          <table><thead><tr><th>Пользователь</th><th>Баллы</th><th>Компетенция</th><th>Начислений</th><th>Отозвано</th></tr></thead><tbody id="scoreBody"></tbody></table>
+        </div>
+      </div>
+    </div>
+    <!-- УВЕДОМЛЕНИЯ -->
+    <div class="view" id="view-ntf">
+      <div class="content">
+        <div class="panelbox">
+          <div class="ph2">Центр уведомлений <small>жизненный цикл: доставка ≠ просмотр ≠ исполнение (§4.12)</small>
+            <button class="btn" onclick="loadNtf()">⟳</button></div>
+          <div id="ntfBody"></div>
+        </div>
+      </div>
+    </div>
+    <!-- АУДИТ -->
+    <div class="view" id="view-audit">
+      <div class="content">
+        <div class="panelbox">
+          <div class="ph2">Журнал аудита <small>хэш-цепочка (SEC-003) · история не удаляется</small>
+            <span class="row"><button class="btn" onclick="loadAudit()">⟳ Обновить</button><button class="btn pri" onclick="verifyAudit()">✓ Проверить целостность цепочки</button></span></div>
+          <table><thead><tr><th>Время</th><th>Субъект (роль)</th><th>Действие</th><th>Объект</th><th>Результат</th></tr></thead><tbody id="audBody"></tbody></table>
+        </div>
+      </div>
+    </div>
+    <!-- ИИ -->
+    <div class="view" id="view-ai">
+      <div class="chat" id="aiChat"></div>
+      <div style="padding:9px 12px;border-top:1px solid var(--line);display:flex;gap:7px">
+        <input id="aiQ" placeholder="Вопрос к локальному RAG (индекс: ТЗ, Приложение А, каталог)…" style="flex:1" onkeydown="if(event.key==='Enter')askAI()">
+        <button class="btn pri" onclick="askAI()">➤</button>
+      </div>
+    </div>
+    <!-- ПРАВАЯ ПАНЕЛЬ -->
+    <div class="side">
+      <div class="ph">Инспектор · результат расчёта</div>
+      <div style="flex:1;overflow-y:auto;padding:10px" id="insp">
+        <div class="kv"><span>Ожидание</span><b>разместите БС и выполните расчёт</b></div>
+      </div>
+    </div>
+  </div>
+  <div class="statusbar">
+    <span>Статус: <b id="stMain" style="color:var(--green)">готов</b></span>
+    <span>Очередь: <b id="stQueue">0</b></span>
+    <span>Внешних соединений: <b style="color:var(--green)">0 (контур)</b></span>
+    <div class="right">
+      <span>API: <b id="stApi">—</b></span>
+      <span>Роль: <b id="stRole">—</b></span>
+    </div>
+  </div>
+</div>
+
+<div id="loginWrap" class="login">
+  <h1>✦ АФИНА NextGen</h1>
+  <div style="color:var(--dim);font-size:11px">рабочий клиент release-линии · автономный контур</div>
+  <div class="fld"><label>Адрес API</label><input id="apiUrl" value="http://127.0.0.1:8470/api/v1" style="width:100%"></div>
+  <div class="fld"><label>Логин</label><input id="lg" value="admin" style="width:100%"></div>
+  <div class="fld"><label>Пароль</label><input id="pw" type="password" style="width:100%" onkeydown="if(event.key==='Enter')login()"></div>
+  <button class="btn pri" onclick="login()">Войти</button>
+  <div style="color:var(--dim);font-size:10px;margin-top:10px;line-height:1.6">Первый запуск: зарегистрируйте администратора —<br>POST /register (bootstrap первого пользователя).<br>Аутентификация: scrypt + HMAC-токены; СКЗИ-провайдер — точка подключения (§8.1).</div>
+</div>
+
+<script>
+'use strict';
+let API='http://127.0.0.1:8470/api/v1',TOKEN=null,ME=null;
+let stations=[],lastResult=null,pollTimer=null;
+const W_M=6000,H_M=6000;
+
+
+/* ================= WebGL-сцена (3D-рельеф + покрытие) ================= */
+let gl=null,glProg=null,glBuf=null,glIdx=null,glIdxCount=0,glTerrain=null,glColors=null,glVerts=null;
+let glYaw=0.6,glPitch=0.9,glDist=2.6,glDragging=false,glLast=[0,0],glCovOn=false,glRAF=0;
+function m4mul(a,b){const o=new Float32Array(16);for(let i=0;i<4;i++)for(let j=0;j<4;j++){let s=0;for(let k=0;k<4;k++)s+=a[i*4+k]*b[k*4+j];o[i*4+j]=s;}return o;}
+function m4persp(fov,asp,n,f){const t=1/Math.tan(fov/2);return new Float32Array([t/asp,0,0,0, 0,t,0,0, 0,0,(f+n)/(n-f),-1, 0,0,2*f*n/(n-f),0]);}
+function m4look(e,c,u){const z=nrm([e[0]-c[0],e[1]-c[1],e[2]-c[2]]);const x=nrm(crs(u,z));const y=crs(z,x);
+  return new Float32Array([x[0],y[0],z[0],0, x[1],y[1],z[1],0, x[2],y[2],z[2],0, -dot(x,e),-dot(y,e),-dot(z,e),1]);}
+function nrm(v){const l=Math.hypot(v[0],v[1],v[2])||1;return [v[0]/l,v[1]/l,v[2]/l];}
+function crs(a,b){return [a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];}
+function dot(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];}
+async function initGL(){
+  const c=document.getElementById('glc');
+  if(gl){resizeGL();return;}
+  gl=c.getContext('webgl',{antialias:true});
+  if(!gl){document.getElementById('glInfo').textContent='WebGL недоступен в этом браузере';return;}
+  const vs=`attribute vec3 aPos; attribute vec3 aColor; uniform mat4 uMVP; varying vec3 vC;
+    void main(){ vC=aColor; gl_Position=uMVP*vec4(aPos,1.0); }`;
+  const fs=`precision mediump float; varying vec3 vC; void main(){ gl_FragColor=vec4(vC,1.0); }`;
+  const mk=(t,src)=>{const sh=gl.createShader(t);gl.shaderSource(sh,src);gl.compileShader(sh);
+    if(!gl.getShaderParameter(sh,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(sh));return sh;};
+  glProg=gl.createProgram();
+  gl.attachShader(glProg,mk(gl.VERTEX_SHADER,vs));gl.attachShader(glProg,mk(gl.FRAGMENT_SHADER,fs));
+  gl.linkProgram(glProg);gl.useProgram(glProg);gl.enable(gl.DEPTH_TEST);
+  glBuf=gl.createBuffer();glIdx=gl.createBuffer();
+  try{
+    const t=await api('GET','/terrain');
+    glTerrain=t;
+    buildTerrainMesh(t);
+    document.getElementById('glInfo').textContent='рельеф: '+t.rows+'×'+t.cols+' · шаг '+t.cell_m+' м · '+t.meta.source;
+  }catch(e){document.getElementById('glInfo').textContent='рельеф не загружен: '+e.message;}
+  c.addEventListener('mousedown',e=>{glDragging=true;glLast=[e.clientX,e.clientY];});
+  window.addEventListener('mouseup',()=>glDragging=false);
+  c.addEventListener('mousemove',e=>{if(!glDragging)return;
+    glYaw+=(e.clientX-glLast[0])*0.008;glPitch=Math.max(0.15,Math.min(1.5,glPitch-(e.clientY-glLast[1])*0.006));
+    glLast=[e.clientX,e.clientY];});
+  c.addEventListener('wheel',e=>{e.preventDefault();glDist=Math.max(1.2,Math.min(6,glDist+e.deltaY*0.002));},{passive:false});
+  resizeGL();
+  if(!glRAF)glLoop();
+}
+function resizeGL(){const c=document.getElementById('glc');
+  if(c.width!==c.clientWidth||c.height!==c.clientHeight){c.width=c.clientWidth;c.height=c.clientHeight;}
+  if(gl)gl.viewport(0,0,c.width,c.height);}
+function buildTerrainMesh(t){
+  const R=t.rows,C=t.cols,st=Math.max(1,Math.floor(R/64)); // LOD сетки отображения
+  const verts=[],idx=[];let n=0;
+  const hs=[];let hmin=1e9,hmax=-1e9;
+  for(let r=0;r<R;r+=st)for(let c=0;c<C;c+=st){const h=t.data[r][c];hs.push(h);hmin=Math.min(hmin,h);hmax=Math.max(hmax,h);}
+  glHmin=hmin;glHspan=(hmax-hmin)||1;
+  let k=0;const RR=Math.ceil((R-1)/st)+1,CC=Math.ceil((C-1)/st)+1;
+  for(let r=0;r<R;r+=st){for(let c=0;c<C;c+=st){
+    const h=(t.data[Math.min(r,R-1)][Math.min(c,C-1)]-hmin)/glHspan;
+    verts.push(c/(C-1)*2-1, h*0.45, r/(R-1)*2-1);
+    k++;
+  }}
+  for(let r=0;r<RR-1;r++)for(let c=0;c<CC-1;c++){
+    const a=r*CC+c,b=a+1,cc=a+CC,d=cc+1;
+    idx.push(a,cc,b, b,cc,d);
+  }
+  glVerts=new Float32Array(verts);glIdxArr=new Uint16Array(idx);glIdxCount=idx.length;glCC=CC;glRR=RR;
+  glColors=new Float32Array(glVerts.length);
+  paintTerrain();
+  uploadGL();
+}
+function paintTerrain(){
+  for(let i=0;i<glVerts.length/3;i++){
+    const h=glVerts[i*3+1]/0.45;
+    let col=h<0.35?[0.16,0.30,0.20]:h<0.62?[0.24,0.42,0.24]:h<0.82?[0.45,0.42,0.28]:[0.62,0.60,0.58];
+    if(glCovOn&&lastResult&&lastResult.grid){
+      const cc=colAtCoverage(i,col);if(cc)col=cc;
+    }
+    glColors[i*3]=col[0];glColors[i*3+1]=col[1];glColors[i*3+2]=col[2];
+  }
+  if(gl)uploadGL();
+}
+function colAtCoverage(i,base){
+  const x=(glVerts[i*3]+1)/2, z=(glVerts[i*3+2]+1)/2;
+  const g=lastResult.grid,R=g.length,C=g[0].length;
+  const r=Math.min(R-1,Math.floor(z*R)), c=Math.min(C-1,Math.floor(x*C));
+  const v=g[r][c];
+  if(v<=-999)return null;
+  const t=Math.max(0,Math.min(1,(v+120)/50));
+  const stops=[[0.69,0.16,0.12],[0.88,0.63,0.19],[0.56,0.75,0.24],[0.12,0.49,0.26]];
+  const p=t*(stops.length-1),j=Math.min(Math.floor(p),stops.length-2),f=p-j;
+  return [0.35+0.65*(stops[j][0]+(stops[j+1][0]-stops[j][0])*f),
+          0.35+0.65*(stops[j][1]+(stops[j+1][1]-stops[j][1])*f),
+          0.35+0.65*(stops[j][2]+(stops[j+1][2]-stops[j][2])*f)];
+}
+function uploadGL(){
+  gl.bindBuffer(gl.ARRAY_BUFFER,glBuf);
+  const inter=new Float32Array(glVerts.length*2);
+  for(let i=0;i<glVerts.length/3;i++){inter.set(glVerts.subarray(i*3,i*3+3),i*6);inter.set(glColors.subarray(i*3,i*3+3),i*6+3);}
+  gl.bufferData(gl.ARRAY_BUFFER,inter,gl.DYNAMIC_DRAW);
+  const aP=gl.getAttribLocation(glProg,'aPos'),aC=gl.getAttribLocation(glProg,'aColor');
+  gl.enableVertexAttribArray(aP);gl.vertexAttribPointer(aP,3,gl.FLOAT,false,24,0);
+  gl.enableVertexAttribArray(aC);gl.vertexAttribPointer(aC,3,gl.FLOAT,false,24,12);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,glIdx);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,glIdxArr,gl.STATIC_DRAW);
+}
+function glToggleCov(){
+  if(!lastResult){toast('Сначала выполните расчёт RF-03 на вкладке «Сцена»','err');return;}
+  glCovOn=!glCovOn;
+  document.getElementById('glCovBtn').textContent=glCovOn?'Показать рельеф':'Наложить покрытие RF-03';
+  paintTerrain();
+}
+function glLoop(){
+  glRAF=requestAnimationFrame(glLoop);
+  if(!gl||document.getElementById('view-gl').style.display==='none'&&!document.getElementById('view-gl').classList.contains('on'))return;
+  resizeGL();
+  const c=document.getElementById('glc');
+  gl.clearColor(0.05,0.043,0.086,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+  if(!glIdxCount)return;
+  const ex=Math.sin(glYaw)*Math.cos(glPitch)*glDist, ey=Math.sin(glPitch)*glDist, ez=Math.cos(glYaw)*Math.cos(glPitch)*glDist;
+  const proj=m4persp(0.9,c.width/Math.max(c.height,1),0.05,50);
+  const view=m4look([ex,ey+0.35,ez],[0,0.1,0],[0,1,0]);
+  const mvp=m4mul(proj,view);
+  gl.useProgram(glProg);
+  gl.uniformMatrix4fv(gl.getUniformLocation(glProg,'uMVP'),false,mvp);
+  gl.drawElements(gl.TRIANGLES,glIdxCount,gl.UNSIGNED_SHORT,0);
+}
+
+/* ---------- утилиты ---------- */
+async function api(method,path,body){
+  const opt={method,headers:{'Content-Type':'application/json'}};
+  if(TOKEN)opt.headers['Authorization']='Bearer '+TOKEN;
+  if(body!==undefined)opt.body=JSON.stringify(body);
+  const r=await fetch(API+path,opt);
+  let j={};try{j=await r.json();}catch(e){}
+  if(!r.ok)throw Object.assign(new Error(j.error||('HTTP '+r.status)),{code:r.status,data:j});
+  return j;
+}
+function toast(txt,cls){
+  const d=document.createElement('div');d.className='toast '+(cls||'');d.textContent=txt;
+  document.body.appendChild(d);setTimeout(()=>d.remove(),cls==='err'?7000:4200);
+}
+function tab(name,btn){
+  document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.v===name));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='view-'+name));
+  if(name==='catalog')loadCatalog();
+  if(name==='registry'){loadObjects();loadZam();}
+  if(name==='lc'){loadChanges();loadRules();loadConflicts();}
+  if(name==='g4')loadG4();
+  if(name==='ntf')loadNtf();
+  if(name==='audit')loadAudit();
+  if(name==='scene')setTimeout(resizeCv,30);
+  if(name==='gl')initGL();
+}
+document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>tab(b.dataset.v));
+
+/* ---------- вход ---------- */
+async function login(){
+  API=document.getElementById('apiUrl').value.replace(/\/$/,'');
+  try{
+    const r=await api('POST','/login',{login:document.getElementById('lg').value,password:document.getElementById('pw').value});
+    TOKEN=r.token;ME=r;
+    document.getElementById('loginWrap').style.display='none';
+    const app=document.getElementById('app');app.style.display='flex';
+    document.getElementById('userChip').textContent=r.display+' · '+r.role;
+    document.getElementById('stRole').textContent=r.role;
+    document.getElementById('stApi').textContent=API;
+    document.getElementById('connChip').textContent='API: подключено';
+    addAI('msg a','Сессия открыта: '+r.login+' ('+r.role+'). Все действия пишутся в журнал аудита (SEC-003). Сервер локальный — внешних обращений нет (AUT-002).');
+    resizeCv();drawScene();loadQueue();
+  }catch(e){
+    if(e.code===401){
+      // bootstrap: пробуем зарегистрировать первого пользователя
+      try{
+        await api('POST','/register',{login:document.getElementById('lg').value,password:document.getElementById('pw').value||'afina123',role:'Администратор системы'});
+        toast('Первый пользователь зарегистрирован (bootstrap). Войдите повторно.','ok');
+      }catch(e2){toast('Вход не выполнен: '+e.message+' | bootstrap: '+e2.message,'err');}
+    }else toast('Ошибка соединения с API: '+e.message+' (сервер: python3 -m afina.server.app)','err');
+  }
+}
+function logout(){TOKEN=null;ME=null;location.reload();}
+
+/* ---------- СЦЕНА: размещение БС + реальный расчёт ---------- */
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+function resizeCv(){cv.width=cv.clientWidth;cv.height=cv.clientHeight;drawScene();}
+window.addEventListener('resize',resizeCv);
+async function placeBS(ev){
+  const r=cv.getBoundingClientRect();
+  const x=(ev.clientX-r.left)/r.width*W_M,y=(ev.clientY-r.top)/r.height*H_M;
+  const id='BS-'+(stations.length+1);
+  try{
+    await api('POST','/locks',{object_id:id});
+    await api('POST','/objects',{id,class:'COM',name:'БС '+id,x:Math.round(x),y:Math.round(y),
+      attrs:{f_mhz:900,power_dbm:43,h_ant_m:40},source:'клиент'});
+    stations.push({id,x_m:x,y_m:y,h_ant_m:40,f_mhz:900,tx_power_dbm:43,sector:false});
+    document.getElementById('calcStatus').textContent='БС: '+stations.length;
+    drawScene();
+    toast(id+' размещена и зафиксирована на сервере (объект + блокировка сессии)','ok');
+  }catch(e){toast('Отказ сервера: '+e.message,'err');}
+}
+function clearBS(){stations=[];lastResult=null;document.getElementById('legendBox').style.display='none';
+  document.getElementById('calcStatus').textContent='БС: 0';drawScene();}
+async function runRF03(){
+  if(!stations.length){toast('Сначала разместите хотя бы одну БС (клик по карте)','err');return;}
+  document.getElementById('calcBtn').disabled=true;
+  document.getElementById('stMain').textContent='расчёт в очереди ⇶';
+  try{
+    const payload={function:'RF-03',model:'OKUMURA_HATA',mode:'Engineering',level:'L1',
+      width_m:W_M,height_m:H_M,cell_m:100,threshold_dbm:-95,env:'urban',stations};
+    const {job_id}=await api('POST','/calc',payload);
+    toast('Задание '+job_id+' поставлено в очередь (ARC-003: интерфейс не блокируется)','ok');
+    pollTimer=setInterval(()=>pollJob(job_id),700);
+  }catch(e){toast('Ошибка постановки расчёта: '+e.message,'err');document.getElementById('calcBtn').disabled=false;}
+}
+async function pollJob(jid){
+  try{
+    const st=await api('GET','/calc/'+jid);
+    document.getElementById('stQueue').textContent=st.status;
+    if(st.status==='done'){
+      clearInterval(pollTimer);lastResult=st.result;
+      document.getElementById('calcBtn').disabled=false;
+      document.getElementById('stMain').textContent='готов';
+      document.getElementById('covPct').textContent=st.result.coverage_pct+' %';
+      document.getElementById('legendBox').style.display='block';
+      renderInsp(st.result);drawScene();
+      toast('RF-03 завершён: покрытие '+st.result.coverage_pct+' % · паспорт '+st.result.passport.run_id,'ok');
+    }else if(st.status==='error'){
+      clearInterval(pollTimer);document.getElementById('calcBtn').disabled=false;
+      document.getElementById('stMain').textContent='ошибка расчёта';
+      toast('Расчёт завершился ошибкой: '+st.error+' — результат как достоверный не выдаётся','err');
+    }
+  }catch(e){/* опрос продолжается */}
+}
+function colorFor(v){
+  if(v<=-999)return null;
+  const t=Math.max(0,Math.min(1,(v+120)/50));
+  const stops=[[176,42,31],[224,160,48],[143,191,63],[30,125,67]];
+  const p=t*(stops.length-1),i=Math.min(Math.floor(p),stops.length-2),f=p-i;
+  const c=stops[i].map((a,k)=>Math.round(a+(stops[i+1][k]-a)*f));
+  return 'rgb('+c.join(',')+')';
+}
+function drawScene(){
+  const W=cv.width,H=cv.height;ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle='rgba(167,139,250,.07)';
+  for(let x=0;x<W;x+=48){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=48){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  if(lastResult&&lastResult.grid){
+    const g=lastResult.grid,rows=g.length,cols=g[0].length;
+    const cw=W/cols,ch=H/rows;
+    for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+      const col=colorFor(g[r][c]);
+      if(col){ctx.globalAlpha=0.55;ctx.fillStyle=col;ctx.fillRect(c*cw,r*ch,cw+0.5,ch+0.5);}
+    }
+    ctx.globalAlpha=1;
+  }
+  stations.forEach(s=>{
+    const x=s.x_m/W_M*W,y=s.y_m/H_M*H;
+    ctx.fillStyle='#67e8f9';ctx.beginPath();ctx.arc(x,y,5,0,7);ctx.fill();
+    ctx.strokeStyle='rgba(103,232,249,.5)';ctx.beginPath();ctx.arc(x,y,11,0,7);ctx.stroke();
+    ctx.fillStyle='#e7e3f5';ctx.font='10px Segoe UI';ctx.textAlign='center';ctx.fillText(s.id,x,y-14);
+  });
+}
+function renderInsp(res){
+  const p=res.passport;
+  document.getElementById('insp').innerHTML=
+    '<div class="kv"><span>Функция</span><b>'+p.function+' · '+p.mode+' · '+p.level+'</b></div>'+
+    '<div class="kv"><span>Модель</span><b>'+p.model_id+' v'+p.model_version+'</b></div>'+
+    '<div class="kv"><span>Run ID</span><b class="mono">'+p.run_id+'</b></div>'+
+    '<div class="kv"><span>Хэш входов</span><b class="mono" style="font-size:9.5px">'+p.inputs_hash.slice(0,24)+'…</b></div>'+
+    '<div class="kv"><span>Покрытие ≥ '+res.threshold_dbm+' дБм</span><b style="color:var(--green)">'+res.coverage_pct+' %</b></div>'+
+    '<div class="kv"><span>Неопределённость (MOD-005)</span><b>данные ±'+p.uncertainty_db.data+' · числ. ±'+p.uncertainty_db.numeric+' · модель ±'+p.uncertainty_db.physical_model+' дБ</b></div>'+
+    '<div class="kv"><span>Среда</span><b style="font-size:10px">'+p.environment.backend+'</b></div>'+
+    '<div style="margin-top:8px;font-size:10.5px;color:var(--dim);line-height:1.6">Допущения: '+res.assumptions.join('; ')+'</div>'+
+    '<div style="margin-top:8px"><span class="st st-g">паспорт сформирован (ENG-001)</span> <span class="st st-c">сетка '+res.grid.length+'×'+res.grid[0].length+' (LOD отображения, расчёт 100 м)</span></div>';
+}
+async function loadQueue(){
+  try{const q=await api('GET','/queue');document.getElementById('stQueue').textContent=(q.jobs||[]).length;}catch(e){}
+}
+
+/* ---------- КАТАЛОГ ---------- */
+async function loadCatalog(){
+  const q=document.getElementById('eqQ').value.trim();
+  const from=document.getElementById('eqFrom').value;
+  try{
+    const r=await api('GET','/catalog/equipment?q='+encodeURIComponent(q)+(from?'&from_year='+from:''));
+    document.getElementById('eqBody').innerHTML=r.equipment.map(e=>{
+      const prog=(e.data_quality||'').includes('ПРОГНОЗ')||String(e.status_kind).includes('ПРОГНОЗ');
+      const st=prog?'<span class="st st-v">ПРОГНОЗ</span>':(e.status_kind==='эксплуатируется'?'<span class="st st-g">эксплуатируется</span>':e.status_kind==='снят с производства'?'<span class="st st-n">снят</span>':'<span class="st st-a">'+e.status_kind+'</span>');
+      const dq=e.data_quality.includes('ПРОГНОЗ')?'st-r':e.data_quality.includes('требует')?'st-a':'st-c';
+      return '<tr><td class="mono">'+e.id+'</td><td>'+e.name+'</td><td>'+e.maker+'</td><td>'+e.year_from+'–'+(e.year_to||'н.в.')+'</td><td class="mono">'+(e.bands||'—')+'</td><td>'+st+'</td><td><span class="st '+dq+'">'+e.data_quality+'</span></td></tr>';
+    }).join('')||'<tr><td colspan="7" style="color:var(--dim)">ничего не найдено</td></tr>';
+  }catch(e){toast('Каталог: '+e.message,'err');}
+}
+(function(){const s=document.getElementById('eqFrom');for(let y=1940;y<=2036;y+=5){const o=document.createElement('option');o.value=y;o.textContent=y;s.appendChild(o);}})();
+
+/* ---------- РЕЕСТРЫ ---------- */
+async function loadObjects(){
+  try{const r=await api('GET','/objects');
+    document.getElementById('objBody').innerHTML=r.objects.map(o=>'<tr><td class="mono">'+o.id+'</td><td>'+o.class+'</td><td>'+o.name+'</td><td class="mono">'+Math.round(o.x)+' / '+Math.round(o.y)+'</td><td><span class="st st-n">'+o.ts_code+'</span></td><td>'+o.dat_status+'</td><td>'+o.source+'</td></tr>').join('')||'<tr><td colspan="7" style="color:var(--dim)">пусто</td></tr>';
+  }catch(e){toast('Реестр: '+e.message,'err');}
+}
+async function exportObjects(){
+  try{const r=await api('GET','/export/objects');
+    const blob=new Blob([JSON.stringify(r,null,1)],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='afina_export_objects.json';a.click();
+    toast('Экспорт: '+r.count+' записей · '+r.note,'ok');
+  }catch(e){toast('Экспорт отклонён: '+e.message,'err');}
+}
+const ZCH=['Предложено','Устранено','Проверено','Согласовано','Закрыто'];
+async function loadZam(){
+  try{const r=await api('GET','/zam');
+    document.getElementById('zamBody').innerHTML=r.zam.map(z=>'<tr><td class="mono">'+z.id+'</td><td>'+z.title+'</td><td>'+z.crit+'</td><td><span class="st '+(z.status==='Закрыто'?'st-g':z.status==='Согласовано'?'st-v':'st-a')+'">'+z.status+'</span></td><td>'+(z.status!=='Закрыто'?'<button class="btn" onclick="advZam(\''+z.id+'\',\''+ZCH[Math.min(ZCH.indexOf(z.status)+1,4)]+'\')">→ '+ZCH[Math.min(ZCH.indexOf(z.status)+1,4)]+'</button>':'—')+'</td></tr>').join('')||'<tr><td colspan="5" style="color:var(--dim)">пусто</td></tr>';
+  }catch(e){}
+}
+async function advZam(id,to){
+  const body={to};
+  if(to==='Закрыто'){const b=prompt('Основание закрытия (обязательно, §4.8.6):');if(!b)return;body.basis=b;}
+  try{await api('POST','/zam/'+encodeURIComponent(id)+'/advance',body);toast(id+' → «'+to+'»','ok');loadZam();}
+  catch(e){toast('Отказ: '+e.message,'err');}
+}
+async function createZam(){
+  const t=document.getElementById('zamTitle').value.trim();if(!t)return;
+  try{const r=await api('POST','/zam',{title:t,crit:document.getElementById('zamCrit').value});
+    document.getElementById('zamTitle').value='';toast('Замечание '+r.id+' создано, уведомление отправлено','ok');loadZam();}
+  catch(e){toast('Ошибка: '+e.message,'err');}
+}
+
+/* ---------- УВЕДОМЛЕНИЯ ---------- */
+const LC=['Создано','В очереди','Доставлено','Просмотрено','Подтверждено','Исполнено','Закрыто'];
+async function loadNtf(){
+  try{const r=await api('GET','/notifications');
+    document.getElementById('ntfBody').innerHTML=r.notifications.map(n=>
+      '<div style="padding:9px 13px;border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:center">'+
+      '<div style="flex:1"><b>'+n.title+'</b><div style="color:var(--dim);font-size:10.5px">'+(n.body||'')+'</div>'+
+      '<div style="margin-top:4px;display:flex;gap:3px">'+LC.map(s=>'<span class="st '+(LC.indexOf(s)<LC.indexOf(n.status)?'st-g':s===n.status?'st-v':'st-n')+'" style="font-size:8px">'+s+'</span>').join('')+'</div></div>'+
+      (n.status!=='Закрыто'?'<button class="btn" onclick="advNtf('+n.id+')">→ '+LC[Math.min(LC.indexOf(n.status)+1,6)]+'</button>':'<span class="st st-g">Закрыто</span>')+
+      '</div>').join('')||'<div style="padding:14px;color:var(--dim)">пусто</div>';
+  }catch(e){toast('Уведомления: '+e.message,'err');}
+}
+async function advNtf(id){try{await api('POST','/notifications/'+id+'/advance',{});loadNtf();}catch(e){toast(e.message,'err');}}
+
+/* ---------- АУДИТ ---------- */
+async function loadAudit(){
+  try{const r=await api('GET','/audit?limit=60');
+    document.getElementById('audBody').innerHTML=r.audit.map(a=>
+      '<tr><td class="mono">'+new Date(a.ts*1000).toLocaleTimeString('ru-RU')+'</td><td>'+a.user_login+' <span style="color:var(--dim)">('+a.role+')</span></td><td>'+a.action+'</td><td class="mono">'+(a.object||'')+'</td><td style="'+/ОТКАЗ|неуспеш/i.test(a.action+a.result)?'color:var(--red)':''+'">'+a.result+'</td></tr>').join('');
+  }catch(e){toast('Аудит: '+e.message+' (требуется роль с audit_read)','err');}
+}
+async function verifyAudit(){
+  try{const v=await api('GET','/audit/verify');
+    toast(v.ok?('Целостность хэш-цепочки подтверждена: '+v.entries+' записей, разрывов нет (SEC-003)'):('НАРУШЕНИЕ ЦЕЛОСТНОСТИ на записи '+v.broken_at+'!'),'ok');}
+  catch(e){toast(e.message,'err');}
+}
+
+/* ---------- ИИ ---------- */
+function addAI(cls,html){const d=document.createElement('div');d.className=cls;d.innerHTML=html;
+  const c=document.getElementById('aiChat');c.appendChild(d);c.scrollTop=c.scrollHeight;}
+async function askAI(){
+  const q=document.getElementById('aiQ').value.trim();if(!q)return;
+  document.getElementById('aiQ').value='';
+  addAI('msg u',q.replace(/</g,'&lt;'));
+  addAI('msg a','<span style="color:var(--dim)">анализирую локальный индекс…</span>');
+  try{
+    const r=await api('POST','/ai/ask',{q});
+    document.getElementById('aiChat').lastChild.remove();
+    let h=(r.answer||'').replace(/</g,'&lt;').replace(/\n/g,'<br>');
+    if(r.status==='disabled')h='<b style="color:var(--amber)">ИИ-слой отключён (AI-003)</b> — ГИС и расчёты работают штатно.';
+    if(r.sources&&r.sources.length)h+='<div class="src"><b style="width:100%;font-size:8.5px;color:var(--dim)">ИСТОЧНИКИ</b>'+r.sources.map(s=>'<span class="sref">'+s.doc+' · '+s.section+' · '+s.score+'</span>').join('')+'</div>';
+    if(r.limitations&&r.limitations.length)h+='<div class="lim"><b>Ограничения:</b> '+r.limitations.join('; ')+'</div>';
+    addAI('msg a',h);
+  }catch(e){document.getElementById('aiChat').lastChild.remove();addAI('msg a','<b style="color:var(--red)">Ошибка ИИ-запроса:</b> '+e.message);}
+}
+
+/* ---------- ЖИЗНЕННЫЙ ЦИКЛ G3 ---------- */
+function esc(s){return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function twJsonParse(){try{return JSON.parse(document.getElementById('twJson').value);}catch(e){toast('JSON панели двойника некорректен: '+e.message,'err');return null;}}
+async function showTwin(){
+  const oid=document.getElementById('twOid').value.trim();if(!oid)return toast('Укажите ID объекта','err');
+  try{
+    const r=await api('GET','/twins/'+encodeURIComponent(oid));
+    const dt=r.dt||{};let h='';
+    h+='<div class="row" style="gap:10px;align-items:center"><b style="font-size:15px;color:var(--cyan)">'+esc(dt.level||'—')+'</b>';
+    h+='<span style="color:var(--dim);font-size:10px">'+esc(dt.rule||'')+'</span></div>';
+    if(dt.criteria)h+='<div style="font-size:10px;line-height:1.5;margin:4px 0">'+Object.keys(dt.criteria).sort().map(k=>{
+      const c=dt.criteria[k];return '<span class="st '+(c.met?'st-g':'st-n')+'">'+k+'</span> '+esc(c.text);}).join('<br>')+'</div>';
+    h+='<table style="margin-top:4px"><thead><tr><th>Слой</th><th>Версия</th><th>Статус</th></tr></thead><tbody>'+
+       (r.layers||[]).map(l=>'<tr><td>'+esc(l.layer)+'</td><td class="mono">'+esc(l.version||'—')+'</td><td><span class="st '+(l.filled?'st-g':'st-n')+'">'+esc(l.status)+'</span></td></tr>').join('')+'</tbody></table>';
+    const obs=(r.observed||{}).observed||{};const ks=Object.keys(obs);
+    h+='<div style="margin-top:6px;font-size:10.5px"><b>Наблюдаемое состояние</b> <span style="color:var(--dim)">(DGT-002: базовая конфигурация не изменяется)</span>: '+
+       (ks.length?ks.map(k=>'<span class="chip">'+esc(k)+': <b>'+obs[k].value+'</b></span>').join(' '):'<span style="color:var(--dim)">нет наблюдений — состояние «не измерено», НЕ ноль (EQP-001)</span>')+'</div>';
+    document.getElementById('twOut').innerHTML=h;
+  }catch(e){document.getElementById('twOut').innerHTML='<span style="color:var(--red)">'+esc(e.message)+'</span>';}
+}
+async function twinDivergence(){
+  const oid=document.getElementById('twOid').value.trim();const j=twJsonParse();if(!oid||!j)return;
+  try{
+    const r=await api('POST','/twins/'+encodeURIComponent(oid)+'/divergence',{project:j.project||{}});
+    let h='<b>Протокол отклонений проект↔факт (DGT-003)</b> — расхождений: <b style="color:'+(r.divergences.length?'var(--red)':'var(--green)')+'">'+r.divergences.length+'</b><br><span style="color:var(--dim);font-size:10px">'+esc(r.rule)+'</span>';
+    h+='<table style="margin-top:4px"><thead><tr><th>Параметр</th><th>Проект</th><th>Факт</th><th>Δ</th><th>Статус</th></tr></thead><tbody>'+
+       r.rows.map(x=>'<tr><td class="mono">'+esc(x.metric)+'</td><td>'+esc(x.project)+'</td><td>'+esc(x.observed??"—")+'</td><td>'+esc(x.delta??"—")+'</td><td><span class="st '+(x.status==='расхождение'?'st-a':x.status==='совпадает'?'st-g':'st-n')+'">'+esc(x.status)+'</span></td></tr>').join('')+'</tbody></table>';
+    document.getElementById('twOut').innerHTML=h;toast('Протокол отклонений сформирован и записан в аудит','ok');
+  }catch(e){toast('Отклонения: '+e.message,'err');}
+}
+async function twinCalib(){
+  const j=twJsonParse();if(!j)return;
+  try{
+    const r=await api('POST','/twins/calibrate',{points:j.points||[],passport:j.passport||null});
+    let h='<b>Калибровка двойника (DGT-005, МНК)</b><br>';
+    if(r.status==='identified')h+='y = <b class="mono">'+r.a+'·x + '+r.b+'</b> · RMSE '+r.rmse+' · точек '+r.train_points+
+      '<br><span style="color:var(--dim);font-size:10px">'+esc(r.storage)+'; '+esc(r.validation_required)+'</span>'+
+      (r.passport?'<br><span class="chip">Паспорт НЕ изменён: '+esc(JSON.stringify(r.passport))+'</span>':'');
+    else h+='<span style="color:var(--amber)">'+esc(r.status)+': '+esc(r.note)+'</span> <span style="color:var(--dim);font-size:10px">(честный отказ вместо выдуманной оценки)</span>';
+    document.getElementById('twOut').innerHTML=h;
+  }catch(e){toast('Калибровка: '+e.message,'err');}
+}
+async function twinPredict(){
+  const j=twJsonParse();if(!j)return;
+  try{
+    const r=await api('POST','/twins/predict',{history:j.history||[],horizon:j.horizon||12});
+    let h='<b>Прогноз</b> <span class="st st-a">'+esc(r.type||r.status)+'</span><br>';
+    if(r.status==='forecast')h+='<span style="font-size:10px;color:var(--dim)">модель: '+esc(r.model)+' · горизонт '+r.horizon+' · неопределённость: '+esc(r.uncertainty)+' · независимая проверка обязательна</span><br>'+
+      '<span class="mono" style="font-size:10px">'+r.points.map(p=>'('+p.x+'→'+p.y+')').join(' ')+'</span>';
+    else h+='<span style="color:var(--amber)">'+esc(r.note||'недостаточно данных — прогноз не выдаётся')+'</span>';
+    document.getElementById('twOut').innerHTML=h;
+  }catch(e){toast('Прогноз: '+e.message,'err');}
+}
+const CRCH=['Предложено','Внесено','Проверено','Утверждено'];
+async function loadChanges(){
+  try{const r=await api('GET','/changes');
+    document.getElementById('crBody').innerHTML=r.changes.map(c=>{
+      const i=CRCH.indexOf(c.status);const nxt=i<3?CRCH[i+1]:null;
+      const aff=(c.affected&&c.affected.counts)?Object.entries(c.affected.counts).map(([k,v])=>k+':'+v).join(', '):'—';
+      return '<tr><td class="mono">'+esc(c.id)+'</td><td>'+esc(c.title)+'</td><td><span class="st '+(c.status==='Утверждено'?'st-g':'st-a')+'">'+esc(c.status)+'</span></td><td style="font-size:10px">'+esc(aff)+'</td><td class="mono" style="font-size:10px">'+esc(c.version_new||'—')+'</td><td>'+(nxt?'<button class="btn" onclick="advanceCR(\''+c.id+'\')">→ '+nxt+'</button>':'—')+'</td></tr>';
+    }).join('')||'<tr><td colspan="6" style="color:var(--dim)">изменений нет</td></tr>';
+  }catch(e){}
+}
+async function createCR(){
+  const t=document.getElementById('crTitle').value.trim();
+  if(!t)return toast('Укажите суть изменения','err');
+  try{
+    const r=await api('POST','/changes',{title:t,reason:document.getElementById('crReason').value,target:document.getElementById('crTarget').value.trim()||'-'});
+    const n=(r.impact&&r.impact.affected)?r.impact.affected.length:0;
+    toast('Изменение '+r.id+' предложено; анализ влияния (CFG-002): затронуто вершин '+n,'ok');
+    loadChanges();
+  }catch(e){toast('CR: '+e.message,'err');}
+}
+async function advanceCR(cid){
+  try{const r=await api('POST','/changes/'+encodeURIComponent(cid)+'/advance',{});
+    toast(cid+': '+r.from+' → '+r.to+(r.version_new?' · линия '+r.version_new:''),'ok');loadChanges();
+  }catch(e){toast('Отказ сервера: '+e.message+(e.data&&e.data.error?' ('+e.data.error+')':''),'err');}
+}
+async function loadRules(){
+  try{const r=await api('GET','/rules');
+    document.getElementById('ruleBody').innerHTML=r.rules.map(x=>'<tr><td class="mono">'+esc(x.id)+'</td><td>'+esc(x.name)+'</td><td><span class="st '+(x.class==='блокирующее'?'st-a':'st-n')+'">'+esc(x.class)+'</span></td><td>'+x.version+'</td><td style="font-size:10px">'+esc(x.basis)+'</td><td style="font-size:10px">'+esc(x.author)+'</td></tr>').join('');
+  }catch(e){}
+}
+async function checkRules(){
+  let ctx;try{ctx=JSON.parse(document.getElementById('ruleCtx').value);}catch(e){return toast('Контекст не JSON','err');}
+  try{
+    const r=await api('POST','/rules/check',{ctx});
+    let h='<b>Вердикт: <span class="st '+(r.overall==='PASS'?'st-g':r.overall==='WARN'?'st-a':'st-a')+'">'+r.overall+'</span></b> ';
+    h+='· пройдено '+r.passed.length+' · нарушений '+r.violations.length+' · предупреждений '+r.warnings.length;
+    const bad=[...r.violations,...r.warnings];
+    if(bad.length)h+='<div style="font-size:10px;margin-top:3px">'+bad.map(v=>'<span style="color:var(--red)">'+esc(v.rule)+' («'+esc(v.name)+'» v'+v.version+'): '+esc(v.detail)+'</span>').join('<br>')+'</div>';
+    document.getElementById('ruleOut').innerHTML=h;
+  }catch(e){toast('Правила: '+e.message,'err');}
+}
+async function validateObjUI(){
+  let o;try{o=JSON.parse(document.getElementById('valJson').value);}catch(e){return toast('Объект не JSON','err');}
+  try{
+    const r=await api('POST','/validate',o);
+    let h='<b>Валидация:</b> <span class="st '+(r.publish_blocked?'st-a':'st-g')+'">'+(r.publish_blocked?'публикация ЗАБЛОКИРОВАНА':'можно публиковать')+'</span> · DAT: '+esc(r.dat_status_suggested);
+    const mk=(a,c)=>a.map(x=>'<div style="font-size:10px;color:'+c+'"><b>'+esc(x.field)+'</b>: '+esc(x.problem)+'</div>').join('');
+    h+=mk(r.errors,'var(--red)')+mk(r.warnings,'var(--amber)')+mk(r.info,'var(--dim)');
+    document.getElementById('valOut').innerHTML=h;
+  }catch(e){toast('Валидация: '+e.message,'err');}
+}
+async function loadConflicts(){
+  try{const r=await api('GET','/conflicts');
+    document.getElementById('cfBody').innerHTML=r.conflicts.map(c=>{
+      const vals=c.values.map(v=>esc(v.source_id)+'='+esc(v.value)).join(' | ');
+      const act=c.status==='КОНФЛИКТ'
+        ?'<span class="row"><input id="w_'+c.id+'" placeholder="источник-победитель" style="width:110px"><input id="b_'+c.id+'" placeholder="основание" style="width:130px"><button class="btn" onclick="resolveConflict(\''+c.id+'\')">Решить</button></span>'
+        :'<span style="font-size:10px;color:var(--dim)">'+esc(c.resolution||'')+' · '+esc(c.resolved_by||'')+'<br>'+esc(c.basis||'')+'</span>';
+      return '<tr><td class="mono">'+esc(c.id)+'</td><td class="mono">'+esc(c.object_id)+'.'+esc(c.field)+'</td><td class="mono" style="font-size:10px">'+vals+'</td><td><span class="st '+(c.status==='РЕШЕНО'?'st-g':'st-a')+'">'+esc(c.status)+'</span></td><td>'+act+'</td></tr>';
+    }).join('')||'<tr><td colspan="5" style="color:var(--dim)">конфликтов нет</td></tr>';
+  }catch(e){}
+}
+async function createConflict(){
+  let vals;try{vals=JSON.parse(document.getElementById('cfVals').value);}catch(e){return toast('Значения не JSON','err');}
+  try{
+    const r=await api('POST','/conflicts',{object_id:document.getElementById('cfOid').value.trim()||'-',field:document.getElementById('cfField').value.trim()||'-',values:vals});
+    toast('Конфликт '+r.id+' зарегистрирован: сохранено значений '+r.values_preserved+' (автоперезапись запрещена)','ok');loadConflicts();
+  }catch(e){toast('Конфликт: '+e.message,'err');}
+}
+async function resolveConflict(cid){
+  const w=document.getElementById('w_'+cid).value.trim(),b=document.getElementById('b_'+cid).value.trim();
+  if(!w||!b)return toast('Нужны источник-победитель И основание решения','err');
+  try{
+    const r=await api('POST','/conflicts/'+encodeURIComponent(cid)+'/resolve',{winner:w,basis:b});
+    if(r.error)toast('Арбитраж отклонён: '+r.error,'err');else toast(cid+' решён в пользу '+r.winner+'; проигравшие значения сохранены','ok');
+    loadConflicts();
+  }catch(e){toast('Арбитраж: '+e.message,'err');}
+}
+
+/* ================= РАСШИРЕНИЕ · G4 ================= */
+async function pollCalc(jid,cb){
+  for(let i=0;i<120;i++){
+    await new Promise(r=>setTimeout(r,250));
+    try{
+      const st=await api('GET','/calc/'+jid);
+      if(st.status==='done'){cb(st.result);return;}
+      if(st.status==='error'){toast('Расчёт завершился ошибкой: '+(st.error||'—')+' — результат как достоверный не выдаётся','err');return;}
+    }catch(e){}
+  }
+  toast('Расчёт не завершился за отведённое время','err');
+}
+async function loadG4(){
+  vtLoadPanel();vtLoadReady();loadTrends();loadScenarios();loadSurrogates();vtLoadAll();loadPolygon();loadScores();loadMissions();
+}
+/* ---- ВТ-08 панель + готовность + тренды ---- */
+async function vtLoadPanel(){
+  try{
+    const p=await api('GET','/vt/panel');
+    const card=(t,o)=>'<div style="border:1px solid var(--line);border-radius:8px;padding:7px 9px"><b style="color:var(--cyan)">'+esc(t)+'</b><br>'+
+      Object.entries(o).map(([k,v])=>'<span style="color:var(--dim)">'+esc(k)+':</span> '+esc(typeof v==='object'?JSON.stringify(v):v)).join('<br>')+'</div>';
+    document.getElementById('vtPanel').innerHTML=Object.entries(p).filter(([k])=>!['generated','note'].includes(k)).map(([k,v])=>card(k,v)).join('');
+  }catch(e){document.getElementById('vtPanel').innerHTML='<span style="color:var(--dim)">панель недоступна: '+esc(e.message)+'</span>';}
+}
+async function vtLoadReady(){
+  try{
+    const r=await api('GET','/vt/readiness');
+    let h='<div class="row" style="gap:8px"><b>Формальная готовность к предъявлению (ВТ-05):</b> <span class="st st-c">уровень '+r.formal_level+' из 4</span></div><div style="font-size:10.5px;margin-top:5px">';
+    r.gates.forEach((g,i)=>{h+='<div>'+(g.passed?'<span style="color:var(--green)">✔</span>':'<span style="color:var(--amber)">✘</span>')+' <b>У'+(i+1)+'</b> '+esc(g.text)+'</div>';});
+    document.getElementById('vtReady').innerHTML=h+'</div><div style="font-size:10px;color:var(--dim)">'+esc(r.note)+'</div>';
+  }catch(e){}
+}
+async function loadTrends(){
+  try{
+    const t=await api('GET','/analytics/trends?days=14');
+    const days=[...new Set(Object.values(t.series).flatMap(o=>Object.keys(o)))].sort();
+    if(!days.length){document.getElementById('trendBox').innerHTML='<span style="color:var(--dim);font-size:10.5px">тренды: за последние 14 дней событий нет</span>';return;}
+    const keys=Object.keys(t.series),colors={'расчёты':'#67e8f9','объекты':'#a78bfa','замечания':'#e0a030','испытания':'#8fbf3f','сценарии':'#b02a1f','изменения':'#9f8fe0','иб_отказы':'#ff7b6b'};
+    const maxV=Math.max(1,...days.map(d=>keys.reduce((a,k)=>a+(t.series[k][d]||0),0)));
+    let svg='<svg width="100%" height="72" style="display:block">';
+    const bw=Math.max(6,(700/days.length)-4);
+    days.forEach((d,i)=>{
+      let y=64;
+      keys.forEach(k=>{const v=t.series[k][d]||0;if(!v)return;const h=Math.max(2,v/maxV*56);y-=h;
+        svg+='<rect x="'+(8+i*(bw+4))+'" y="'+y+'" width="'+bw+'" height="'+h+'" fill="'+(colors[k]||'#888')+'" opacity="0.85"><title>'+esc(d+' · '+k+': '+v)+'</title></rect>';});
+    });
+    svg+='</svg>';
+    const leg=keys.map(k=>'<span style="margin-right:8px"><span style="display:inline-block;width:8px;height:8px;background:'+(colors[k]||'#888')+';border-radius:2px"></span> '+esc(k)+'</span>').join('');
+    document.getElementById('trendBox').innerHTML='<div style="font-size:10px;color:var(--dim);margin-bottom:2px">Активность по дням (агрегаты первичных реестров)</div>'+svg+'<div style="font-size:9.5px;color:var(--dim)">'+leg+'</div>';
+  }catch(e){}
+}
+/* ---- сценарии DT-5 ---- */
+async function runScenario(){
+  const oid=document.getElementById('scOid').value.trim();
+  if(!oid)return toast('Укажите ID объекта','err');
+  let params;try{params=JSON.parse(document.getElementById('scParams').value);}catch(e){return toast('Параметры — не JSON','err');}
+  try{
+    const r=await api('POST','/twins/'+encodeURIComponent(oid)+'/scenario',{kind:document.getElementById('scKind').value,params});
+    if(r.status==='insufficient_data')toast('Недостаточно данных: '+r.note,'err');
+    else if(r.error)toast('Сценарий отклонён: '+r.error,'err');
+    else{document.getElementById('scOut').innerHTML='<pre style="font-size:10px;max-height:150px;overflow:auto;background:var(--panel2);padding:7px;border-radius:6px">'+esc(JSON.stringify(r.result,null,1))+'</pre><div style="font-size:10px;color:var(--dim)">'+esc(r.marked)+' · '+esc(r.rule||'')+'</div>';toast('Сценарий '+r.id+' выполнен — результат ОЦЕНКА','ok');}
+    loadScenarios();
+  }catch(e){toast('Сценарий: '+e.message,'err');}
+}
+async function loadScenarios(){
+  try{
+    const r=await api('GET','/scenarios');
+    document.getElementById('scBody').innerHTML=r.scenarios.map(x=>
+      '<tr><td class="mono">'+esc(x.id)+'</td><td class="mono">'+esc(x.object_id)+'</td><td>'+esc(x.kind)+'</td>'+
+      '<td class="mono" style="font-size:9.5px">'+esc(JSON.stringify(x.params))+'</td>'+
+      '<td><span class="st st-a">'+esc(x.marked)+'</span></td>'+
+      '<td>'+(x.validated?'<span class="st st-g">проверен</span>':'<span class="st">нет</span>')+'</td>'+
+      '<td>'+(x.validated?'':'<button class="btn" onclick="validateSc(\''+x.id+'\')">Проверить (verify)</button>')+'</td></tr>').join('')
+      ||'<tr><td colspan="7" style="color:var(--dim)">сценариев нет</td></tr>';
+  }catch(e){}
+}
+async function validateSc(sid){
+  const basis=prompt('Основание независимой проверки сценария '+sid+' (обязательно):');
+  if(!basis)return;
+  try{const r=await api('POST','/scenarios/'+encodeURIComponent(sid)+'/validate',{basis});toast(r.status==='validated'?'Сценарий проверен — учтён в критерии DT-5':('Отказ: '+(r.error||'')),r.status==='validated'?'ok':'err');loadScenarios();}
+  catch(e){toast('Проверка: '+e.message,'err');}
+}
+async function aiSuggest(){
+  const oid=document.getElementById('scOid').value.trim();
+  if(!oid)return toast('Укажите ID объекта','err');
+  try{
+    const r=await api('POST','/ai/suggest',{object_id:oid});
+    if(r.status==='disabled')return toast('ИИ-слой отключён (AI-003)','err');
+    document.getElementById('scOut').innerHTML='<b style="font-size:11px">ИИ-предложение (оценка, источники в ответе):</b><pre style="font-size:10px;background:var(--panel2);padding:7px;border-radius:6px">'+esc(JSON.stringify(r.suggestions,null,1))+'</pre><div style="font-size:9.5px;color:var(--dim)">'+esc((r.limitations||[]).join(' · '))+'</div>';
+  }catch(e){toast('ИИ: '+e.message,'err');}
+}
+/* ---- OPT-01 / LCC-01 ---- */
+async function runOpt(){
+  let payload;try{payload=JSON.parse(document.getElementById('optJson').value);}catch(e){return toast('Варианты/критерии — не JSON','err');}
+  payload.function='OPT-01';
+  try{
+    const {job_id}=await api('POST','/calc',payload);
+    toast('OPT-01 в очереди: '+job_id,'ok');
+    pollCalc(job_id,res=>{
+      let h='<div class="row" style="gap:8px"><span class="st st-g">допустимых: '+res.feasible_count+'</span><span class="st st-a">отклонено: '+res.rejected_count+'</span><b>Парето: '+esc((res.pareto_front||[]).join(', ')||'—')+'</b></div>';
+      h+='<table><thead><tr><th>Ранг</th><th>Вариант</th><th>Балл</th><th>Показатели</th></tr></thead><tbody>'+
+        (res.ranked||[]).map((v,i)=>'<tr><td>'+(i+1)+'</td><td class="mono">'+esc(v.id)+'</td><td><b>'+v.score+'</b></td><td class="mono" style="font-size:9.5px">'+esc(JSON.stringify(v))+'</td></tr>').join('')+'</tbody></table>';
+      if(res.rejected&&res.rejected.length)h+='<div style="margin-top:6px;font-size:10.5px"><b style="color:var(--amber)">Отклонённые (жёсткие ограничения — ENG-006):</b><br>'+res.rejected.map(r=>esc(r.variant.id)+': '+esc(r.reason)).join('<br>')+'</div>';
+      h+='<div style="font-size:10px;color:var(--dim);margin-top:5px">'+esc(res.note)+' · паспорт '+esc(res.passport&&res.passport.run_id||'')+'</div>';
+      document.getElementById('optOut').innerHTML=h;
+    });
+  }catch(e){toast('OPT-01: '+e.message,'err');}
+}
+async function runLcc(){
+  try{
+    const {job_id}=await api('POST','/calc',{function:'LCC-01',capex:1200000,years:10,opex_per_year:150000,discount:0.08,disposal:60000});
+    pollCalc(job_id,res=>{
+      document.getElementById('optOut').innerHTML='<b>LCC-01 (TCO):</b> '+esc(res.tco)+' ₽ · чувствительность −20 % OPEX: '+esc(res.tco_sensitivity.minus20_opex)+' / +20 %: '+esc(res.tco_sensitivity.plus20_opex)+' · горизонт '+res.years+' лет, ставка '+res.discount;
+    });
+  }catch(e){toast('LCC-01: '+e.message,'err');}
+}
+/* ---- Co-Simulation и суррогаты ---- */
+async function runCosim(){
+  let seed;try{seed=JSON.parse(document.getElementById('cosimSeed').value);}catch(e){return toast('Seed — не JSON','err');}
+  try{
+    const {job_id}=await api('POST','/calc',{function:'COSIM-01',scenario_id:'CS-CLIENT-'+Date.now()%100000,seed});
+    pollCalc(job_id,res=>{
+      let h=res.ok?'<span class="st st-g">цепочка PWR-01→THM-01→REL-01 сошлась</span>':'<span class="st st-a">прогон не завершён: ошибка решателя не подменяется значением</span>';
+      h+='<div style="font-size:10px;color:var(--dim);margin:4px 0">сценарий '+esc(res.scenario_id)+' · единицы: '+esc(JSON.stringify(res.unit_checks))+' · версии: '+esc(JSON.stringify(res.versions))+'</div>';
+      h+='<table><thead><tr><th>Решатель</th><th>Версия</th><th>Выходы / ошибка</th></tr></thead><tbody>'+
+        (res.log||[]).map(l=>'<tr><td class="mono">'+esc(l.solver)+'</td><td>'+esc(l.version||'')+'</td><td class="mono" style="font-size:9.5px">'+esc(JSON.stringify(l.outputs||l.error))+'</td></tr>').join('')+'</tbody></table>';
+      if(res.data)h+='<div style="font-size:10.5px;margin-top:4px">Итог: t шкафа '+esc(Math.round((res.data.t_cabinet_c||0)*10)/10)+' °C · доступность '+esc(res.data.availability)+'</div>';
+      document.getElementById('cosimOut').innerHTML=h;
+    });
+  }catch(e){toast('COSIM-01: '+e.message,'err');}
+}
+async function demoTrain(){
+  try{
+    const r=await api('POST','/surrogate/demo_train',{model_key:'OKUMURA_HATA'});
+    if(r.status==='trained')toast('Суррогат '+r.id+' обучен на '+r.n_points+' точках RF-01: RMSE '+r.rmse+' дБ · статус «Проверяется» · '+r.marked,'ok');
+    else toast('Обучение: '+(r.error||r.status),'err');
+    loadSurrogates();
+  }catch(e){toast('Суррогат: '+e.message,'err');}
+}
+async function loadSurrogates(){
+  try{
+    const r=await api('GET','/surrogates');
+    document.getElementById('surBody').innerHTML=r.surrogates.map(x=>
+      '<tr><td class="mono">'+esc(x.id)+'</td><td class="mono">'+esc(x.model_ref)+'</td><td><span class="st '+(x.status.startsWith('Валид')?'st-g':'st-a')+'">'+esc(x.status)+'</span></td><td>'+(x.disabled?'<span class="st st-a">ДА</span>':'нет')+'</td></tr>').join('')
+      ||'<tr><td colspan="4" style="color:var(--dim)">суррогатов нет — обучите на решателе RF-01</td></tr>';
+  }catch(e){}
+}
+async function surPredict(){
+  const id=document.getElementById('surId').value.trim();
+  const x=document.getElementById('surX').value.split(',').map(v=>parseFloat(v.trim()));
+  if(!id||x.some(isNaN))return toast('Укажите ID суррогата и входы через запятую','err');
+  try{
+    const r=await api('POST','/surrogate/predict',{id,x});
+    if(r.status==='ok')toast('СУРРОГАТ '+id+': '+r.value+' дБ (RMSE обуч. '+r.rmse_train+') — не равен физическому решателю','ok');
+    else if(r.status==='out_of_domain')toast('Вне области применения: '+r.outside.join('; ')+' — значение НЕ выдаётся как достоверное','err');
+    else toast(r.status+': '+(r.error||''),'err');
+  }catch(e){toast('Предсказание: '+e.message,'err');}
+}
+/* ---- ВТ-01…07 ---- */
+async function vtLoadAll(){vtLoadStages();vtLoadAging();}
+async function vtStageCreate(){
+  try{
+    const r=await api('POST','/vt/stages',{title:document.getElementById('stTitle').value.trim()||'Этап',contract:document.getElementById('stContract').value.trim()||'К-2026'});
+    toast('Этап '+r.id+' открыт (закрытие — только решением комиссии)','ok');vtLoadStages();
+  }catch(e){toast('Этап: '+e.message,'err');}
+}
+async function vtLoadStages(){
+  try{
+    const r=await api('GET','/vt/stages');
+    document.getElementById('vtStageBody').innerHTML=r.stages.map(st=>{
+      const d=st.dimensions;
+      const dims=['изделие','документация','испытания','комплект'].map(k=>
+        '<button class="btn" style="padding:1px 5px;font-size:9px;'+(d[k]?'border-color:var(--green);color:var(--green)':'')+'" onclick="vtMark(\''+st.id+'\',\''+k+'\','+!d[k]+')">'+(d[k]?'✔ ':'')+esc(k)+'</button>').join(' ');
+      const act=st.status==='Закрыт решением комиссии'
+        ?'<span class="st st-g">комиссия: '+esc(st.commission_by||'')+'</span>'
+        :'<button class="btn" onclick="vtCommission(\''+st.id+'\')">Решение комиссии</button>'+(st.overdue?' <span class="st st-a">просрочен</span>':'');
+      return '<tr><td class="mono">'+esc(st.id)+'<br><span style="font-size:9.5px;color:var(--dim)">'+esc(st.title||'')+'</span></td><td>'+dims+'</td><td><span class="st '+(st.status==='Открыт'?'st-a':'st-c')+'">'+esc(st.status)+'</span></td><td>'+act+'</td></tr>';
+    }).join('')||'<tr><td colspan="4" style="color:var(--dim)">этапов нет</td></tr>';
+  }catch(e){}
+}
+async function vtMark(sid,dim,val){
+  const ev=val?(prompt('Подтверждающий документ/результат для «'+dim+'»:')||''):'';
+  if(val&&!ev)return toast('Измерение без подтверждения не отмечается (ВТ-02)','err');
+  try{const r=await api('POST','/vt/stages/'+encodeURIComponent(sid)+'/mark',{dimension:dim,value:val,evidence:ev});if(r.error)toast(r.error,'err');vtLoadStages();}catch(e){toast('Отметка: '+e.message,'err');}
+}
+async function vtCommission(sid){
+  const basis=prompt('Основание решения комиссии (протокол/документ) — обязательно:');
+  if(!basis)return;
+  try{
+    const r=await api('POST','/vt/stages/'+encodeURIComponent(sid)+'/commission',{basis});
+    toast(r.status==='closed'?('Этап '+sid+' закрыт решением комиссии'):'Комиссия отказала: '+(r.error||''),r.status==='closed'?'ok':'err');
+    vtLoadStages();
+  }catch(e){toast('Комиссия: '+e.message+(e.data&&e.data.error?' · '+e.data.error:''),'err');}
+}
+async function vtLoadAging(){
+  try{
+    const a=await api('GET','/vt/aging');
+    const u=await api('GET','/vt/unification');
+    document.getElementById('vtAging').innerHTML='<b>ВТ-07 риски старения ('+a.risks.length+'):</b> '+a.risks.slice(0,8).map(r=>
+      '<span class="st st-a" title="'+esc(r.reactions.join(' · '))+'">'+esc(r.risk)+(r.equipment?': '+esc(Array.isArray(r.equipment)?r.equipment.join(','):r.equipment):'')+'</span>').join(' ')+' <span style="color:var(--dim)">(наведение — варианты реакции)</span>';
+    document.getElementById('vtUni').innerHTML='<b>ВТ-04:</b> дублей номенклатуры: '+Object.keys(u.duplicates||{}).length+
+      ' · заимствование: '+esc(u.reuse_rate_pct??'—')+' % каталога используется в объектах'+
+      ' · EOL-последствий: '+(u.eol_consequences||[]).length;
+  }catch(e){}
+}
+/* ---- полигон, миссии, баллы ---- */
+async function loadPolygon(){
+  try{
+    const p=await api('GET','/game/polygon');
+    document.getElementById('polyBox').innerHTML='<b>Инженерный полигон — этап '+esc(String(p.current_stage))+' из 8:</b> <span style="color:var(--dim);font-size:10px">'+esc(p.rule)+'</span><div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap">'+
+      p.stages.map(s=>'<span class="st '+(s.met?'st-g':'')+'" title="'+esc(s.criterion)+'">'+s.n+'. '+esc(s.name)+(s.met?' ✔':'')+'</span>').join('')+'</div>';
+  }catch(e){}
+}
+async function loadScores(){
+  try{
+    const r=await api('GET','/game/scores');
+    document.getElementById('scoreBody').innerHTML=r.leaderboard.map(x=>
+      '<tr><td>'+esc(x.user_login)+'</td><td><b>'+x.total+'</b></td><td>'+esc(x.competency)+'</td><td>'+x.awards+'</td><td>'+(x.revoked_n||0)+'</td></tr>').join('')
+      ||'<tr><td colspan="5" style="color:var(--dim)">начислений нет — баллы выдаются за проверяемый результат</td></tr>';
+  }catch(e){}
+}
+let curMission=null;
+function loadMissions(){
+  const sel=document.getElementById('missionSel');
+  if(sel.options.length)return;
+  ['собери_узел','найди_ошибку_в_паспорте','проверь_модель','безопасное_изменение','восстанови_состояние','восстанови_ошс','проведи_инвентаризацию','диагностируй_состояние','подготовь_то'].forEach(m=>{
+    const o=document.createElement('option');o.value=m;o.textContent=m.replace(/_/g,' ');sel.appendChild(o);
+  });
+}
+async function missionStart(){
+  curMission=document.getElementById('missionSel').value;
+  const seed=parseInt(document.getElementById('missionSeed').value)||42;
+  try{
+    const t=await api('POST','/game/missions/'+encodeURIComponent(curMission)+'/start',{seed});
+    const data=JSON.parse(JSON.stringify(t));delete data.status;delete data.mission;delete data.seed;delete data.isolation;
+    document.getElementById('missionBox').innerHTML='<b>'+esc(t.mission.replace(/_/g,' '))+'</b> <span style="color:var(--dim)">(seed '+t.seed+' · '+esc(t.isolation)')</span><pre style="font-size:10px;background:var(--panel2);padding:7px;border-radius:6px;max-height:180px;overflow:auto">'+esc(JSON.stringify(data,null,1))+'</pre>';
+  }catch(e){toast('Миссия: '+e.message,'err');}
+}
+async function missionCheck(){
+  if(!curMission)return toast('Сначала запустите миссию','err');
+  const seed=parseInt(document.getElementById('missionSeed').value)||42;
+  let ans=document.getElementById('missionAns').value.trim();
+  if(ans.startsWith('{')||ans.startsWith('['))try{ans=JSON.parse(ans);}catch(e){}
+  try{
+    const r=await api('POST','/game/missions/'+encodeURIComponent(curMission)+'/check',{seed,answer:ans});
+    document.getElementById('missionBox').insertAdjacentHTML('beforeend',
+      '<div style="margin-top:6px"><span class="st '+(r.correct?'st-g':'st-a')+'">'+(r.correct?'ВЕРНО':'НЕВЕРНО')+'</span> <b>Почему:</b> '+esc(r.why)+'</div>');
+    toast(r.correct?'Миссия пройдена — объяснение ниже':'Ответ неверен — смотрите объяснение и подсказки',r.correct?'ok':'err');
+  }catch(e){toast('Проверка: '+e.message,'err');}
+}
+async function missionHint(level){
+  if(!curMission)return toast('Сначала запустите миссию','err');
+  const seed=parseInt(document.getElementById('missionSeed').value)||42;
+  try{
+    const r=await api('POST','/game/missions/'+encodeURIComponent(curMission)+'/hint',{seed,level});
+    document.getElementById('missionBox').insertAdjacentHTML('beforeend','<div style="margin-top:4px;color:var(--dim)">💡 '+esc(r.hint)+'</div>');
+  }catch(e){toast('Подсказка: '+e.message,'err');}
+}
+
+</script>
+</body>
+</html>

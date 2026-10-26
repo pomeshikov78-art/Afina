@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>СПО «Афина» — Прототип 4 «Панель руководителя»</title>
+<style>
+  :root{
+    --bg:#f4f6f9; --white:#fff; --line:#e4e9ef; --txt:#22303f; --dim:#7c8a99;
+    --blue:#1552a0; --blue2:#3b82d6; --green:#188a4c; --amber:#c07800; --red:#c3372b; --violet:#6d4fc4;
+    --shadow:0 1px 3px rgba(20,40,70,.07),0 4px 14px rgba(20,40,70,.05);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI","Arial",sans-serif}
+  body{background:var(--bg);color:var(--txt);font-size:13px;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+  .top{background:var(--white);border-bottom:1px solid var(--line);padding:0 20px;height:56px;display:flex;align-items:center;gap:26px;flex-shrink:0;box-shadow:var(--shadow)}
+  .logo{font-size:17px;font-weight:800;color:var(--blue);letter-spacing:.5px}
+  .logo span{color:var(--amber)}
+  nav{display:flex;gap:4px}
+  nav a{padding:8px 13px;border-radius:7px;color:var(--dim);cursor:pointer;font-weight:500;font-size:13px}
+  nav a:hover{background:var(--bg)}
+  nav a.on{background:#e8f0fb;color:var(--blue);font-weight:700}
+  .top .right{margin-left:auto;display:flex;gap:12px;align-items:center;font-size:12px;color:var(--dim)}
+  .avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--violet));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px}
+  .pill{border-radius:14px;padding:3px 12px;font-size:11px;font-weight:600}
+  .p-green{background:#e6f5ec;color:var(--green)}
+  .sub{background:var(--white);border-bottom:1px solid var(--line);padding:8px 20px;display:flex;gap:10px;align-items:center;flex-shrink:0;flex-wrap:wrap}
+  .sbtn{border:1px solid var(--line);background:#fff;border-radius:7px;padding:5px 13px;font-size:12px;color:var(--dim);cursor:pointer}
+  .sbtn:hover{border-color:var(--blue2);color:var(--blue)}
+  .sbtn.on{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:600}
+  .sbtn.pri{border-color:var(--blue2);color:var(--blue);font-weight:600}
+  select{border:1px solid var(--line);border-radius:7px;padding:5px 9px;font-size:12px;background:#fff;color:var(--txt)}
+  .content{flex:1;overflow-y:auto;padding:16px 20px}
+  /* KPI */
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:14px}
+  .kpi{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:13px 15px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .kpi::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--blue2)}
+  .kpi.g::before{background:var(--green)} .kpi.a::before{background:var(--amber)} .kpi.r::before{background:var(--red)} .kpi.v::before{background:var(--violet)}
+  .kpi .t{font-size:10.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.8px;font-weight:600}
+  .kpi .v{font-size:26px;font-weight:800;margin:4px 0 2px;font-variant-numeric:tabular-nums}
+  .kpi .d{font-size:11px;color:var(--dim)}
+  .kpi .tr{font-size:11px;font-weight:700}
+  .up{color:var(--green)} .down{color:var(--red)} .flat{color:var(--dim)}
+  .grid2{display:grid;grid-template-columns:1.35fr 1fr;gap:12px;margin-bottom:14px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px}
+  .card{background:var(--white);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+  .card .ch{padding:11px 15px;border-bottom:1px solid var(--line);font-weight:700;font-size:13px;display:flex;justify-content:space-between;align-items:center}
+  .card .ch small{color:var(--dim);font-weight:400;font-size:11px}
+  .card .cb{padding:13px 15px}
+  /* прогресс-этапы */
+  .gate{display:flex;gap:8px;margin-bottom:12px}
+  .g{flex:1;border-radius:9px;border:1px solid var(--line);padding:9px 11px;font-size:11px;position:relative}
+  .g .n{font-weight:800;font-size:12px;margin-bottom:2px}
+  .g.done{background:#eef8f2;border-color:#bfe4cd;color:var(--green)}
+  .g.cur{background:#e8f0fb;border-color:#bcd3f0;color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,214,.12)}
+  .g.next{color:var(--dim);background:#fafbfc}
+  .g .p{margin-top:5px;height:4px;border-radius:2px;background:rgba(0,0,0,.08);overflow:hidden}
+  .g .p i{display:block;height:100%;border-radius:2px;background:currentColor}
+  /* бары */
+  .brow{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:12px}
+  .brow .l{width:220px;color:var(--dim);flex-shrink:0}
+  .brow .bar{flex:1;height:16px;background:var(--bg);border-radius:5px;overflow:hidden;display:flex}
+  .brow .bar i{height:100%}
+  .brow .n{width:52px;text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+  /* donut */
+  .donut-wrap{display:flex;gap:18px;align-items:center}
+  .dlegend{font-size:12px;line-height:2}
+  .dlegend .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:7px}
+  /* таблица */
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th{text-align:left;color:var(--dim);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;padding:7px 10px;border-bottom:1px solid var(--line)}
+  td{padding:8px 10px;border-bottom:1px solid var(--line)}
+  tr:hover td{background:#fafcff}
+  .badge{display:inline-block;border-radius:11px;padding:2px 10px;font-size:10.5px;font-weight:700}
+  .b-g{background:#e6f5ec;color:var(--green)} .b-a{background:#fdf3e2;color:var(--amber)} .b-r{background:#fbeae8;color:var(--red)} .b-b{background:#e8f0fb;color:var(--blue)} .b-n{background:#eef0f3;color:var(--dim)}
+  .risk-dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:6px}
+  /* уведомления */
+  .ntf{display:flex;gap:10px;padding:9px 4px;border-bottom:1px solid var(--line);font-size:12px;align-items:flex-start}
+  .ntf:last-child{border-bottom:none}
+  .ntf .ic{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+  .ntf .tt{font-weight:600}
+  .ntf .dd{color:var(--dim);font-size:11px;margin-top:1px}
+  .ntf .st2{margin-left:auto;font-size:10px;color:var(--dim);white-space:nowrap;padding-top:3px}
+  .statusbar{background:var(--white);border-top:1px solid var(--line);padding:6px 20px;display:flex;gap:22px;font-size:11px;color:var(--dim);flex-shrink:0}
+  .statusbar b{color:var(--txt)}
+  .statusbar .right{margin-left:auto;display:flex;gap:18px}
+  .mini{display:inline-block;width:44px;height:5px;background:var(--bg);border-radius:3px;vertical-align:middle;overflow:hidden}
+  .mini i{display:block;height:100%;background:var(--blue2);border-radius:3px}
+</style>
+</head>
+<body>
+  <div class="top">
+    <div class="logo">Афина<span>·Панель руководителя</span></div>
+    <nav>
+      <a>Обзор</a><a class="on">Программа</a><a>Подразделения (ОШС)</a><a>Каталог</a><a>Расчёты</a><a>Испытания</a><a>Конфигурация</a><a>Документы</a><a>Отчёты</a>
+    </nav>
+    <div class="right">
+      <span class="pill p-green">Режим А · защищённый контур</span>
+      <span>ГОЗ-2026 · контракт №4187</span>
+      <div class="avatar">РП</div>
+    </div>
+  </div>
+
+  <div class="sub">
+    <button class="sbtn pri">▶ Расчёт</button>
+    <button class="sbtn">⇶ Очередь (5)</button>
+    <button class="sbtn">Сценарий Новый</button>
+    <button class="sbtn">Импорт</button>
+    <button class="sbtn">Экспорт</button>
+    <span style="width:1px;height:22px;background:var(--line);margin:0 6px"></span>
+    <span style="color:var(--dim);font-size:12px">Физика:</span>
+    <select><option>Авто</option><option>Быстро</option><option>Полная</option></select>
+    <span style="color:var(--dim);font-size:12px">Профиль:</span>
+    <select><option>Руководитель (ВТ-08)</option><option>Тактический</option><option>RF-Инженер</option><option>Сетевой Архитектор</option><option>3D-Планировщик</option><option>ИИ-Оператор</option></select>
+    <span style="margin-left:auto;color:var(--dim);font-size:12px">Данные на: 17.10.2026 12:10 · обновление агрегатов — каждые 15 мин</span>
+  </div>
+
+  <div class="content">
+    <!-- KPI -->
+    <div class="kpis">
+      <div class="kpi g"><div class="t">Готовность программы</div><div class="v" style="color:var(--green)">78 %</div><div class="d">рубеж G3 · <span class="tr up">▲ +6 % за месяц</span></div></div>
+      <div class="kpi"><div class="t">Покрытие реализацией</div><div class="v">84 %</div><div class="d">212 / 252 требования P0–P1</div></div>
+      <div class="kpi v"><div class="t">Подтверждение требований</div><div class="v" style="color:var(--violet)">61 %</div><div class="d">154 прошло проверку · <span class="tr flat">≠ реализовано</span></div></div>
+      <div class="kpi a"><div class="t">Открытые замечания</div><div class="v" style="color:var(--amber)">17</div><div class="d">2 крит. · 6 знач. · 9 мин.</div></div>
+      <div class="kpi r"><div class="t">CAPEX-эффект</div><div class="v" style="color:var(--red)">−16,4 %</div><div class="d">цель 15–20 % · 3 альтернативы</div></div>
+    </div>
+
+    <!-- Рубежи -->
+    <div class="card" style="margin-bottom:14px">
+      <div class="ch">Контрольные рубежи (разд. 12) <small>переход — по предъявленным результатам, не по дате</small></div>
+      <div class="cb">
+        <div class="gate">
+          <div class="g done"><div class="n">G0 · Обоснование</div>закрыт 14.03.2026<div class="p"><i style="width:100%"></i></div></div>
+          <div class="g done"><div class="n">G1 · Реализуемость</div>закрыт 02.06.2026<div class="p"><i style="width:100%"></i></div></div>
+          <div class="g done"><div class="n">G2 · Базовое ядро</div>закрыт 28.08.2026<div class="p"><i style="width:100%"></i></div></div>
+          <div class="g cur"><div class="n">G3 · Интеграция и ЖЦ</div>выполняется · 64 %<div class="p"><i style="width:64%"></i></div></div>
+          <div class="g next"><div class="n">G4 · Расширение</div>план: Q1 2027<div class="p"><i style="width:0%"></i></div></div>
+          <div class="g next"><div class="n">G5 · Приёмка</div>план: Q3 2027<div class="p"><i style="width:0%"></i></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <!-- Подразделения -->
+      <div class="card">
+        <div class="ch">Подразделения: ОШС / факт / состояние <small>UNT · штат ≠ факт ≠ исправность</small></div>
+        <div class="cb">
+          <div class="brow"><span class="l">14-й узел связи — укомплектованность</span><div class="bar"><i style="width:92%;background:var(--green)"></i><i style="width:8%;background:#dfe5eb"></i></div><span class="n">92 %</span></div>
+          <div class="brow"><span class="l">14-й узел — техника исправна (TS-1/TS-2)</span><div class="bar"><i style="width:71%;background:var(--blue2)"></i><i style="width:12%;background:var(--amber)"></i><i style="width:9%;background:var(--red)"></i><i style="width:8%;background:#dfe5eb"></i></div><span class="n">71 %</span></div>
+          <div class="brow"><span class="l">7-я рота связи — укомплектованность</span><div class="bar"><i style="width:78%;background:var(--green)"></i><i style="width:22%;background:#dfe5eb"></i></div><span class="n">78 %</span></div>
+          <div class="brow"><span class="l">7-я рота — техника исправна</span><div class="bar"><i style="width:54%;background:var(--blue2)"></i><i style="width:14%;background:var(--amber)"></i><i style="width:11%;background:var(--red)"></i><i style="width:21%;background:#dfe5eb"></i></div><span class="n">54 %</span></div>
+          <div class="brow"><span class="l">РТП-2 — укомплектованность</span><div class="bar"><i style="width:88%;background:var(--green)"></i><i style="width:12%;background:#dfe5eb"></i></div><span class="n">88 %</span></div>
+          <div style="display:flex;gap:16px;margin-top:10px;font-size:11px;color:var(--dim)">
+            <span><span class="risk-dot" style="background:var(--blue2)"></span>TS-1/2 исправно</span>
+            <span><span class="risk-dot" style="background:var(--amber)"></span>TS-3/5/6 обслуживание</span>
+            <span><span class="risk-dot" style="background:var(--red)"></span>TS-4 неисправно</span>
+            <span><span class="risk-dot" style="background:#dfe5eb"></span>TS-0/8 не оценено · устарело</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Возможности donut -->
+      <div class="card">
+        <div class="ch">Подтверждённость возможностей <small>UNT-004</small></div>
+        <div class="cb donut-wrap">
+          <svg width="150" height="150" viewBox="0 0 42 42">
+            <circle cx="21" cy="21" r="15.9" fill="none" stroke="#eef0f3" stroke-width="6"/>
+            <circle cx="21" cy="21" r="15.9" fill="none" stroke="#188a4c" stroke-width="6" stroke-dasharray="46 54" stroke-dashoffset="25"/>
+            <circle cx="21" cy="21" r="15.9" fill="none" stroke="#c07800" stroke-width="6" stroke-dasharray="27 73" stroke-dashoffset="-21"/>
+            <circle cx="21" cy="21" r="15.9" fill="none" stroke="#3b82d6" stroke-width="6" stroke-dasharray="18 82" stroke-dashoffset="-48"/>
+            <circle cx="21" cy="21" r="15.9" fill="none" stroke="#c9d2dc" stroke-width="6" stroke-dasharray="9 91" stroke-dashoffset="-66"/>
+            <text x="21" y="20" text-anchor="middle" font-size="6.5" font-weight="800" fill="#22303f">91</text>
+            <text x="21" y="26.5" text-anchor="middle" font-size="2.8" fill="#7c8a99">возможностей</text>
+          </svg>
+          <div class="dlegend">
+            <div><span class="sw" style="background:var(--green)"></span>Подтверждённые — 46 %</div>
+            <div><span class="sw" style="background:var(--amber)"></span>Расчётные — 27 %</div>
+            <div><span class="sw" style="background:var(--blue2)"></span>Заявленные — 18 %</div>
+            <div><span class="sw" style="background:#c9d2dc"></span>Не определены — 9 %</div>
+            <div style="color:var(--dim);font-size:11px;margin-top:8px">«Не определено» отображается отдельно,<br>а не как 0 % или 100 % (п. 4.11.8)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid3">
+      <!-- Качество данных -->
+      <div class="card">
+        <div class="ch">Качество данных <small>цель ≥ 98 %</small></div>
+        <div class="cb">
+          <div class="brow"><span class="l" style="width:130px">Полнота</span><div class="bar"><i style="width:98.2%;background:var(--green)"></i></div><span class="n">98,2 %</span></div>
+          <div class="brow"><span class="l" style="width:130px">Актуальность</span><div class="bar"><i style="width:94%;background:var(--blue2)"></i></div><span class="n">94,0 %</span></div>
+          <div class="brow"><span class="l" style="width:130px">Согласованность</span><div class="bar"><i style="width:97%;background:var(--blue2)"></i></div><span class="n">97,1 %</span></div>
+          <div class="brow"><span class="l" style="width:130px">Подтверждённость</span><div class="bar"><i style="width:89%;background:var(--amber)"></i></div><span class="n">89,4 %</span></div>
+          <div class="brow"><span class="l" style="width:130px">Round-trip потери</span><div class="bar"><i style="width:100%;background:var(--green)"></i></div><span class="n">0</span></div>
+        </div>
+      </div>
+      <!-- Воспроизводимость -->
+      <div class="card">
+        <div class="ch">Расчёты и воспроизводимость <small>ENG/MOD</small></div>
+        <div class="cb">
+          <div class="brow"><span class="l" style="width:150px">Эталонные запуски в допуске</span><div class="bar"><i style="width:100%;background:var(--green)"></i></div><span class="n">100 %</span></div>
+          <div class="brow"><span class="l" style="width:150px">Расчёты с паспортом</span><div class="bar"><i style="width:100%;background:var(--green)"></i></div><span class="n">100 %</span></div>
+          <div class="brow"><span class="l" style="width:150px">Модели VALIDATED</span><div class="bar"><i style="width:72%;background:var(--blue2)"></i><i style="width:16%;background:var(--amber)"></i><i style="width:12%;background:#dfe5eb"></i></div><span class="n">18 / 25</span></div>
+          <div class="brow"><span class="l" style="width:150px">Выход за обл. применимости</span><div class="bar"><i style="width:4%;background:var(--red)"></i></div><span class="n">3 случ.</span></div>
+          <div style="font-size:11px;color:var(--dim);margin-top:8px">Среднее время RF-03 (сектор 5G, r=3 км): <b style="color:var(--txt)">1 мин 42 с</b> · норма ≤ 2 мин ✓</div>
+        </div>
+      </div>
+      <!-- Автономность -->
+      <div class="card">
+        <div class="ch">Автономность и безопасность <small>AUT / SEC</small></div>
+        <div class="cb">
+          <div class="brow"><span class="l" style="width:160px">Сценарии без внешних связей</span><div class="bar"><i style="width:100%;background:var(--green)"></i></div><span class="n">100 %</span></div>
+          <div class="brow"><span class="l" style="width:160px">Исходящие соединения (режим Б)</span><div class="bar"><i style="width:100%;background:var(--green)"></i></div><span class="n">0</span></div>
+          <div class="brow"><span class="l" style="width:160px">RTO после отказа узла</span><div class="bar"><i style="width:73%;background:var(--blue2)"></i></div><span class="n">11 мин</span></div>
+          <div class="brow"><span class="l" style="width:160px">Проверки RBAC пройдено</span><div class="bar"><i style="width:96%;background:var(--green)"></i></div><span class="n">96 %</span></div>
+          <div style="font-size:11px;color:var(--dim);margin-top:8px">Последний протокол автономности: AUT-T02 от 10.10.2026 — <b style="color:var(--green)">успешно</b></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <!-- Реестр замечаний -->
+      <div class="card">
+        <div class="ch">Критические замечания и риски <small>реестр · Maker–Checker</small></div>
+        <div class="cb" style="padding:0">
+          <table>
+            <tr><th>ID</th><th>Содержание</th><th>Категория</th><th>Ответственный</th><th>Статус</th></tr>
+            <tr><td>ЗАМ-114</td><td>EMC-конфликт РРЛ-18 ГГц ↔ сектор 3.4 ГГц («Высота-12»)</td><td><span class="badge b-r">Критическое</span></td><td>Петров К. (исп.) / Смирнов А. (пров.)</td><td><span class="badge b-a">Устранено → проверка</span></td></tr>
+            <tr><td>ЗАМ-109</td><td>Данные ОШС 7-й роты устарели (TS-8, > 90 сут)</td><td><span class="badge b-r">Критическое</span></td><td>Администратор данных</td><td><span class="badge b-a">Внесено</span></td></tr>
+            <tr><td>РСК-07</td><td><span class="risk-dot" style="background:var(--amber)"></span>Единственный поставщик СВЧ-модулей (EOL 2027)</td><td><span class="badge b-a">Значительный</span></td><td>ВТ-07 · кооперация</td><td><span class="badge b-b">Анализ альтернатив</span></td></tr>
+            <tr><td>ЗАМ-102</td><td>Чувствительность приёмника «не измерена» — расчёт предварительный</td><td><span class="badge b-a">Значительный</span></td><td>Инженер-верификатор</td><td><span class="badge b-n">Ожидает измерения</span></td></tr>
+          </table>
+        </div>
+      </div>
+      <!-- Уведомления -->
+      <div class="card">
+        <div class="ch">Уведомления и события <small>NTF · доставка ≠ просмотр ≠ исполнение</small></div>
+        <div class="cb" style="padding:4px 15px">
+          <div class="ntf"><div class="ic" style="background:#fbeae8;color:var(--red)">▲</div><div><div class="tt">Критическое несоответствие ограничениям: СЗЗ сектора 3</div><div class="dd">RF-09 · объект «Высота-13» · эскалация включена</div></div><div class="st2">12:02 · Просмотрено</div></div>
+          <div class="ntf"><div class="ic" style="background:#fdf3e2;color:var(--amber)">⏱</div><div><div class="tt">Срок ТО-2: Р-444 «Пересвет» (через 5 сут)</div><div class="dd">MAINTENANCE_EVENT · назначен исполнитель</div></div><div class="st2">11:40 · Доставлено</div></div>
+          <div class="ntf"><div class="ic" style="background:#e8f0fb;color:var(--blue)">✔</div><div><div class="tt">Расчёт RF-03 завершён · паспорт CALC-2026-4471</div><div class="dd">воспроизводимость в допуске MOD-002</div></div><div class="st2">09:14 · Исполнено</div></div>
+          <div class="ntf"><div class="ic" style="background:#f0ecfb;color:var(--violet)">⇄</div><div><div class="tt">Изменение исходных данных ЦД «Мачта М-25»</div><div class="dd">затронуто расчётов: 4 · анализ влияния CFG-002 выполнен</div></div><div class="st2">08:55 · Подтверждено</div></div>
+          <div class="ntf"><div class="ic" style="background:#eef0f3;color:var(--dim)">✎</div><div><div class="tt">Документ на согласование: отчёт по покрытию v2.1</div><div class="dd">утверждающий: комиссия · авто-утверждение запрещено (DOC-002)</div></div><div class="st2">вчера · В очереди</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px">
+      <div class="ch">Готовность к предъявлению (ВТ-05) <small>оценка формальной готовности — не решение комиссии</small></div>
+      <div class="cb">
+        <div class="grid3" style="margin:0">
+          <div class="brow"><span class="l" style="width:190px">1 · Комплектность</span><div class="bar"><i style="width:91%;background:var(--green)"></i></div><span class="n">91 %</span></div>
+          <div class="brow"><span class="l" style="width:190px">2 · Документация</span><div class="bar"><i style="width:76%;background:var(--blue2)"></i></div><span class="n">76 %</span></div>
+          <div class="brow"><span class="l" style="width:190px">3 · Подтверждение требований</span><div class="bar"><i style="width:61%;background:var(--amber)"></i></div><span class="n">61 %</span></div>
+          <div class="brow"><span class="l" style="width:190px">4 · Процедурная готовность</span><div class="bar"><i style="width:48%;background:var(--amber)"></i></div><span class="n">48 %</span></div>
+          <div style="grid-column:span 2;font-size:11.5px;color:var(--dim);line-height:1.7;padding:6px 10px;background:var(--bg);border-radius:8px">
+            ⚠ Наличие всех файлов в Системе <b>не означает</b> выполнения этапа контракта (ВТ-02). Этап закрывается только решением уполномоченного органа. Высокий суммарный процент не компенсирует нарушение обязательного требования.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="statusbar">
+    <span>Статус: <b style="color:var(--green)">Готов</b></span>
+    <span>FPS: <b>—</b> (панель)</span>
+    <span>Выделено: <b>программа ГОЗ-2026</b></span>
+    <span>Ошибки и ресурсы: <b style="color:var(--amber)">2 крит. замечания открыты</b></span>
+    <div class="right">
+      <span>Очередь расчётов: <b>5</b></span>
+      <span>CPU <span class="mini"><i style="width:24%"></i></span> 24 %</span>
+      <span>GPU <span class="mini"><i style="width:38%"></i></span> 38 %</span>
+      <span>Пользователей онлайн: <b>12</b></span>
+    </div>
+  </div>
+</body>
+</html>

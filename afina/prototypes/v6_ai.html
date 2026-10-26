@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>СПО «Афина» — Прототип 6 «ИИ-Оператор»</title>
+<style>
+  :root{
+    --bg:#0d0b16; --panel:#151222; --panel2:#1c1830; --line:#2c2745; --line2:#3a3458;
+    --txt:#e7e3f5; --dim:#8f88ad; --violet:#a78bfa; --pink:#f472b6; --cyan:#67e8f9;
+    --green:#4ade80; --amber:#fbbf24; --red:#f87171;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI","Arial",sans-serif}
+  body{background:var(--bg);color:var(--txt);font-size:12px;overflow:hidden;height:100vh;display:flex;flex-direction:column}
+  .menubar{background:var(--panel);border-bottom:1px solid var(--line);height:34px;display:flex;align-items:center;padding:0 12px;gap:3px;flex-shrink:0}
+  .logo{font-weight:800;letter-spacing:1px;margin-right:16px;font-size:14px;background:linear-gradient(90deg,var(--violet),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .menubar a{color:var(--dim);padding:6px 10px;cursor:pointer;border-radius:5px}
+  .menubar a:hover{background:var(--panel2);color:var(--txt)}
+  .menubar .right{margin-left:auto;display:flex;gap:10px;align-items:center;font-size:11px}
+  .chip{border-radius:12px;padding:2px 11px;font-size:10px;font-weight:600;letter-spacing:.5px}
+  .chip.ai{background:linear-gradient(90deg,rgba(167,139,250,.2),rgba(244,114,182,.2));border:1px solid var(--line2);color:var(--violet)}
+  .chip.air{border:1px solid rgba(74,222,128,.4);color:var(--green);background:rgba(74,222,128,.07)}
+  .toolbar{background:var(--panel2);border-bottom:1px solid var(--line);padding:6px 12px;display:flex;gap:8px;align-items:center;flex-shrink:0;flex-wrap:wrap}
+  .tbtn{background:var(--panel);border:1px solid var(--line2);color:var(--txt);border-radius:6px;padding:4px 12px;cursor:pointer;font-size:11.5px}
+  .tbtn:hover{border-color:var(--violet);color:var(--violet)}
+  .tbtn.pri{background:linear-gradient(90deg,rgba(167,139,250,.25),rgba(244,114,182,.18));border-color:var(--violet);color:var(--violet);font-weight:700}
+  select{background:var(--panel);border:1px solid var(--line2);color:var(--pink);border-radius:6px;padding:4px 8px;font-size:11px}
+  .sep{width:1px;height:18px;background:var(--line)}
+  .main{flex:1;display:flex;min-height:0}
+  /* левая колонка — ИИ-чат */
+  .col-ai{width:380px;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;flex-shrink:0}
+  .ai-head{padding:9px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+  .ai-orb{width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 30% 30%,var(--pink),var(--violet) 70%);box-shadow:0 0 14px rgba(167,139,250,.6);animation:orb 3s ease-in-out infinite}
+  @keyframes orb{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+  .ai-head .t{font-weight:700;color:var(--violet);font-size:13px}
+  .ai-head .s{color:var(--dim);font-size:10px}
+  .ai-body{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:9px}
+  .msg{max-width:94%;border-radius:10px;padding:8px 11px;font-size:12px;line-height:1.55}
+  .msg.user{align-self:flex-end;background:linear-gradient(135deg,rgba(167,139,250,.22),rgba(244,114,182,.14));border:1px solid var(--line2)}
+  .msg.ai{align-self:flex-start;background:var(--panel2);border:1px solid var(--line)}
+  .msg .src{margin-top:6px;display:flex;flex-wrap:wrap;gap:4px}
+  .src b{font-size:9px;color:var(--dim);width:100%;letter-spacing:1px;text-transform:uppercase}
+  .sref{font-size:9.5px;border:1px solid var(--line2);border-radius:9px;padding:1px 8px;color:var(--cyan);cursor:pointer;background:rgba(103,232,249,.05)}
+  .sref:hover{border-color:var(--cyan)}
+  .lim{margin-top:6px;font-size:10px;color:var(--dim);border-top:1px dashed var(--line2);padding-top:5px;line-height:1.5}
+  .lim b{color:var(--amber)}
+  .typing{align-self:flex-start;color:var(--dim);font-size:11px;display:flex;gap:4px;align-items:center}
+  .typing i{width:5px;height:5px;border-radius:50%;background:var(--violet);animation:tp 1s infinite}
+  .typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+  @keyframes tp{0%,100%{opacity:.2}50%{opacity:1}}
+  .ai-input{border-top:1px solid var(--line);padding:9px 12px;display:flex;gap:7px}
+  .ai-input input{flex:1;background:var(--bg);border:1px solid var(--line2);border-radius:8px;padding:8px 11px;color:var(--txt);font-size:12px;font-family:inherit}
+  .ai-input input:focus{outline:none;border-color:var(--violet)}
+  .send{background:linear-gradient(135deg,var(--violet),var(--pink));border:none;border-radius:8px;width:38px;color:#fff;cursor:pointer;font-size:15px}
+  .quick{padding:0 12px 8px;display:flex;gap:5px;flex-wrap:wrap}
+  .q{font-size:10px;border:1px solid var(--line2);border-radius:10px;padding:2px 9px;color:var(--dim);cursor:pointer}
+  .q:hover{color:var(--pink);border-color:var(--pink)}
+  /* центр — сцена */
+  .col-center{flex:1;display:flex;flex-direction:column;min-width:0}
+  .scene{flex:1;position:relative;min-height:0;background:radial-gradient(800px 500px at 50% 40%,#171328 0%,var(--bg) 75%)}
+  canvas{position:absolute;inset:0;width:100%;height:100%}
+  .ovl-tl{position:absolute;top:12px;left:12px;background:rgba(21,18,34,.85);border:1px solid var(--line2);border-radius:9px;padding:9px 12px;font-size:11px;color:var(--dim);line-height:1.8;backdrop-filter:blur(6px)}
+  .ovl-tl b{color:var(--txt)}
+  .ovl-tools{position:absolute;top:12px;right:12px;display:flex;flex-direction:column;gap:5px}
+  .ot{background:rgba(21,18,34,.88);border:1px solid var(--line2);border-radius:8px;padding:6px 11px;font-size:11px;color:var(--dim);cursor:pointer;backdrop-filter:blur(6px)}
+  .ot:hover{color:var(--violet);border-color:var(--violet)}
+  .ot.on{color:var(--pink);border-color:var(--pink);background:rgba(244,114,182,.08)}
+  .ot .d{display:block;font-size:9px;opacity:.7}
+  .sugg{position:absolute;bottom:12px;left:12px;right:12px;display:flex;gap:8px}
+  .sg{flex:1;background:rgba(21,18,34,.88);border:1px solid var(--line2);border-radius:9px;padding:8px 11px;font-size:10.5px;color:var(--dim);cursor:pointer;backdrop-filter:blur(6px)}
+  .sg:hover{border-color:var(--violet)}
+  .sg b{color:var(--violet);display:block;margin-bottom:2px;font-size:11px}
+  .sg .ok{color:var(--green)}
+  .layers{background:var(--panel);border-top:1px solid var(--line);padding:5px 12px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:11px;flex-shrink:0}
+  .lb{color:var(--dim);font-size:9px;letter-spacing:1.6px}
+  .lay{display:flex;gap:4px;align-items:center;color:var(--dim);cursor:pointer}
+  .lay input{accent-color:var(--violet)}
+  .lay.on{color:var(--txt)}
+  /* правая — инспектор + ограничения ИИ */
+  .col-right{width:270px;background:var(--panel);border-left:1px solid var(--line);display:flex;flex-direction:column;flex-shrink:0}
+  .ph{padding:8px 12px;font-size:10px;letter-spacing:2px;color:var(--pink);text-transform:uppercase;border-bottom:1px solid var(--line);display:flex;justify-content:space-between}
+  .insp{overflow-y:auto;flex:1;padding:10px}
+  .blk{background:var(--panel2);border:1px solid var(--line);border-radius:9px;margin-bottom:9px;padding:9px 11px}
+  .blk .bt{font-size:9.5px;letter-spacing:1.4px;color:var(--dim);text-transform:uppercase;margin-bottom:6px}
+  .kv{display:flex;justify-content:space-between;gap:8px;padding:2px 0;color:var(--dim);font-size:11.5px}
+  .kv b{color:var(--txt);font-weight:500;text-align:right}
+  .st{display:inline-block;border-radius:9px;padding:1px 8px;font-size:9.5px;font-weight:700}
+  .st-g{background:rgba(74,222,128,.12);color:var(--green);border:1px solid rgba(74,222,128,.35)}
+  .st-a{background:rgba(251,191,36,.1);color:var(--amber);border:1px solid rgba(251,191,36,.3)}
+  .st-v{background:rgba(167,139,250,.12);color:var(--violet);border:1px solid rgba(167,139,250,.35)}
+  .ban{background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.3);border-radius:9px;padding:8px 11px;font-size:10.5px;color:#e8a9a9;line-height:1.6}
+  .ban .bt{color:var(--red);font-weight:700;letter-spacing:1px;font-size:9.5px;text-transform:uppercase;margin-bottom:4px}
+  .ban div{padding:1px 0}
+  .statusbar{background:var(--panel2);border-top:1px solid var(--line);display:flex;align-items:center;gap:18px;padding:4px 12px;font-size:10.5px;color:var(--dim);flex-shrink:0}
+  .statusbar b{color:var(--txt);font-weight:500}
+  .statusbar .right{margin-left:auto;display:flex;gap:16px}
+  .mbar{display:inline-block;width:46px;height:5px;background:var(--bg);border-radius:3px;vertical-align:middle;overflow:hidden}
+  .mbar i{display:block;height:100%;background:linear-gradient(90deg,var(--violet),var(--pink));border-radius:3px}
+</style>
+</head>
+<body>
+  <div class="menubar">
+    <div class="logo">✦ АФИНА · ИИ-ОПЕРАТОР</div>
+    <a>Файл</a><a>Правка</a><a>Вид</a><a>Задачи</a><a>База</a><a>Параметры</a><a>Окно</a><a>Справка</a>
+    <div class="right">
+      <span class="chip ai">Локальная модель · RAG-индекс v12 · веса на диске</span>
+      <span class="chip air">Режим Б · внешних обращений: 0</span>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <button class="tbtn pri">▶ Расчёт</button>
+    <button class="tbtn">⇶ Очередь (2)</button>
+    <div class="sep"></div>
+    <span style="color:var(--dim);font-size:11px">Физика:</span>
+    <select><option>Авто</option><option>Быстро</option><option>Полная</option></select>
+    <span style="color:var(--dim);font-size:11px">Профиль:</span>
+    <select><option>ИИ-Оператор</option><option>Тактический</option><option>RF-Инженер</option><option>Сетевой Архитектор</option><option>3D-Планировщик</option></select>
+    <div class="sep"></div>
+    <button class="tbtn">⊞ Умная рамка</button>
+    <button class="tbtn">⌕ Очистка данных</button>
+    <button class="tbtn">⚖ Балансировщик азимутов</button>
+    <button class="tbtn">❐ Клонирование сети</button>
+    <div class="sep"></div>
+    <button class="tbtn" style="color:var(--dim)">ИИ: ВКЛ (отключение не влияет на ГИС и расчёты · AI-003)</button>
+  </div>
+
+  <div class="main">
+    <!-- ИИ-ассистент -->
+    <div class="col-ai">
+      <div class="ai-head">
+        <div class="ai-orb"></div>
+        <div><div class="t">Помощник «Афина-ИИ»</div><div class="s">локальный RAG · каждый ответ — с источниками и допущениями (AI-001)</div></div>
+      </div>
+      <div class="ai-body">
+        <div class="msg user">Разбери раздел 4 ТЗ «Узел Заря-5»: извлеки требования, найди неполные данные и предложи план размещения.</div>
+        <div class="msg ai">
+          Из ТЗ (стр. 12–14) извлечено <b>23 требования</b>: 8 — связь УКВ, 6 — электропитание, 5 — размещение, 4 — условия эксплуатации. Уверенность извлечения: 0,86–0,97 (порог публикации 0,8).
+          <div class="src">
+            <b>Источники</b>
+            <span class="sref">ТЗ_Заря5.pdf · стр.12, v3.1</span>
+            <span class="sref">REQ-114…REQ-137 (черновики)</span>
+            <span class="sref">ГОСТ 34.602-2020 п.5.2</span>
+          </div>
+          <div class="lim">Неполные данные: <b>3 критичных пробела</b> — тип антенны не указан (REQ-118), грунт для заземления (REQ-125), режим работы ПА «не измерен». По REQ-118 <b>запрашиваю данные</b>, подстановка условного значения запрещена (EQP-001).</div>
+        </div>
+        <div class="msg user">Предложи допустимые позиции мачты с учётом рельефа и СЗЗ.</div>
+        <div class="msg ai">
+          Построено <b>7 кандидатов</b> (умная рамка, полигон 4×4 км). Допустимы 3: M-02, M-05, M-06 — вне жилой застройки, уклон ≤ 5°, проезд графа дорог существует.
+          <div class="src">
+            <b>Основание расчёта</b>
+            <span class="sref">RF-09 · проверка ограничений</span>
+            <span class="sref">MTW рельеф · 10 м · от 2025</span>
+            <span class="sref">СанПиН · зона СЗЗ (методика утв.)</span>
+            <span class="sref">Паспорт CALC-2026-4480 (Preview, L0)</span>
+          </div>
+          <div class="lim">Оценка — <b>L0 концептуальная</b>, порядок величин. Для проектного решения требуется L1–L2 инженерный расчёт (п. 4.5.2). Корреляция «выше точка → лучше покрытие» не выдаётся за причинно-следственную связь.</div>
+        </div>
+        <div class="msg ai" style="border-color:rgba(251,191,36,.4)">
+          <span style="color:var(--amber)">⚠ Обнаружено противоречие:</span> в проекте мощность ПА 50 Вт (COM-014, паспорт), а в телеметрии «Заря-4» — 43 Вт. Оба значения сохранены раздельно, запись помечена <b>КОНФЛИКТ</b> и вынесена на арбитраж (п. 6.4). Автоматическая перезапись запрещена.
+          <div class="src"><b>Объекты</b><span class="sref">ASSET 8F3A-0012</span><span class="sref">DAT-конфликт №44</span></div>
+        </div>
+        <div class="typing"><i></i><i></i><i></i> готовлю черновик отчёта с прослеживаемостью до данных…</div>
+      </div>
+      <div class="quick">
+        <span class="q">Разбор ТЗ</span><span class="q">Найди пробелы в данных</span><span class="q">Объясни ошибку топологии</span><span class="q">Черновик отчёта</span><span class="q">Сценарии РЭБ</span>
+      </div>
+      <div class="ai-input">
+        <input placeholder="Промпт-поиск по проекту, каталогу и документам…">
+        <button class="send">➤</button>
+      </div>
+    </div>
+
+    <!-- Сцена -->
+    <div class="col-center">
+      <div class="scene">
+        <canvas id="scene"></canvas>
+        <div class="ovl-tl">
+          <b>Умная рамка · автопланирование</b><br>
+          Полигон: 4×4 км · критерии: СЗЗ, уклон, проезд, LOS<br>
+          Кандидатов: <b style="color:var(--cyan)">7</b> · допустимо: <b style="color:var(--green)">3</b> · отклонено: <b style="color:var(--red)">4</b><br>
+          <span style="color:var(--dim)">каждый отклонённый — с объяснением причины (3DM-003)</span>
+        </div>
+        <div class="ovl-tools">
+          <div class="ot on">⊞ Умная рамка<span class="d">автопланирование узлов</span></div>
+          <div class="ot">⚖ Балансировщик<span class="d">азимуты и наклоны</span></div>
+          <div class="ot">⌕ Очистка данных<span class="d">дубли, ошибки, контуры</span></div>
+          <div class="ot">❐ Клонирование сети<span class="d">перенос на новый рельеф</span></div>
+          <div class="ot">⌖ Промпт-поиск<span class="d">запрос к модели</span></div>
+        </div>
+        <div class="sugg">
+          <div class="sg"><b>Вариант M-02 <span class="ok">рекомендован</span></b>Покрытие 94 % · CAPEX −18 % · LOS ✓ на 3 направления · СЗЗ соблюдена. Неопределённость ±4 дБ.</div>
+          <div class="sg"><b>Вариант M-05</b>Покрытие 88 % · CAPEX −12 % · требуется вырубка просеки 300 м (ограничение).</div>
+          <div class="sg"><b>Вариант M-06</b>Покрытие 91 % · CAPEX −9 % · близко к границе СЗЗ — запас 40 м.</div>
+        </div>
+      </div>
+      <div class="layers">
+        <span class="lb">СЛОИ</span>
+        <label class="lay on"><input type="checkbox" checked>Геоподложка</label>
+        <label class="lay on"><input type="checkbox" checked>Зоны покрытия</label>
+        <label class="lay on"><input type="checkbox" checked>Кандидаты ИИ</label>
+        <label class="lay on"><input type="checkbox" checked>Отклонённые + причины</label>
+        <label class="lay"><input type="checkbox">Сетка</label>
+        <label class="lay on"><input type="checkbox" checked>Z-рельеф</label>
+        <span class="lb" style="margin-left:10px">СОСТОЯНИЯ</span>
+        <span style="color:var(--green)">● Исправна</span><span style="color:var(--amber)">● Ограниченно</span><span style="color:var(--red)">● Неисправна</span><span style="color:var(--dim)">○ Не оценено</span>
+      </div>
+    </div>
+
+    <!-- Инспектор -->
+    <div class="col-right">
+      <div class="ph"><span>Инспектор · вариант M-02</span><span class="st st-v">ИИ-предложение</span></div>
+      <div class="insp">
+        <div class="blk">
+          <div class="bt">Происхождение рекомендации</div>
+          <div class="kv">Метод <b>OPT-01 + RF-03 (Preview L0)</b></div>
+          <div class="kv">Паспорт <b style="color:var(--cyan)">CALC-2026-4480 ↗</b></div>
+          <div class="kv">Данные рельефа <b>MTW v2025 · ±2 м</b></div>
+          <div class="kv">Статус <b><span class="st st-a">ТРЕБУЕТ ИНЖ. ПОДТВЕРЖДЕНИЯ</span></b></div>
+        </div>
+        <div class="blk">
+          <div class="bt">KPI варианта</div>
+          <div class="kv">Покрытие ≥ −95 дБм <b style="color:var(--green)">94,1 %</b></div>
+          <div class="kv">CAPEX относительно базы <b>−18,2 %</b></div>
+          <div class="kv">Запас по СЗЗ <b>310 м</b></div>
+          <div class="kv">Резервирование N+1 <b style="color:var(--green)">выполнено</b></div>
+        </div>
+        <div class="blk">
+          <div class="bt">Качество данных полигона</div>
+          <div class="kv">Дублей найдено <b style="color:var(--amber)">4 → на арбитраж</b></div>
+          <div class="kv">Контуров по снимкам <b>2 не верифицированы</b></div>
+          <div class="kv">Заполненность обяз. атрибутов <b>97,2 % (цель 98)</b></div>
+        </div>
+        <div class="ban">
+          <div class="bt">Ограничения ИИ-слоя (п. 4.10.2)</div>
+          <div>✕ не изменяет утверждённую конфигурацию</div>
+          <div>✕ не подтверждает техническую исправность</div>
+          <div>✕ не объявляет модель валидированной</div>
+          <div>✕ не закрывает замечания и документы</div>
+          <div>✕ не подменяет расчётное ядро ENG6+</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="statusbar">
+    <span>FPS: <b>60</b></span>
+    <span>Генерализация: <b>LOD-1</b></span>
+    <span>Выделено: <b>7 кандидатов · вариант M-02</b></span>
+    <span>Статус: <b style="color:var(--violet)">ИИ: локальный инференс · GPU 0</b></span>
+    <span>Ошибки и ресурсы: <b style="color:var(--amber)">1 конфликт данных · 3 пробела</b></span>
+    <div class="right">
+      <span>Очередь: <b>2</b></span>
+      <span>CPU <span class="mbar"><i style="width:38%"></i></span> 38 %</span>
+      <span>GPU <span class="mbar"><i style="width:61%"></i></span> 61 %</span>
+    </div>
+  </div>
+
+<script>
+const cv=document.getElementById('scene'),ctx=cv.getContext('2d');
+function resize(){cv.width=cv.clientWidth;cv.height=cv.clientHeight;draw();}
+window.addEventListener('resize',resize);
+let t=0;
+const cands=[
+  {x:.38,y:.36,ok:true,n:'M-02',best:true},
+  {x:.62,y:.28,ok:true,n:'M-05'},
+  {x:.3,y:.62,ok:true,n:'M-06'},
+  {x:.75,y:.55,ok:false,n:'M-01',why:'СЗЗ: жилая застройка 90 м'},
+  {x:.5,y:.78,ok:false,n:'M-03',why:'уклон 9° > 5°'},
+  {x:.2,y:.24,ok:false,n:'M-04',why:'нет проезда (граф дорог)'},
+  {x:.82,y:.78,ok:false,n:'M-07',why:'LOS закрыт высотой 214 м'},
+];
+function draw(){
+  const W=cv.width,H=cv.height;t+=0.02;
+  ctx.clearRect(0,0,W,H);
+  // рельеф
+  ctx.strokeStyle='rgba(167,139,250,.1)';
+  for(let i=0;i<8;i++){ctx.beginPath();
+    for(let x=0;x<=W;x+=8){const y=H*0.5+Math.sin(x*0.006+i*1.1)*46+(i-4)*30;
+      x?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();}
+  // умная рамка
+  ctx.strokeStyle='rgba(103,232,249,.5)';ctx.setLineDash([8,6]);ctx.lineWidth=1.4;
+  ctx.strokeRect(W*0.12,H*0.12,W*0.76,H*0.76);ctx.setLineDash([]);ctx.lineWidth=1;
+  ctx.fillStyle='rgba(103,232,249,.8)';ctx.font='10px Segoe UI';ctx.textAlign='left';
+  ctx.fillText('⊞ УМНАЯ РАМКА · 4×4 км',W*0.12,H*0.12-7);
+  // лучшая зона покрытия M-02
+  const b=cands[0];
+  const g=ctx.createRadialGradient(W*b.x,H*b.y,10,W*b.x,H*b.y,Math.min(W,H)*0.3);
+  g.addColorStop(0,'rgba(74,222,128,.2)');g.addColorStop(1,'rgba(74,222,128,0)');
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(W*b.x,H*b.y,Math.min(W,H)*0.3,0,7);ctx.fill();
+  // кандидаты
+  cands.forEach((c,i)=>{
+    const x=W*c.x,y=H*c.y;
+    if(c.ok){
+      ctx.strokeStyle=c.best?'#4ade80':'rgba(74,222,128,.55)';ctx.lineWidth=c.best?2.4:1.6;
+      ctx.beginPath();ctx.arc(x,y,c.best?13+Math.sin(t*2)*2:10,0,7);ctx.stroke();
+      ctx.fillStyle='#4ade80';ctx.beginPath();ctx.arc(x,y,4,0,7);ctx.fill();
+      ctx.fillStyle=c.best?'#4ade80':'rgba(74,222,128,.85)';ctx.font=(c.best?'bold ':'')+'11px Segoe UI';ctx.textAlign='center';
+      ctx.fillText(c.n+(c.best?' ★ рекомендован':''),x,y-20);
+    }else{
+      ctx.strokeStyle='rgba(248,113,113,.65)';ctx.lineWidth=1.4;
+      ctx.beginPath();ctx.moveTo(x-8,y-8);ctx.lineTo(x+8,y+8);ctx.moveTo(x+8,y-8);ctx.lineTo(x-8,y+8);ctx.stroke();
+      ctx.fillStyle='rgba(248,113,113,.9)';ctx.font='10px Segoe UI';ctx.textAlign='center';
+      ctx.fillText(c.n,x,y-14);
+      ctx.fillStyle='rgba(248,113,113,.55)';ctx.font='9px Segoe UI';
+      ctx.fillText('✕ '+c.why,x,y+22);
+    }
+  });
+  ctx.lineWidth=1;
+}
+setInterval(draw,50);resize();
+</script>
+</body>
+</html>

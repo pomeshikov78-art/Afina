@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>СПО «Афина» — Прототип 5 «3D-Планировщик · BIM»</title>
+<style>
+  :root{
+    --bg:#2b2d31; --panel:#35373c; --panel2:#3d4046; --line:#4a4d54; --line2:#55585f;
+    --txt:#e6e8ea; --dim:#9aa0a6; --orange:#e8833a; --blue:#5b9dd9; --green:#6fbf73;
+    --amber:#e0b34c; --red:#e06c5f; --view:#1c1e22;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI","Arial",sans-serif}
+  body{background:var(--bg);color:var(--txt);font-size:12px;overflow:hidden;height:100vh;display:flex;flex-direction:column}
+  /* строка заголовка + меню */
+  .titlebar{background:#26282c;border-bottom:1px solid var(--line);height:30px;display:flex;align-items:center;padding:0 10px;gap:2px;flex-shrink:0}
+  .filebtn{background:var(--orange);color:#1c1e22;font-weight:800;border-radius:4px;padding:4px 14px;cursor:pointer;font-size:13px;margin-right:10px}
+  .titlebar a{color:var(--dim);padding:4px 10px;cursor:pointer;border-radius:3px}
+  .titlebar a:hover{background:var(--panel2);color:var(--txt)}
+  .titlebar a.on{background:var(--panel2);color:var(--orange)}
+  .titlebar .right{margin-left:auto;color:var(--dim);font-size:11px;display:flex;gap:12px;align-items:center}
+  .airpill{border:1px solid var(--green);color:var(--green);border-radius:3px;padding:1px 8px;font-size:10px}
+  /* лента */
+  .ribbon{background:var(--panel);border-bottom:1px solid var(--line);display:flex;flex-shrink:0}
+  .rb-group{padding:6px 12px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:4px;min-width:0}
+  .rb-group .glabel{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;text-align:center;margin-top:2px}
+  .rb-row{display:flex;gap:4px}
+  .rb{background:var(--panel2);border:1px solid transparent;border-radius:4px;padding:5px 9px;cursor:pointer;color:var(--txt);font-size:11px;display:flex;gap:6px;align-items:center;white-space:nowrap}
+  .rb:hover{border-color:var(--orange);background:#464038}
+  .rb.on{background:#4d3a28;border-color:var(--orange);color:var(--orange)}
+  .rb .ic{font-size:13px}
+  .rb-big{flex-direction:column;padding:6px 10px}
+  .rb-big .ic{font-size:17px}
+  .rb.pri{background:#4d3a28;border-color:var(--orange);color:var(--orange);font-weight:600}
+  /* Z-срез панель */
+  .zstrip{background:var(--panel2);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:2px;padding:4px 12px;flex-shrink:0;font-size:11px}
+  .zstrip .zl{color:var(--dim);margin-right:8px;letter-spacing:1px;font-size:10px}
+  .zfloor{padding:3px 12px;border-radius:4px;cursor:pointer;color:var(--dim);border:1px solid transparent}
+  .zfloor:hover{background:var(--panel)}
+  .zfloor.on{background:var(--orange);color:#1c1e22;font-weight:700}
+  .zfloor .cnt{font-size:9px;opacity:.75;margin-left:4px}
+  /* компоновка */
+  .main{flex:1;display:flex;min-height:0}
+  .col-left{width:212px;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;flex-shrink:0}
+  .col-center{flex:1;display:flex;flex-direction:column;min-width:0}
+  .col-right{width:280px;background:var(--panel);border-left:1px solid var(--line);display:flex;flex-direction:column;flex-shrink:0}
+  .ph{padding:6px 10px;font-size:10px;letter-spacing:1.6px;color:var(--dim);text-transform:uppercase;border-bottom:1px solid var(--line);background:var(--panel2);display:flex;justify-content:space-between}
+  .assets{overflow-y:auto;flex:1;padding:6px}
+  .agrid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+  .acard{background:var(--panel2);border:1px solid var(--line);border-radius:5px;padding:7px 6px;cursor:grab;text-align:center}
+  .acard:hover{border-color:var(--orange)}
+  .acard .pv{height:40px;background:var(--view);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:19px;color:var(--blue);margin-bottom:4px}
+  .acard .nm{font-size:9.5px;color:var(--txt);line-height:1.25}
+  .acard .cd{font-size:8px;color:var(--dim)}
+  .bimtree{padding:6px 8px;font-size:11.5px;overflow-y:auto}
+  .bt{padding:2.5px 4px;border-radius:3px;cursor:pointer;color:var(--dim)}
+  .bt:hover{background:var(--panel2);color:var(--txt)}
+  .bt.on{color:var(--orange);background:#3a3025}
+  .bt .lvl1{font-weight:600}
+  .ind1{margin-left:14px} .ind2{margin-left:28px} .ind3{margin-left:42px}
+  /* видовые окна */
+  .views{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:3px;padding:3px;background:var(--view);min-height:0}
+  .vcell{position:relative;background:#202226;border:1px solid var(--line);overflow:hidden;min-height:0}
+  .vcell.main3d{grid-row:span 2}
+  .vlabel{position:absolute;top:6px;left:8px;font-size:10px;color:var(--dim);letter-spacing:1px;z-index:2;background:rgba(28,30,34,.7);padding:1px 7px;border-radius:3px}
+  .vlabel b{color:var(--orange);font-weight:600}
+  canvas{position:absolute;inset:0;width:100%;height:100%}
+  .vhint{position:absolute;bottom:6px;left:8px;font-size:9.5px;color:var(--dim);z-index:2}
+  /* слои */
+  .layers{background:var(--panel);border-top:1px solid var(--line);padding:5px 12px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:11px;flex-shrink:0}
+  .lb{color:var(--dim);font-size:9.5px;letter-spacing:1.4px}
+  .lay{display:flex;gap:4px;align-items:center;color:var(--dim);cursor:pointer}
+  .lay input{accent-color:var(--orange)}
+  .lay.on{color:var(--txt)}
+  /* инспектор */
+  .insp{overflow-y:auto;flex:1;padding:8px}
+  .blk{background:var(--panel2);border:1px solid var(--line);border-radius:5px;margin-bottom:8px}
+  .blk .bh{padding:5px 9px;font-size:9.5px;letter-spacing:1.3px;color:var(--dim);text-transform:uppercase;border-bottom:1px solid var(--line)}
+  .blk .bb{padding:7px 9px;font-size:11.5px}
+  .kv{display:flex;justify-content:space-between;gap:8px;padding:2px 0;color:var(--dim)}
+  .kv b{color:var(--txt);font-weight:500;text-align:right}
+  .chip{display:inline-block;border-radius:3px;padding:1px 7px;font-size:9.5px;font-weight:700}
+  .c-g{background:#2c4030;color:var(--green)} .c-a{background:#453c26;color:var(--amber)} .c-b{background:#27384a;color:var(--blue)} .c-n{background:#3a3c40;color:var(--dim)} .c-r{background:#47302d;color:var(--red)}
+  .cable{margin-top:6px}
+  .crow{display:flex;gap:8px;padding:3px 0;border-bottom:1px dotted var(--line);font-size:10.5px;color:var(--dim)}
+  .crow b{color:var(--txt)}
+  .warnbox{background:#3a3226;border:1px solid #6b5433;border-radius:5px;padding:7px 9px;font-size:10.5px;color:#d9bd85;line-height:1.55;margin-top:8px}
+  .statusbar{background:#26282c;border-top:1px solid var(--line);display:flex;align-items:center;gap:18px;padding:4px 12px;font-size:10.5px;color:var(--dim);flex-shrink:0}
+  .statusbar b{color:var(--txt);font-weight:500}
+  .statusbar .right{margin-left:auto;display:flex;gap:16px}
+  .mbar{display:inline-block;width:46px;height:5px;background:var(--view);border-radius:3px;vertical-align:middle;overflow:hidden}
+  .mbar i{display:block;height:100%;background:var(--orange);border-radius:3px}
+</style>
+</head>
+<body>
+  <div class="titlebar">
+    <div class="filebtn">А</div>
+    <a class="on">3D-Планировщик</a><a>Тактический</a><a>RF-Инженер</a><a>Сетевой Архитектор</a><a>ИИ-Оператор</a><a>Вид</a><a>База</a><a>Параметры</a><a>Окно</a><a>Справка</a>
+    <div class="right">
+      <span>Проект: <b style="color:var(--txt)">КП «Гранит» · indoor-покрытие · BIM v4</b></span>
+      <span class="airpill">РЕЖИМ Б</span>
+    </div>
+  </div>
+
+  <div class="ribbon">
+    <div class="rb-group">
+      <div class="rb-row">
+        <div class="rb rb-big pri"><span class="ic">▶</span>Расчёт</div>
+        <div class="rb rb-big"><span class="ic">⇶</span>Очередь (4)</div>
+      </div>
+      <div class="glabel">Задачи</div>
+    </div>
+    <div class="rb-group">
+      <div class="rb-row">
+        <div class="rb on"><span class="ic">▥</span>Z-Срез</div>
+        <div class="rb"><span class="ic">◫</span>Диэлектрик</div>
+        <div class="rb"><span class="ic">◉</span>Точка доступа</div>
+        <div class="rb"><span class="ic">⌇</span>Трассировка в BIM</div>
+        <div class="rb"><span class="ic">🎥</span>Виртуальная камера</div>
+      </div>
+      <div class="glabel">Инструменты профиля 4</div>
+    </div>
+    <div class="rb-group">
+      <div class="rb-row">
+        <div class="rb"><span class="ic">⬒</span>Drag-and-Drop</div>
+        <div class="rb"><span class="ic">⊕</span>Snap-to (крыша/фасад/мачта)</div>
+        <div class="rb"><span class="ic">⌀</span>Коллизии и сервисные зоны</div>
+      </div>
+      <div class="glabel">Размещение · 3DM-003</div>
+    </div>
+    <div class="rb-group">
+      <div class="rb-row">
+        <div class="rb"><span class="ic">◧</span>2D</div>
+        <div class="rb on"><span class="ic">◩</span>3D</div>
+        <div class="rb"><span class="ic">▤</span>Срез этажей</div>
+        <div class="rb"><span class="ic">⇆</span>Сравнение сценариев</div>
+      </div>
+      <div class="glabel">Режимы вида · 3DM-002</div>
+    </div>
+    <div class="rb-group">
+      <div class="rb-row">
+        <div class="rb"><span class="ic">⇣</span>Импорт IFC / glTF</div>
+        <div class="rb"><span class="ic">⇡</span>Экспорт</div>
+        <div class="rb"><span class="ic">🗂</span>Базовая линия</div>
+      </div>
+      <div class="glabel">Обмен · round-trip GIS-004</div>
+    </div>
+    <div class="rb-group">
+      <div class="rb-row">
+        <span class="lb" style="align-self:center">ФИЗИКА</span>
+        <div class="rb">Быстро</div><div class="rb on">Авто</div><div class="rb">Полная</div>
+      </div>
+      <div class="glabel">Режим ядра ENG6+</div>
+    </div>
+  </div>
+
+  <div class="zstrip">
+    <span class="zl">Z-СРЕЗ ЭТАЖЕЙ:</span>
+    <div class="zfloor">Кровля<span class="cnt">2 АП</span></div>
+    <div class="zfloor">Этаж 3<span class="cnt">4 АП</span></div>
+    <div class="zfloor on">Этаж 2<span class="cnt">5 АП · активен</span></div>
+    <div class="zfloor">Этаж 1<span class="cnt">6 АП</span></div>
+    <div class="zfloor">Подвал<span class="cnt">кроссовая</span></div>
+    <span style="margin-left:auto;color:var(--dim);font-size:10px">Z = +7,200 м · отображение: этаж 2 + прозрачно этаж 1/3 · расчётная геометрия не изменяется (3DM-004)</span>
+  </div>
+
+  <div class="main">
+    <div class="col-left">
+      <div class="ph"><span>Активы · indoor</span></div>
+      <div class="assets">
+        <div class="agrid">
+          <div class="acard"><div class="pv">◉</div><div class="nm">Точка доступа Wi-Fi 6E</div><div class="cd">COM-061</div></div>
+          <div class="acard"><div class="pv">◉</div><div class="nm">DAS-антенна потолочная</div><div class="cd">ANT-052</div></div>
+          <div class="acard"><div class="pv">⇄</div><div class="nm">Коммутатор PoE 24п</div><div class="cd">NET-014</div></div>
+          <div class="acard"><div class="pv">⌇</div><div class="nm">Кабель Cat6A (бухта)</div><div class="cd">CAB-003</div></div>
+          <div class="acard"><div class="pv">⚡</div><div class="nm">ИБП 3 кВА 19"</div><div class="cd">PWR-021</div></div>
+          <div class="acard"><div class="pv">▦</div><div class="nm">Шкаф телеком 22U</div><div class="cd">STR-014</div></div>
+        </div>
+      </div>
+      <div class="ph"><span>Структура BIM (IFC)</span></div>
+      <div class="bimtree" style="flex:1">
+        <div class="bt lvl1">🏢 КП «Гранит» · IfcBuilding</div>
+        <div class="bt ind1">▸ IfcSite · геоподоснова (MTW)</div>
+        <div class="bt ind1">▾ IfcBuildingStorey · Этаж 2</div>
+        <div class="bt ind2">IfcSpace · 201 (зал связи)</div>
+        <div class="bt ind2">IfcSpace · 202 (аппаратная)</div>
+        <div class="bt on ind2">IfcSpace · 203 (коридор)</div>
+        <div class="bt ind2">IfcWall ×14 · диэлектрик: бетон ε=6,4</div>
+        <div class="bt ind1">▸ IfcBuildingStorey · Этаж 1</div>
+        <div class="bt ind1">▸ IfcBuildingStorey · Подвал</div>
+        <div class="bt ind1">⌇ CableRun · RISER-1 (подвал→кровля)</div>
+        <div class="bt ind1">⌇ CableRun · FL2-C1 (этаж 2)</div>
+      </div>
+    </div>
+
+    <div class="col-center">
+      <div class="views">
+        <div class="vcell main3d">
+          <div class="vlabel"><b>3D</b> · перспектива · этаж 2 выделен</div>
+          <canvas id="v3d"></canvas>
+          <div class="vhint">◌ тепловая карта — PREVIEW (physics: fast) · точный расчёт в очереди ⇶</div>
+        </div>
+        <div class="vcell">
+          <div class="vlabel"><b>ПЛАН</b> · этаж 2 · Z=+7,200</div>
+          <canvas id="vplan"></canvas>
+        </div>
+        <div class="vcell">
+          <div class="vlabel"><b>РАЗРЕЗ</b> · A–A · кабели в BIM</div>
+          <canvas id="vsec"></canvas>
+        </div>
+      </div>
+      <div class="layers">
+        <span class="lb">СЛОИ</span>
+        <label class="lay on"><input type="checkbox" checked>Геоподложка</label>
+        <label class="lay on"><input type="checkbox" checked>Зоны покрытия (indoor)</label>
+        <label class="lay on"><input type="checkbox" checked>Линии связи / кабель</label>
+        <label class="lay on"><input type="checkbox" checked>Подписи</label>
+        <label class="lay"><input type="checkbox">Z-рельеф</label>
+        <span class="lb" style="margin-left:10px">ФИЛЬТРЫ</span>
+        <label class="lay on"><input type="checkbox" checked>Wi-Fi 6E</label>
+        <label class="lay"><input type="checkbox">LTE/DAS</label>
+        <label class="lay"><input type="checkbox">ВОЛС</label>
+        <span class="lb" style="margin-left:10px">СОСТОЯНИЯ</span>
+        <span style="color:var(--green)">● Исправна</span><span style="color:var(--amber)">● Ограниченно</span><span style="color:var(--red)">● Неисправна</span><span style="color:var(--dim)">○ Не оценено</span>
+      </div>
+    </div>
+
+    <div class="col-right">
+      <div class="ph"><span>Инспектор · AP-203-C</span><span class="chip c-b">размещение</span></div>
+      <div class="insp">
+        <div class="blk">
+          <div class="bh">Размещение · Snap-to</div>
+          <div class="bb">
+            <div class="kv">Привязка <b>потолок коридора 203 · h = 3,1 м</b></div>
+            <div class="kv">Координаты <b>X 12,4 / Y −6,8 / Z +7,2</b></div>
+            <div class="kv">Габариты и сервисная зона <b style="color:var(--green)">✓ соблюдены</b></div>
+            <div class="kv">Коллизии <b style="color:var(--green)">0 (MEC-01, L1)</b></div>
+            <div class="kv">Доступность соединителей <b style="color:var(--green)">✓ 0,6 м до лотка</b></div>
+          </div>
+        </div>
+        <div class="blk">
+          <div class="bh">Автопрокладка линка · 3DM-005</div>
+          <div class="bb">
+            <div class="kv">Трасса <b>FL2-C1 → лоток → riser → кроссовая</b></div>
+            <div class="crow">Длина кабеля <b>41,2 м</b> · основание: кратчайший путь по BIM-лоткам</div>
+            <div class="crow">Затухание Cat6A <b>9,1 дБ @ 500 МГц</b> · радиус изгиба <b style="color:var(--green)">✓ 8×D</b></div>
+            <div class="crow">PoE-бюджет <b>падение 1,8 В · допустимо</b> · стоимость <b>14 200 ₽</b></div>
+          </div>
+        </div>
+        <div class="blk">
+          <div class="bh">Радиопараметры · indoor-модель</div>
+          <div class="bb">
+            <div class="kv">Модель <b>ITU-R indoor + материалы стен (L1)</b></div>
+            <div class="kv">Стены на трассе <b>бетон ε=6,4 ×1 · ГКЛ ×2</b></div>
+            <div class="kv">RSRP в точке <b>−63 дБм <span class="chip c-a">предварительно</span></b></div>
+            <div class="kv">Throughput <b style="color:var(--dim)">не определён — нужна конфигурация радиоинтерфейса</b></div>
+          </div>
+        </div>
+        <div class="blk">
+          <div class="bh">Двухуровневый отклик · 3DM-003</div>
+          <div class="bb" style="line-height:1.8">
+            <div>1. Перемещение → <span class="chip c-b">Preview ≤ 100 мс ✓ (68 мс)</span></div>
+            <div>2. Drop → <span class="chip c-a">⇶ точный расчёт RF-03 поставлен в очередь</span></div>
+            <div style="color:var(--dim);font-size:10px;margin-top:3px">маркировка достоверности задним числом не изменяется</div>
+          </div>
+        </div>
+        <div class="warnbox">⚠ Виртуальная камера: монтаж на высоте 3,1 м требует вышки — зафиксировано как эксплуатационное ограничение (класс «эксплуатационная совместимость»).</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="statusbar">
+    <span>FPS: <b>59</b> · 842 тыс. полигонов</span>
+    <span>Генерализация: <b>LOD-2 (визуал) / LOD-3 (расчёт)</b></span>
+    <span>Выделено: <b>AP-203-C · 1 линк · 3 стены</b></span>
+    <span>Статус: <b style="color:var(--amber)">⇶ точный расчёт в очереди…</b></span>
+    <span>Ошибки и ресурсы: <b>0 крит · 1 пред.</b></span>
+    <div class="right">
+      <span>CPU <span class="mbar"><i style="width:31%"></i></span> 31 %</span>
+      <span>GPU <span class="mbar"><i style="width:67%"></i></span> 67 %</span>
+    </div>
+  </div>
+
+<script>
+function setup(id){const c=document.getElementById(id);const x=c.getContext('2d');
+  const r=()=>{c.width=c.clientWidth;c.height=c.clientHeight;x.clearRect(0,0,c.width,c.height);return x;};
+  window.addEventListener('resize',()=>draw[id]());return {c,x,r};}
+
+// --- 3D вид: изометрическое здание со слоями этажей ---
+const V3=setup('v3d');
+function drawV3(){
+  const x=V3.r(),W=V3.c.width,H=V3.c.height;
+  const cx=W/2,cy=H*0.62,s=0.62;
+  const iso=(px,py,pz)=>[cx+(px-py)*s,cy+(px+py)*s*0.5-pz];
+  function face(pts,fill,stroke){x.beginPath();pts.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1]));x.closePath();x.fillStyle=fill;x.fill();if(stroke){x.strokeStyle=stroke;x.lineWidth=1;x.stroke();}}
+  // этажи: подвал,1,2(активный),3,кровля
+  const floors=[{z:-36,h:32,a:0.25},{z:0,h:34,a:0.35},{z:40,h:34,a:0.92,act:true},{z:80,h:34,a:0.4},{z:120,h:14,a:0.3}];
+  floors.forEach(f=>{
+    const s1=iso(-150,-110,f.z),s2=iso(150,-110,f.z),s3=iso(150,110,f.z),s4=iso(-150,110,f.z);
+    const t1=iso(-150,-110,f.z+f.h),t2=iso(150,-110,f.z+f.h),t3=iso(150,110,f.z+f.h),t4=iso(-150,110,f.z+f.h);
+    const base=f.act?'rgba(232,131,58,':'rgba(91,157,217,';
+    face([t1,t2,t3,t4],base+(f.a*0.55)+')',base+'0.9)');
+    face([s4,t4,t3,s3],base+(f.a*0.32)+')',base+'0.55)');
+    face([s3,t3,t2,s2],base+(f.a*0.2)+')',base+'0.45)');
+  });
+  // точки доступа на активном этаже
+  [[-90,-40],[30,-70],[100,20],[-40,60],[60,80]].forEach((p,i)=>{
+    const a=iso(p[0],p[1],40+34);
+    x.fillStyle='#e8833a';x.beginPath();x.arc(a[0],a[1],4,0,7);x.fill();
+    x.strokeStyle='rgba(232,131,58,.5)';x.beginPath();x.arc(a[0],a[1],10+i%3*3,0,7);x.stroke();
+    x.fillStyle='rgba(230,232,234,.8)';x.font='9px Segoe UI';x.textAlign='center';x.fillText('AP-20'+(i+1),a[0],a[1]-12);
+  });
+  // выбранная AP
+  const sel=iso(-40,60,40+34);
+  x.strokeStyle='#fff';x.setLineDash([3,3]);x.beginPath();x.arc(sel[0],sel[1],14,0,7);x.stroke();x.setLineDash([]);
+  // riser кабель
+  const r1=iso(-130,90,-36),r2=iso(-130,90,120);
+  x.strokeStyle='#6fbf73';x.lineWidth=2.5;x.beginPath();x.moveTo(r1[0],r1[1]);x.lineTo(r2[0],r2[1]);x.stroke();x.lineWidth=1;
+  x.fillStyle='#6fbf73';x.font='9px Segoe UI';x.textAlign='left';x.fillText('RISER-1',r2[0]+6,r2[1]+4);
+}
+// --- план этажа ---
+const VP=setup('vplan');
+function drawVP(){
+  const x=VP.r(),W=VP.c.width,H=VP.c.height,p=18;
+  x.strokeStyle='#5b9dd9';x.lineWidth=2;x.strokeRect(p,p,W-2*p,H-2*p);x.lineWidth=1;
+  // внутренние стены
+  x.strokeStyle='rgba(91,157,217,.7)';
+  [[0.38,0,0.38,0.55],[0.38,0.55,1,0.55],[0.7,0.55,0.7,1]].forEach(([x1,y1,x2,y2])=>{
+    x.beginPath();x.moveTo(p+(W-2*p)*x1,p+(H-2*p)*y1);x.lineTo(p+(W-2*p)*x2,p+(H-2*p)*y2);x.stroke();});
+  // тепловые пятна от АП (preview)
+  [[0.19,0.27],[0.64,0.27],[0.85,0.72],[0.19,0.78],[0.5,0.78]].forEach((a,i)=>{
+    const px=p+(W-2*p)*a[0],py=p+(H-2*p)*a[1],r=Math.min(W,H)*0.21;
+    const g=x.createRadialGradient(px,py,4,px,py,r);
+    g.addColorStop(0,'rgba(111,191,115,.4)');g.addColorStop(.6,'rgba(224,179,76,.25)');g.addColorStop(1,'rgba(224,108,95,.03)');
+    x.fillStyle=g;x.beginPath();x.arc(px,py,r,0,7);x.fill();
+    x.fillStyle='#e8833a';x.beginPath();x.arc(px,py,3.4,0,7);x.fill();
+    x.fillStyle='rgba(230,232,234,.85)';x.font='8.5px Segoe UI';x.textAlign='center';x.fillText('AP-20'+(i+1),px,py-8);
+  });
+  // кабельный лоток
+  x.strokeStyle='#6fbf73';x.setLineDash([4,3]);
+  x.beginPath();x.moveTo(p+6,H*0.5);x.lineTo(W-p-6,H*0.5);x.stroke();x.setLineDash([]);
+  // подпись помещений
+  x.fillStyle='rgba(154,160,166,.8)';x.font='9px Segoe UI';x.textAlign='left';
+  x.fillText('201 зал связи',p+8,p+16);x.fillText('202 аппаратная',W*0.42,p+16);x.fillText('203 коридор',p+8,H-p-8);
+  // выбранная AP рамка
+  x.strokeStyle='#fff';x.strokeRect(W*0.19-16+p*0.16,H*0.78-16,32,32);
+}
+// --- разрез ---
+const VS=setup('vsec');
+function drawVS(){
+  const x=VS.r(),W=VS.c.width,H=VS.c.height;
+  const floors=[{y:0.85,n:'Подвал · кроссовая'},{y:0.62,n:'Этаж 1'},{y:0.39,n:'Этаж 2 ◀ активен'},{y:0.16,n:'Кровля'}];
+  floors.forEach((f,i)=>{
+    const y=H*f.y;x.strokeStyle=i===2?'#e8833a':'rgba(91,157,217,.6)';x.lineWidth=i===2?2:1;
+    x.beginPath();x.moveTo(W*0.1,y);x.lineTo(W*0.9,y);x.stroke();
+    x.fillStyle=i===2?'#e8833a':'rgba(154,160,166,.85)';x.font='9px Segoe UI';x.textAlign='left';x.fillText(f.n,W*0.1,y-4);
+  });
+  x.lineWidth=1;
+  // riser
+  x.strokeStyle='#6fbf73';x.lineWidth=2;
+  x.beginPath();x.moveTo(W*0.2,H*0.85);x.lineTo(W*0.2,H*0.16);x.stroke();x.lineWidth=1;
+  // радиус изгиба — дуга
+  x.strokeStyle='#6fbf73';x.beginPath();x.arc(W*0.24,H*0.62,W*0.04,Math.PI,Math.PI*1.5);x.stroke();
+  x.fillStyle='rgba(154,160,166,.9)';x.font='8.5px Segoe UI';x.textAlign='left';
+  x.fillText('R=8×D ✓',W*0.245,H*0.60);
+  x.fillText('RISER-1 · 41,2 м · затух. 9,1 дБ',W*0.22,H*0.80);
+}
+function drawAll(){drawV3();drawVP();drawVS();}
+const draw={v3d:drawV3,vplan:drawVP,vsec:drawVS};
+drawAll();
+window.addEventListener('resize',()=>setTimeout(drawAll,60));
+</script>
+</body>
+</html>
