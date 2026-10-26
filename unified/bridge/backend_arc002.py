@@ -68,6 +68,9 @@ PAIRED_MODELS: Dict[str, Dict[str, Any]] = {
     "OKUMURA_HATA": {"probe": "hata",         "tol": 0.05, "unit": "дБ"},
     "COST231_HATA": {"probe": "cost231_hata", "tol": 0.05, "unit": "дБ"},
     "FRESNEL_R1":   {"probe": "fresnel",      "tol": 0.001, "unit": "м"},
+    # RF-07 (шумовая площадка kTB) ⇄ ENG6.noiseDbm: единицы разные (Гц ⇄ кГц) —
+    # конвертация ЯВНАЯ на стороне платформы (ENG-004: молчаливая конвертация запрещена).
+    "NOISE_FLOOR_DB": {"probe": "noise_dbm",  "tol": 0.01, "unit": "дБм"},
 }
 
 # Документированные семантические согласования (стадия ALIGNED).
@@ -125,6 +128,15 @@ class ComputeBackend:
     def fingerprint(self) -> BackendFingerprint:
         raise NotImplementedError
 
+    def canonical_hash(self, value: Any) -> str:
+        """Точный canonicalHash ядра (core/validate.mjs) — для сквозной связки аудитов.
+
+        Повторять JS-сериализацию чисел в Python ненадёжно (toPrecision(12) +
+        кратчайшая форма), поэтому хэш считается ТОЙ ЖЕ функцией контура.
+        """
+        resp = self._call({"mode": "canonical_hash", "value": value})
+        return resp["sha256"]
+
     def evaluate(self, point: Dict[str, Any]) -> float:
         """Расчёт одной точки сетки XVER (модель + параметры + опц. согласования)."""
         raise NotImplementedError
@@ -157,6 +169,10 @@ class PythonRefBackend(ComputeBackend):
         m = point["model"]
         if m == "FRESNEL_R1":
             return py_rf.fresnel_radius_m(1, float(point["d1_km"]), float(point["d2_km"]), float(point["f_ghz"]))
+        if m == "NOISE_FLOOR_DB":
+            # RF-07: шум = K_BOLTZMANN_DB + 10·lg(B_Гц) + NF; B_кГц → B_Гц явно (ENG-004)
+            bw_hz = float(point["bw_khz"]) * 1000.0
+            return py_rf.K_BOLTZMANN_DB + 10.0 * math.log10(bw_hz) + float(point["nf_db"])
         kw = dict(point.get("a_kwargs") or {})
         if m == "COST231_HATA":
             # rf.path_loss_db не пробрасывает cm_db → вызываем модель напрямую (код линии A не изменяется)
@@ -211,7 +227,8 @@ class Eng6ProbeBackend(ComputeBackend):
         for p in points:
             pair = PAIRED_MODELS[p["model"]]
             q: Dict[str, Any] = {"model": pair["probe"]}
-            for k in ("f_mhz", "d_km", "h_bs_m", "h_ms_m", "env", "n", "d1_km", "d2_km", "f_ghz"):
+            for k in ("f_mhz", "d_km", "h_bs_m", "h_ms_m", "env", "n", "d1_km", "d2_km", "f_ghz",
+                      "bw_khz", "nf_db"):
                 if p.get(k) is not None:
                     q[k] = p[k]
             payload.append(q)
@@ -291,6 +308,10 @@ def default_grid() -> List[Dict[str, Any]]:
     for f_ghz in (1.0, 2.5, 5.8, 10.0):
         for d1, d2 in ((1.0, 1.0), (2.5, 2.5), (5.0, 10.0)):
             pts.append({"model": "FRESNEL_R1", "d1_km": d1, "d2_km": d2, "f_ghz": f_ghz})
+    # RF-07 (шумовая площадка kTB) ⇄ ENG6.noiseDbm: полосы УКВ…СПУТНИК, NF 3…10 дБ
+    for bw_khz in (25.0, 200.0, 3000.0, 28000.0, 36000.0):
+        for nf_db in (3.0, 6.0, 10.0):
+            pts.append({"model": "NOISE_FLOOR_DB", "bw_khz": bw_khz, "nf_db": nf_db})
     return pts
 
 

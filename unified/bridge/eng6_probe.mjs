@@ -18,11 +18,13 @@
  * Поддерживаемые model:
  *   fspl(f_mhz,d_km) · hata(f_mhz,d_km,h_bs_m,h_ms_m,env) · cost231_hata(f_mhz,d_km,h_bs_m,h_ms_m)
  *   two_ray(d_km,h_bs_m,h_ms_m) · log_distance(d_km,f_mhz,n) · fresnel(d1_km,d2_km,f_ghz)
+ *   noise_dbm(bw_khz,nf_db) — тепловой шум kTB (пара для RF-07, единицы ENG6: кГц)
  * Порядок аргументов ENG6 учтён внутри (PROP.fspl(d,f), PROP.hata(f,d,h1,h2,env),
  * PROP.fresnelR(d1,d2,f)). Значение — в поле "value" (единицы: дБ, кроме fresnel — метры·√1000,
  * см. документированное отклонение XVER-FRESNEL).
  */
 import { loadEng6 } from '../../eng6-service/core/eng6.mjs';
+import { canonicalHash } from '../../eng6-service/core/validate.mjs';
 
 function readStdin() {
   return new Promise((resolve) => {
@@ -55,15 +57,26 @@ function evaluate(E, p) {
     case 'fresnel':
       // ENG6: PROP.fresnelR(d1_km, d2_km, f_ghz) — единицы вендора (см. XVER-FRESNEL)
       return E.PROP.fresnelR(Number(p.d1_km), Number(p.d2_km), Number(p.f_ghz));
+    case 'noise_dbm':
+      // ENG6: noiseDbm(bw_khz, nf_db) = -174 + 10lg(bw_кГц·1000) + NF — kTB, как RF-07
+      return E.noiseDbm(Number(p.bw_khz), Number(p.nf_db));
     default:
       throw new Error('MODEL_UNSUPPORTED: ' + p.model);
   }
 }
 
 async function main() {
+  const req = JSON.parse((await readStdin()) || '{}');
+
+  // канонический SHA-256 запроса — ТОЧНАЯ функция ядра (core/validate.mjs),
+  // используется для сквозной связки аудитов (inputSha256 линии B)
+  if (req.mode === 'canonical_hash') {
+    process.stdout.write(JSON.stringify({ ok: true, sha256: canonicalHash(req.value) }));
+    return;
+  }
+
   const loaded = loadEng6();
   const E = loaded.ENG6;
-  const req = JSON.parse((await readStdin()) || '{}');
 
   const core = {
     sha256: loaded.sha256,

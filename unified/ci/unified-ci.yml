@@ -64,7 +64,7 @@ jobs:
         with: {python-version: '3.11'}
       - uses: actions/setup-node@v4
         with: {node-version: '20'}
-      - name: Тесты моста (23: маппинг 16 + бэкенды 7… + интеграция с живым сервисом)
+      - name: тесты моста (37: маппинг 8 + бэкенды 8 + БД 5 + аудит 5 + live-сервис 7 + очередь live 4)
         working-directory: unified/bridge
         run: python -m unittest discover -s tests -p "test_*.py" -v
       - name: Кросс-верификация ARC-002 (XVER, RAW→ALIGNED)
@@ -82,7 +82,7 @@ jobs:
           name: unified-protocols
           path: |
             unified/protocols/
-            unified/rtm/out/
+            unified/rtm/artifacts/
           retention-days: 90
 
   docker:

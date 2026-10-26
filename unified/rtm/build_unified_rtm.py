@@ -9,8 +9,8 @@
 Переопределения (overrides): статусы требований линии A, которые ЗАКРЫТЫ
 работами совмещения (ARC-002 — протоколом XVER от 26.10.2026).
 
-Выход: rtm/out/RTM_UNIFIED.csv (разделитель ';' — как в источнике),
-       rtm/out/RTM_UNIFIED.json, сводка в stdout.
+Выход: rtm/artifacts/RTM_UNIFIED.csv (разделитель ';' — как в источнике),
+       rtm/artifacts/RTM_UNIFIED.json, сводка в stdout.
 Запуск: python3 build_unified_rtm.py
 """
 from __future__ import annotations
@@ -26,7 +26,7 @@ UNIFIED = os.path.dirname(HERE)
 REPO = os.path.dirname(UNIFIED)
 SRC_A = os.path.join(REPO, "afina", "data", "Афина_RTM_машиночитаемая.csv")
 SEED_B = os.path.join(HERE, "seed_dopolnenie2.json")
-OUT_DIR = os.path.join(HERE, "out")
+OUT_DIR = os.path.join(HERE, "artifacts")
 
 XVER_EVIDENCE = "unified/bridge/xverify.py → unified/protocols/ПРОТОКОЛ_ARC002_XVER_*.json (102 точки, RAW→ALIGNED PASS, 26.10.2026)"
 
@@ -48,9 +48,9 @@ UNIF_REQUIREMENTS = [
      "evidence": "unified/bridge/eng6_js_client.py; tests/test_client.py 7/7 (прогон 26.10.2026)",
      "status": "подтверждено прогоном 26.10.2026 (песочница 2 vCPU/1 ГБ)"},
     {"id": "UNIF-02", "priority": "P0",
-     "text": "Кросс-верификация моделей двух линий (XVER): FSPL, Окамура–Хата, COST-231, Френель; двухстадийный протокол RAW→ALIGNED",
+     "text": "Кросс-верификация моделей двух линий (XVER): FSPL, Окамура–Хата, COST-231, Френель, шумовая площадка kTB (RF-07⇄noiseDbm, единицы Гц⇄кГц — ENG-004); двухстадийный протокол RAW→ALIGNED",
      "criteria": "ALIGNED PASS: все пары в допуске; расхождения документированы (CM, √1000, hata-suburban), вендор не изменяется",
-     "evidence": XVER_EVIDENCE,
+     "evidence": XVER_EVIDENCE + "; NOISE_FLOOR_DB Δ=0.0 дБм (15 точек)",
      "status": "подтверждено прогоном 26.10.2026 (песочница 2 vCPU/1 ГБ)"},
     {"id": "UNIF-03", "priority": "P0",
      "text": "Единая модель данных: Прил. Г (ASSET/GEO_OBJECT/ORG_UNIT/TECHNICAL_STATE/заявки) ⇄ контракт ENG6-PLAN; обратный ход в плоские таблицы К-03",
@@ -68,19 +68,19 @@ UNIF_REQUIREMENTS = [
      "evidence": "unified/protocols/ПРОТОКОЛ_UNIF_E2E_*.json (verdict PASS, 26.10.2026)",
      "status": "подтверждено прогоном 26.10.2026 (песочница 2 vCPU/1 ГБ)"},
     {"id": "UNIF-06", "priority": "P1",
-     "text": "Единый CI: матрица Python 3.11 × Node 20; 145 + 125 + 23 теста; conformance; selfcheck; смоуки; XVER; E2E; сборка Docker",
+     "text": "Единый CI: матрица Python 3.11 × Node 20; 145 + 125 + 37 тестов; conformance; selfcheck; смоуки; XVER; E2E; сборка Docker",
      "criteria": "все джобы зелёные на push/PR; протоколы — артефакты CI",
-     "evidence": "unified/ci/unified-ci.yml (скопировать в .github/workflows/ при включении)",
-     "status": "скрипт готов; требует включения GitHub Actions в репозитории"},
+     "evidence": ".github/workflows/unified-ci.yml (включён в репозиторий 26.10.2026; источник — unified/ci/)",
+     "status": "включён в репозиторий; первый прогон — на стороне GitHub Actions"},
     {"id": "UNIF-07", "priority": "P1",
      "text": "Единое развёртывание: docker-compose (platform + engine + Prometheus + Grafana); режим Б — оба стека zero-dependency",
      "criteria": "compose up: platform 8470, engine 8080, healthz обоих ok, метрики собираются",
      "evidence": "unified/deploy/docker-compose.unified.yml + Dockerfile.platform",
      "status": "скрипт готов; требует Docker-стенда"},
     {"id": "UNIF-08", "priority": "P1",
-     "text": "Единый RTM: Прил. А (83) + Дополнение №2 (77) + UNIF (10) с источниками, доказательствами и честными статусами",
+     "text": "Единый RTM: Прил. А (83) + Дополнение №2 (77) + UNIF (15) с источниками, доказательствами и честными статусами",
      "criteria": "CSV+JSON генерируются скриптом; статусы ссылаются на протоколы/тесты",
-     "evidence": "unified/rtm/build_unified_rtm.py → rtm/out/RTM_UNIFIED.{csv,json}",
+     "evidence": "unified/rtm/build_unified_rtm.py → rtm/artifacts/RTM_UNIFIED.{csv,json}",
      "status": "подтверждено прогоном 26.10.2026 (песочница 2 vCPU/1 ГБ)"},
     {"id": "UNIF-09", "priority": "P2",
      "text": "Стабилизация фазы 0: фикс smoke_planner.mjs:21 (INVALID-ветка) — npm run smoke проходит целиком",
@@ -88,10 +88,35 @@ UNIF_REQUIREMENTS = [
      "evidence": "eng6-service/tests/smoke_planner.mjs (?? null); прогон npm run smoke 26.10.2026",
      "status": "подтверждено прогоном 26.10.2026 (песочница 2 vCPU/1 ГБ)"},
     {"id": "UNIF-10", "priority": "P2",
-     "text": "Гигиена репозитория: .gitignore unified (var/, out/, __pycache__), исключение служебных журналов из git, монорепо-структура",
+     "text": "Гигиена репозитория: .gitignore unified (var/, artifacts-кэш, __pycache__), исключение служебных журналов из git, монорепо-структура",
      "criteria": "служебные файлы не попадают в коммиты; структура platform/engine/unified зафиксирована",
      "evidence": "unified/.gitignore; WORKPLAN.md шаг 2 (монорепо — в работе)",
      "status": "частично: unified — готово; корень репозитория (eng6-service/var/) — долг до слияния ветки"},
+    {"id": "UNIF-11", "priority": "P0",
+     "text": "PLAN-01 в штатной очереди платформы (ARC-003): тяжёлое планирование не блокирует интерфейс, задание queued→running→done с паспортом и результатом",
+     "criteria": "CalcQueue «Афины» исполняет PLAN-01 через мост; паспорт ENG-001 с отпечатками обоих путей; live-цикл на реальном контуре",
+     "evidence": "unified/bridge/plan_service.py; tests/test_plan_service.py 4/4 (live, 26.10.2026)",
+     "status": "подтверждено прогоном 26.10.2026 (песочница 2 vCPU/1 ГБ)"},
+    {"id": "UNIF-12", "priority": "P1",
+     "text": "Персистентность результатов планирования в БД платформы: plan_runs + таблицы К-03 (SQLite; целевая СУБД PostgreSQL — схема идентична, AUT-001)",
+     "criteria": "save/load round-trip; контроль целостности: sha256 ответа + пересчёт таблиц (подмена ответа и подмена строк обнаруживаются)",
+     "evidence": "unified/bridge/platform_db.py; tests/test_platform_db.py 5/5",
+     "status": "подтверждено прогоном 26.10.2026 (песочница 2 vCPU/1 ГБ)"},
+    {"id": "UNIF-13", "priority": "P1",
+     "text": "Единый аудит: append-only хэш-цепочка, связка run_id ↔ engine taskId ↔ inputSha256 (точный canonicalHash ядра); якорь журнала NDJSON линии B; обнаружение подмены",
+     "criteria": "verify() находит подмену/перестановку; якорь совпал по inputSha256 (matched ≥ 1) на живом контуре",
+     "evidence": "unified/bridge/audit_bridge.py; tests/test_audit_bridge.py 5/5 + test_plan_service (anchor matched≥1)",
+     "status": "подтверждено прогоном 26.10.2026 (песочница 2 vCPU/1 ГБ)"},
+    {"id": "UNIF-14", "priority": "P2",
+     "text": "Единое рабочее место (UI PoC): клиент платформы во фрейме + модуль планирования (прямые запросы к контуру по CORS), Canvas2D-карта с запасами/маршрутами, экспорт К-03, заготовка postMessage-контракта",
+     "criteria": "NFR-02: 0 внешних ресурсов, 0 обращений к хранилищам браузера (скан паттернами линии B — PASS); расчёт и отрисовка — на живом контуре",
+     "evidence": "unified/ui/workspace.html; скан NFR-02 PASS (26.10.2026); визуальный контроль — браузерный стенд",
+     "status": "подтверждено частично: скан и синтаксис — прогон 26.10.2026; визуальный контроль — требует браузерного стенда"},
+    {"id": "UNIF-15", "priority": "P2",
+     "text": "Корневая гигиена git: .gitignore корня (var/, __pycache__, node_modules, *.db), CI в .github/workflows/",
+     "criteria": "служебные файлы вне индекса; workflow обнаруживается GitHub",
+     "evidence": ".gitignore (корень), .github/workflows/unified-ci.yml",
+     "status": "подтверждено коммитом 26.10.2026; эффект — на стороне GitHub"},
 ]
 
 
@@ -155,7 +180,7 @@ def main() -> int:
                    "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
                    "sources": {"A": "afina/data/Афина_RTM_машиночитаемая.csv (83)",
                                "B": "unified/rtm/seed_dopolnenie2.json (77)",
-                               "UNIF": "unified/rtm/build_unified_rtm.py (10)"},
+                               "UNIF": "unified/rtm/build_unified_rtm.py (15)"},
                    "total": len(rows), "rows": rows},
                   f, ensure_ascii=False, indent=1)
 

@@ -1,0 +1,9 @@
+# среда выполнения и артефакты прогонов — не в git
+__pycache__/
+*.pyc
+node_modules/
+unified/var/
+*.db
+*.db-journal
+*.tmp
+eng6-service/var/audit-smoke.ndjson

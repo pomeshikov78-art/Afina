@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Афина · Единое рабочее место (PoC, UNIF-14)</title>
+<!--
+  UNIF-14 · Единое рабочее место совмещённой платформы (proof-of-concept).
+
+  Архитектура (docs/00_UNIFIED_OVERVIEW.md, шаг 8):
+    • левая панель  — клиент платформы «Афина» во фрейме (сервер линии A не
+                      устанавливает X-Frame-Options — фреймирование допустимо);
+    • правая панель — модуль «Планирование развертывания»: прямые запросы к
+                      контуру ENG6-PLAN по CORS (ENG6_CORS_ORIGIN='*' по умолчанию).
+                      Встраивание самого планировщика линии B фреймом ЗАПРЕЩЕНО
+                      его собственным X-Frame-Options: DENY (NFR-02) — поэтому
+                      карта рисуется здесь заново (Canvas2D, без внешних ресурсов);
+    • postMessage-контракт (фаза 2, заготовка):
+        ← {type:'afina:scenario', payload:{assets,geo_objects,relations,orders,…}}
+        → {type:'afina:plan-result', payload:{run summary}}
+      Клиент платформы начнёт отправлять afina:scenario после доработки (шаг 8.2).
+
+  NFR-02: без внешних ресурсов (шрифты/скрипты/картинки — inline), без
+  localStorage/sessionStorage/cookie — состояние только в памяти вкладки.
+-->
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font: 13px/1.45 system-ui, "Segoe UI", Arial, sans-serif; background: #10141a; color: #dfe6ee; height: 100vh; display: flex; flex-direction: column; }
+  header { display: flex; align-items: center; gap: 12px; padding: 8px 14px; background: #161c25; border-bottom: 1px solid #263041; flex-wrap: wrap; }
+  header h1 { font-size: 15px; font-weight: 600; color: #f0b429; letter-spacing: .3px; }
+  header .tag { font-size: 11px; color: #8fa1b8; border: 1px solid #2c3a50; border-radius: 10px; padding: 1px 8px; }
+  header label { font-size: 12px; color: #9fb0c6; }
+  header input[type=text] { background: #0d1117; border: 1px solid #2c3a50; color: #dfe6ee; border-radius: 6px; padding: 4px 8px; width: 250px; font-size: 12px; }
+  main { flex: 1; display: flex; min-height: 0; }
+  #platformzone { flex: 1; min-width: 320px; display: flex; flex-direction: column; border-right: 1px solid #263041; }
+  #platformzone iframe { flex: 1; border: 0; width: 100%; background: #fff; }
+  #planzone { width: 430px; min-width: 380px; max-width: 560px; display: flex; flex-direction: column; overflow: hidden; }
+  .zhead { padding: 7px 12px; background: #1a2230; border-bottom: 1px solid #263041; font-weight: 600; font-size: 12.5px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .zhead .hint { font-weight: 400; color: #7e90a8; font-size: 11px; }
+  #planbody { flex: 1; overflow-y: auto; padding: 10px 12px; display: flex; flex-direction: column; gap: 10px; }
+  textarea { width: 100%; height: 120px; background: #0d1117; color: #cfe0f5; border: 1px solid #2c3a50; border-radius: 6px; padding: 8px; font: 11.5px/1.4 "Cascadia Mono", Consolas, monospace; resize: vertical; }
+  button { background: #1f6feb; border: 0; color: #fff; border-radius: 6px; padding: 7px 14px; font-size: 13px; cursor: pointer; }
+  button:hover { background: #2f7ffb; }
+  button:disabled { background: #33405a; cursor: wait; }
+  button.secondary { background: #263041; }
+  button.secondary:hover { background: #31405a; }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  #mapwrap { position: relative; border: 1px solid #263041; border-radius: 8px; overflow: hidden; background: #0b0f14; }
+  #map { display: block; width: 100%; height: 340px; }
+  #mapinfo { position: absolute; left: 8px; bottom: 6px; font-size: 11px; color: #8fa1b8; background: rgba(13,17,23,.75); padding: 2px 8px; border-radius: 6px; }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .card { background: #161d29; border: 1px solid #263041; border-radius: 8px; padding: 7px 9px; }
+  .card b { display: block; font-size: 15px; color: #f0b429; }
+  .card span { font-size: 10.5px; color: #8fa1b8; }
+  table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+  th { text-align: left; color: #8fa1b8; font-weight: 500; border-bottom: 1px solid #263041; padding: 4px 6px; }
+  td { border-bottom: 1px solid #1c2534; padding: 4px 6px; }
+  .st { border-radius: 8px; padding: 7px 10px; font-size: 12px; border: 1px solid #263041; background: #161d29; }
+  .st.PARTIAL { border-color: #9e6a00; } .st.OPTIMAL, .st.FEASIBLE { border-color: #1f7a3d; }
+  .st.INFEASIBLE, .st.INVALID, .st.ERROR { border-color: #a33; }
+  .warn { color: #e3b341; } .err { color: #ff7b72; } .ok { color: #56d364; }
+  details summary { cursor: pointer; color: #9fb0c6; font-size: 12px; padding: 2px 0; }
+  h3 { font-size: 12px; color: #9fb0c6; text-transform: uppercase; letter-spacing: .6px; }
+  #log { font: 11px/1.5 Consolas, monospace; color: #7e90a8; max-height: 90px; overflow-y: auto; background: #0d1117; border-radius: 6px; padding: 6px 8px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>АФИНА · ЕДИНОЕ РАБОЧЕЕ МЕСТО</h1>
+  <span class="tag">PoC · UNIF-14</span>
+  <label>Платформа <input type="text" id="platformUrl" value="http://127.0.0.1:8470/"></label>
+  <label>Контур ENG6-PLAN <input type="text" id="engineUrl" value="http://127.0.0.1:8080"></label>
+  <button class="secondary" id="reloadFrame" title="Перезагрузить клиент платформы">⟳</button>
+</header>
+<main>
+  <section id="platformzone">
+    <div class="zhead">Платформа «Афина NextGen» <span class="hint">клиент линии A (фрейм)</span></div>
+    <iframe id="platformFrame" src="about:blank" title="Клиент платформы Афина"></iframe>
+  </section>
+  <section id="planzone">
+    <div class="zhead">Планирование развертывания <span class="hint">контур ENG6-PLAN · CORS</span></div>
+    <div id="planbody">
+      <div class="row">
+        <button id="calcBtn">▶ Рассчитать план</button>
+        <button class="secondary" id="demoBtn" title="Вставить демо-сценарий (батальонный рубеж)">Демо-сценарий</button>
+        <button class="secondary" id="exportBtn" title="Выгрузить плоские таблицы К-03 (JSON)">Экспорт К-03</button>
+      </div>
+      <details>
+        <summary>Сценарий (контракт ENG6-PLAN: topology / fleet / demands / constraints)</summary>
+        <textarea id="scenario" spellcheck="false"></textarea>
+      </details>
+      <div id="statusBox"></div>
+      <div id="mapwrap" hidden>
+        <canvas id="map"></canvas>
+        <div id="mapinfo"></div>
+      </div>
+      <div id="metricsBox" class="cards" hidden></div>
+      <div id="routesBox" hidden><h3>Маршруты заявок</h3><table id="routesTbl"></table></div>
+      <div id="wavesBox" hidden><h3>Расписание развертывания</h3><table id="wavesTbl"></table></div>
+      <div id="issuesBox" hidden><h3>Замечания и рекомендации</h3><div id="issuesList"></div></div>
+      <div id="log"></div>
+    </div>
+  </section>
+</main>
+<script>
+'use strict';
+/* ============ состояние (только в памяти вкладки — NFR-02) ============ */
+const S = { lastResponse: null, lastTables: null, lastRunInfo: null };
+const $ = (id) => document.getElementById(id);
+const round6 = (x) => Math.round((Number(x) + 0) * 1e6) / 1e6;
+
+function log(msg, cls) {
+  const el = $('log');
+  const t = new Date().toLocaleTimeString('ru-RU');
+  el.innerHTML = `<div class="${cls || ''}">[${t}] ${msg}</div>` + el.innerHTML;
+}
+
+/* ============ демо-сценарий (синтетика, координаты учебные) ============ */
+const DEMO = {
+  meta: { name: 'Демо: батальонный рубеж (единое рабочее место)' },
+  topology: {
+    nodes: [
+      { id: 'n-kp',  type: 'cp',    name: 'КП батальона', lat: 55.750000, lng: 37.620000, status: 'active', unitId: 'КП-001' },
+      { id: 'n-rl',  type: 'relay', name: 'РЛ-002',       lat: 55.800000, lng: 37.720000, status: 'active', unitId: 'РЛ-002', parentId: 'n-kp' },
+      { id: 'n-r1a', type: 'radio', name: 'РС-003',       lat: 55.830000, lng: 37.660000, status: 'active', unitId: 'РС-003', parentId: 'n-kp' },
+      { id: 'n-r1b', type: 'radio', name: 'РС-004',       lat: 55.850000, lng: 37.700000, status: 'active', unitId: 'РС-004', parentId: 'n-kp' },
+      { id: 'n-r2a', type: 'radio', name: 'РС-005',       lat: 55.770000, lng: 37.760000, status: 'active', unitId: 'РС-005', parentId: 'n-kp' },
+      { id: 'n-r2b', type: 'radio', name: 'РС-006 (🔴)',  lat: 55.740000, lng: 37.700000, status: 'active', unitId: 'РС-006', parentId: 'n-kp' }
+    ],
+    links: [
+      { id: 'l-kp-rl',  from: 'n-kp',  to: 'n-rl',  type: 'VHF' },
+      { id: 'l-rl-r1a', from: 'n-rl',  to: 'n-r1a', type: 'VHF' },
+      { id: 'l-rl-r1b', from: 'n-rl',  to: 'n-r1b', type: 'VHF' },
+      { id: 'l-rl-r2a', from: 'n-rl',  to: 'n-r2a', type: 'VHF' },
+      { id: 'l-kp-r2b', from: 'n-kp',  to: 'n-r2b', type: 'VHF' }
+    ]
+  },
+  fleet: [
+    { unitId: 'КП-001', kind: 'П-240Б (УШБ)', nodeType: 'cp',    condition: 'green',  costDeploy: 40, deployTimeMin: 45 },
+    { unitId: 'РЛ-002', kind: 'Р-419Л1',      nodeType: 'relay', condition: 'green',  costDeploy: 30, deployTimeMin: 35 },
+    { unitId: 'РС-003', kind: 'Р-168-100У',   nodeType: 'radio', condition: 'green',  costDeploy: 10, deployTimeMin: 15 },
+    { unitId: 'РС-004', kind: 'Р-168-100У',   nodeType: 'radio', condition: 'yellow', costDeploy: 10, deployTimeMin: 15 },
+    { unitId: 'РС-005', kind: 'Р-168-25У',    nodeType: 'radio', condition: 'green',  costDeploy: 8,  deployTimeMin: 12 },
+    { unitId: 'РС-006', kind: 'Р-168-25У',    nodeType: 'radio', condition: 'red',    costDeploy: 8,  deployTimeMin: 12 }
+  ],
+  demands: [
+    { id: 'd-r1a', from: 'n-kp', to: 'n-r1a', rateKbps: 16, priority: 1 },
+    { id: 'd-r1b', from: 'n-kp', to: 'n-r1b', rateKbps: 16, priority: 2 },
+    { id: 'd-r2a', from: 'n-kp', to: 'n-r2a', rateKbps: 16, priority: 2 },
+    { id: 'd-r2b', from: 'n-kp', to: 'n-r2b', rateKbps: 16, priority: 3 }
+  ],
+  constraints: { budget: 200, physics: 'fast', maxSimultaneousDeploy: 2, crewSpeedKmh: 40 },
+  environment: { clutterType: 'open', terrain: { source: 'flat' } }
+};
+
+/* ============ запрос к контуру (CORS; X-Requestor обязателен) ============ */
+async function calcPlan() {
+  const btn = $('calcBtn'); btn.disabled = true;
+  let scenario;
+  try { scenario = JSON.parse($('scenario').value); }
+  catch (e) { showStatus('INVALID', `JSON сценария некорректен: ${e.message}`); btn.disabled = false; return; }
+  const base = $('engineUrl').value.replace(/\/+$/, '');
+  const requestId = 'ws-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+  log(`POST ${base}/api/v1/plan/sync (X-Request-Id: ${requestId})`);
+  const t0 = performance.now();
+  try {
+    const resp = await fetch(base + '/api/v1/plan/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Requestor': 'единое рабочее место (PoC)', 'X-Request-Id': requestId },
+      body: JSON.stringify(scenario)
+    });
+    const data = await resp.json();
+    const dt = Math.round(performance.now() - t0);
+    if (!resp.ok && resp.status !== 422) throw new Error(`HTTP ${resp.status}: ${JSON.stringify(data).slice(0, 200)}`);
+    S.lastResponse = data;
+    S.lastTables = toTables(data);
+    S.lastRunInfo = { requestId, dt, httpStatus: resp.status, engineCore: (data.core || {}).engineSha256 || null };
+    render(data, dt);
+    // postMessage-контракт (фаза 2): уведомляем клиент платформы о результате
+    try { $('platformFrame').contentWindow.postMessage({ type: 'afina:plan-result', payload: { status: data.status, grade: (data.metrics || {}).grade, requestId } }, '*'); } catch (e) { /* клиент ещё не подключён к контракту */ }
+    log(`ответ ${data.status} за ${dt} мс`, data.status === 'INVALID' ? 'err' : 'ok');
+  } catch (e) {
+    showStatus('ERROR', String(e.message || e));
+    log(`отказ: ${e.message || e}`, 'err');
+  } finally { btn.disabled = false; }
+}
+
+/* ============ обратный маппинг в таблицы К-03 (идентично bridge/datamodel_map) ============ */
+function toTables(resp) {
+  const p = resp.plan || {};
+  const core = resp.core || {};
+  return {
+    calc_run: [{ status: resp.status, backend: `ENG6-JS ${core.engineVersion || '?'} ${String(core.engineSha256 || '').slice(0, 16)}` }],
+    map_object: (p.deployedUnits || []).map((d) => ({ object_id: d.nodeId, object_type: d.nodeType, unit_id: d.unitId, condition: d.condition, geo_lat: round6(d.lat), geo_lng: round6(d.lng), cost: d.cost, wave_index: d.wave, start_min: d.startMin })),
+    link_line: (p.activeLinks || []).map((l) => ({ line_id: l.id, a: l.from, b: l.to, kind: l.type, length_km: l.distKm, margin_db: l.marginDb, capacity_kbps: l.capacityKbps, load_kbps: l.loadKbps, util_pct: l.utilPct, delay_ms: l.delayMs, availability_pct: l.availabilityPct, cost: l.cost, role: l.role })),
+    link_rejected: (p.rejectedLinks || []).map((l) => ({ line_id: l.id, a: l.from, b: l.to, kind: l.type, code: l.code, reason: l.reason, margin_db: l.marginDb })),
+    route: (p.routes || []).map((r) => ({ demand_id: r.demandId, status: r.status, granted_kbps: r.grantedKbps, deficit_kbps: r.deficitKbps, delay_ms: r.delayMs, hops: r.hops, reason: r.reason, redundant: !!r.redundant, path_nodes: r.path || [], path_lines: r.links || [] })),
+    deployment_wave: ((p.schedule || {}).waves || []).map((w) => ({ wave_index: w.index, t_start_min: w.tStartMin, t_end_min: w.tEndMin, crews_used: w.crewsUsed, items: (w.items || []).map((i) => ({ object_id: i.nodeId, unit_id: i.unitId, crew: i.crew })) })),
+    schedule_summary: (p.schedule ? [{ makespan_min: p.schedule.makespanMin, crews: p.schedule.crews, crew_util_pct: p.schedule.crewUtilPct }] : []),
+    issues: ((resp.diagnostics || {}).issues || []).map((i) => ({ sev: i.sev, code: i.code, message: i.message })),
+    metrics: resp.metrics ? [resp.metrics] : []
+  };
+}
+
+/* ============ отрисовка ============ */
+function marginColor(m) {
+  if (m == null) return '#6e7681';
+  if (m >= 20) return '#2ea043'; if (m >= 10) return '#7bc96f';
+  if (m >= 3) return '#d7c04a'; if (m >= 0) return '#e08a3c';
+  return '#e5534b';
+}
+function showStatus(status, note) {
+  $('statusBox').innerHTML = `<div class="st ${status}"><b>${status}</b>${note ? ` — <span class="${status === 'INVALID' || status === 'ERROR' ? 'err' : ''}">${note}</span>` : ''}</div>`;
+}
+function render(data, dt) {
+  const m = data.metrics || {};
+  const p = data.plan || {};
+  showStatus(data.status, data.statusReasons && data.statusReasons.length
+    ? data.statusReasons.map((r) => `${r.code}${r.path ? ' (' + r.path + ')' : ''}: ${r.message || ''}`).join('; ')
+    : `грейд ${m.grade || '—'} · расчёт ${dt} мс${S.lastRunInfo.engineCore ? ' · ядро ' + S.lastRunInfo.engineCore.slice(0, 12) + '…' : ''}`);
+  $('metricsBox').hidden = !data.status || data.status === 'INVALID';
+  if (data.status !== 'INVALID') {
+    $('metricsBox').innerHTML = [
+      ['Обслужено заявок', `${m.demandsSatisfied ?? '—'} / ${m.demandsTotal ?? '—'}`],
+      ['Уровень по полосе', (m.serviceLevelByBandwidthPct ?? '—') + ' %'],
+      ['Стоимость / бюджет', `${m.totalCost ?? '—'} / ${m.budget ?? '—'}`],
+      ['Развернуто узлов', `${m.nodesDeployed ?? '—'} / ${m.nodesTotal ?? '—'}`],
+      ['Активных линий', m.linksActive ?? '—'],
+      ['Makespan, мин', (p.schedule || {}).makespanMin ?? '—']
+    ].map(([k, v]) => `<div class="card"><b>${v}</b><span>${k}</span></div>`).join('');
+    drawMap(data);
+    renderRoutes(p); renderWaves(p); renderIssues(data);
+  } else { ['mapwrap', 'routesBox', 'wavesBox', 'issuesBox'].forEach((id) => { $(id).hidden = true; }); }
+}
+function drawMap(data) {
+  const wrap = $('mapwrap'); wrap.hidden = false;
+  const cv = $('map'); const dpr = window.devicePixelRatio || 1;
+  const W = wrap.clientWidth, H = 340;
+  cv.width = W * dpr; cv.height = H * dpr; cv.style.height = H + 'px';
+  const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  g.clearRect(0, 0, W, H);
+  const nodes = (data.topology && data.topology.nodes) || (data.plan && data.plan.nodes) || [];
+  // узлы берём из запроса (эталон координат); если их нет — из deployedUnits
+  const src = nodes.length ? nodes : ((data.plan || {}).deployedUnits || []).map((d) => ({ id: d.nodeId, lat: d.lat, lng: d.lng, type: d.nodeType }));
+  if (!src.length) { $('mapinfo').textContent = 'нет координат для отрисовки'; return; }
+  const lats = src.map((n) => n.lat), lngs = src.map((n) => n.lng);
+  const pad = 26;
+  const minLa = Math.min(...lats), maxLa = Math.max(...lats), minLn = Math.min(...lngs), maxLn = Math.max(...lngs);
+  const sx = (W - 2 * pad) / Math.max(maxLn - minLn, 1e-6), sy = (H - 2 * pad) / Math.max(maxLa - minLa, 1e-6);
+  const s = Math.min(sx, sy);
+  const X = (lng) => pad + (lng - minLn) * s + ((W - 2 * pad) - (maxLn - minLn) * s) / 2;
+  const Y = (lat) => H - pad - (lat - minLa) * s - ((H - 2 * pad) - (maxLa - minLa) * s) / 2;
+  const pos = {}; src.forEach((n) => { pos[n.id] = [X(n.lng), Y(n.lat)]; });
+  // линии: активные (цвет по запасу) + отклонённые (серый пунктир)
+  const plan = data.plan || {};
+  for (const l of plan.activeLinks || []) {
+    const a = pos[l.from || l.a], b = pos[l.to || l.b]; if (!a || !b) continue;
+    g.strokeStyle = marginColor(l.marginDb); g.lineWidth = Math.max(1.5, Math.min(5, (l.capacityKbps || 25) / 400));
+    g.setLineDash([]); g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.stroke();
+    g.fillStyle = '#9fb0c6'; g.font = '10px sans-serif';
+    g.fillText(`${l.type || ''} ${l.marginDb != null ? l.marginDb.toFixed(1) + ' дБ' : ''}`, (a[0] + b[0]) / 2 + 4, (a[1] + b[1]) / 2 - 3);
+  }
+  for (const l of plan.rejectedLinks || []) {
+    const a = pos[l.from || l.a], b = pos[l.to || l.b]; if (!a || !b) continue;
+    g.strokeStyle = '#4d5866'; g.lineWidth = 1; g.setLineDash([4, 4]);
+    g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.stroke(); g.setLineDash([]);
+  }
+  // маршруты заявок (ROUTED — синяя полилиния поверх)
+  for (const r of plan.routes || []) {
+    if (r.status !== 'ROUTED' || !r.path) continue;
+    g.strokeStyle = 'rgba(56,139,253,.85)'; g.lineWidth = 1.6; g.setLineDash([7, 3]);
+    g.beginPath();
+    r.path.forEach((nid, i) => { const pt = pos[nid]; if (!pt) return; i ? g.lineTo(pt[0], pt[1]) : g.moveTo(pt[0], pt[1]); });
+    g.stroke(); g.setLineDash([]);
+  }
+  // узлы
+  const deployed = {}; (plan.deployedUnits || []).forEach((d) => { deployed[d.nodeId] = d.condition; });
+  for (const n of src) {
+    const pt = pos[n.id]; if (!pt) continue;
+    const cond = deployed[n.id];
+    g.fillStyle = cond === 'red' ? '#5a2b2b' : (n.type === 'cp' ? '#1f3d63' : '#22303f');
+    g.strokeStyle = cond === 'red' ? '#e5534b' : (n.type === 'cp' ? '#58a6ff' : '#6e7681');
+    g.lineWidth = 1.6;
+    const r = n.type === 'cp' ? 9 : 6.5;
+    g.beginPath(); g.rect(pt[0] - r, pt[1] - r, 2 * r, 2 * r); g.fill(); g.stroke();
+    g.fillStyle = '#dfe6ee'; g.font = '10.5px sans-serif';
+    g.fillText(n.name || n.id, pt[0] + r + 3, pt[1] + 3.5);
+  }
+  $('mapinfo').textContent = `${src.length} узлов · ${(plan.activeLinks || []).length} активных линий · ${(plan.routes || []).filter((r) => r.status === 'ROUTED').length} маршрутов · цвет линии — запас, пунктир — маршрут заявки, серый — отклонённые`;
+}
+function renderRoutes(p) {
+  $('routesBox').hidden = false;
+  const rows = (p.routes || []).map((r) =>
+    `<tr><td>${r.demandId}</td><td class="${r.status === 'ROUTED' ? 'ok' : (r.status === 'PARTIAL' ? 'warn' : 'err')}">${r.status}</td>
+     <td>${r.grantedKbps ?? 0}/${r.requestedKbps ?? '—'} кбит/с</td><td>${r.delayMs != null ? r.delayMs.toFixed(1) : '—'} мс</td>
+     <td>${r.hops ?? '—'}</td><td>${r.reason || ''}</td></tr>`).join('');
+  $('routesTbl').innerHTML = `<tr><th>Заявка</th><th>Статус</th><th>Выдано/запрошено</th><th>Задержка</th><th>Хопы</th><th>Причина</th></tr>${rows}`;
+}
+function renderWaves(p) {
+  const waves = (p.schedule || {}).waves || [];
+  $('wavesBox').hidden = !waves.length;
+  $('wavesTbl').innerHTML = `<tr><th>Волна</th><th>Старт, мин</th><th>Финиш, мин</th><th>Бригады</th><th>Работы</th></tr>` + waves.map((w) =>
+    `<tr><td>${w.index}</td><td>${w.tStartMin}</td><td>${w.tEndMin}</td><td>${w.crewsUsed}</td><td>${(w.items || []).length}</td></tr>`).join('');
+}
+function renderIssues(data) {
+  const iss = ((data.diagnostics || {}).issues || []);
+  $('issuesBox').hidden = !iss.length;
+  $('issuesList').innerHTML = iss.slice(0, 14).map((i) =>
+    `<div class="${i.sev === 'warn' ? 'warn' : (i.sev === 'error' ? 'err' : '')}">${i.sev}/${i.code}${i.message ? ' — ' + i.message : ''}</div>`).join('');
+}
+
+/* ============ экспорт К-03 ============ */
+function exportTables() {
+  if (!S.lastTables) { log('нет результата для экспорта', 'warn'); return; }
+  const blob = new Blob([JSON.stringify(S.lastTables, null, 1)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'afina_plan_tables_K03.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  log('экспорт таблиц К-03 (JSON) — файл afina_plan_tables_K03.json', 'ok');
+}
+
+/* ============ postMessage-контракт (фаза 2) ============ */
+window.addEventListener('message', (ev) => {
+  const d = ev.data || {};
+  if (d.type === 'afina:scenario' && d.payload) {
+    $('scenario').value = JSON.stringify(d.payload, null, 1);
+    log('сценарий принят от клиента платформы (afina:scenario)', 'ok');
+  }
+});
+
+/* ============ инициализация ============ */
+$('demoBtn').onclick = () => { $('scenario').value = JSON.stringify(DEMO, null, 1); log('демо-сценарий загружен'); };
+$('calcBtn').onclick = calcPlan;
+$('exportBtn').onclick = exportTables;
+$('reloadFrame').onclick = loadFrame;
+function loadFrame() {
+  const u = $('platformUrl').value.trim();
+  $('platformFrame').src = u || 'about:blank';
+  log(u ? `клиент платформы: ${u}` : 'платформа отключена (about:blank)');
+}
+$('scenario').value = JSON.stringify(DEMO, null, 1);
+loadFrame();
+log('рабочее место готово; требуется запущенный контур ENG6-PLAN (unified/scripts/start_stack.sh)');
+</script>
+</body>
+</html>
