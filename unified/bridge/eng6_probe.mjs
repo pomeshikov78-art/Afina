@@ -60,6 +60,9 @@ function evaluate(E, p) {
     case 'noise_dbm':
       // ENG6: noiseDbm(bw_khz, nf_db) = -174 + 10lg(bw_кГц·1000) + NF — kTB, как RF-07
       return E.noiseDbm(Number(p.bw_khz), Number(p.nf_db));
+    case 'knife_j':
+      // ENG6: PROP.knifeEdgeJ(v) — дифракционные потери J(v), ITU-R P.526 аппроксимация
+      return E.PROP.knifeEdgeJ(Number(p.v));
     default:
       throw new Error('MODEL_UNSUPPORTED: ' + p.model);
   }

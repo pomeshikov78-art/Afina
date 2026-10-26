@@ -71,6 +71,13 @@ PAIRED_MODELS: Dict[str, Dict[str, Any]] = {
     # RF-07 (шумовая площадка kTB) ⇄ ENG6.noiseDbm: единицы разные (Гц ⇄ кГц) —
     # конвертация ЯВНАЯ на стороне платформы (ENG-004: молчаливая конвертация запрещена).
     "NOISE_FLOOR_DB": {"probe": "noise_dbm",  "tol": 0.01, "unit": "дБм"},
+    # Дифракция J(v) (ITU-R P.526 аппроксимация): Python _diffraction_epsilon (rf.py)
+    # ⇄ ENG6.PROP.knifeEdgeJ. Формулы идентичны: 6.9+20lg(√((v−0.1)²+1)+v−0.1);
+    # пороги отсечки РАЗНЫЕ: Python v≤−0.7→0, вендор v≤−0.78→0 (XVER-KNIFE-THRESH).
+    # Сетка избегает расходящейся полосы (−0.78; −0.7] — полоса документирована.
+    "DIFFRACTION_J": {"probe": "knife_j", "tol": 0.01, "unit": "дБ",
+                      "note": "XVER-KNIFE-THRESH: пороги отсечки −0.7 (Python) и −0.78 (вендор); "
+                              "полоса (−0.78;−0.7] вне сетки, расхождение ≤0.35 дБ измерено отдельно"},
 }
 
 # Документированные семантические согласования (стадия ALIGNED).
@@ -173,6 +180,14 @@ class PythonRefBackend(ComputeBackend):
             # RF-07: шум = K_BOLTZMANN_DB + 10·lg(B_Гц) + NF; B_кГц → B_Гц явно (ENG-004)
             bw_hz = float(point["bw_khz"]) * 1000.0
             return py_rf.K_BOLTZMANN_DB + 10.0 * math.log10(bw_hz) + float(point["nf_db"])
+        if m == "DIFFRACTION_J":
+            # J(v) по формуле rf.py::_diffraction_epsilon (ITU-R P.526 аппроксимация):
+            #   v ≤ −0.7 → 0; иначе 6.9 + 20·lg(√((v−0.1)²+1) + v − 0.1)
+            # (код линии A не изменяется — формула воспроизведена по её документации)
+            v = float(point["v"])
+            if v <= -0.7:
+                return 0.0
+            return 6.9 + 20.0 * math.log10(math.sqrt((v - 0.1) ** 2 + 1.0) + v - 0.1)
         kw = dict(point.get("a_kwargs") or {})
         if m == "COST231_HATA":
             # rf.path_loss_db не пробрасывает cm_db → вызываем модель напрямую (код линии A не изменяется)
@@ -228,7 +243,7 @@ class Eng6ProbeBackend(ComputeBackend):
             pair = PAIRED_MODELS[p["model"]]
             q: Dict[str, Any] = {"model": pair["probe"]}
             for k in ("f_mhz", "d_km", "h_bs_m", "h_ms_m", "env", "n", "d1_km", "d2_km", "f_ghz",
-                      "bw_khz", "nf_db"):
+                      "bw_khz", "nf_db", "v"):
                 if p.get(k) is not None:
                     q[k] = p[k]
             payload.append(q)
@@ -312,6 +327,10 @@ def default_grid() -> List[Dict[str, Any]]:
     for bw_khz in (25.0, 200.0, 3000.0, 28000.0, 36000.0):
         for nf_db in (3.0, 6.0, 10.0):
             pts.append({"model": "NOISE_FLOOR_DB", "bw_khz": bw_khz, "nf_db": nf_db})
+    # Дифракция J(v) ⇄ PROP.knifeEdgeJ: сетка МИНУЕТ полосу расхождения порогов
+    # (−0.78; −0.7] (XVER-KNIFE-THRESH); значение внутри полосы измеряется отдельно.
+    for v in (-2.0, -1.0, -0.8, -0.5, -0.2, 0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 6.0, 8.0, 10.0):
+        pts.append({"model": "DIFFRACTION_J", "v": v})
     return pts
 
 
@@ -425,6 +444,7 @@ def verify_arc002(backend_a: ComputeBackend, backend_b: ComputeBackend,
         "path_b": fb.to_dict(),
         "grid_points": len(grid),
         "tolerances": {k: {"tol": v["tol"], "unit": v["unit"]} for k, v in PAIRED_MODELS.items()},
+        "model_notes": {k: v["note"] for k, v in PAIRED_MODELS.items() if v.get("note")},
         "alignments": {k: {"id": v["id"], "note": v["note"]} for k, v in ALIGNMENTS.items()},
         "known_incompatible": [dict(v, model=k[0], env=k[1]) for k, v in KNOWN_INCOMPATIBLE.items()],
         "stages": {"raw": raw, "aligned": aligned},

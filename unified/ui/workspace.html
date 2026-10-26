@@ -84,6 +84,8 @@
       <div class="row">
         <button id="calcBtn">▶ Рассчитать план</button>
         <button class="secondary" id="demoBtn" title="Вставить демо-сценарий (батальонный рубеж)">Демо-сценарий</button>
+        <button class="secondary" id="loadBtn" title="Загрузить сценарий JSON (экспорт из платформы: bridge/scenario_export.py --out scenario.json)">📂 Из файла</button>
+        <input type="file" id="fileIn" accept=".json,application/json" hidden>
         <button class="secondary" id="exportBtn" title="Выгрузить плоские таблицы К-03 (JSON)">Экспорт К-03</button>
       </div>
       <details>
@@ -333,6 +335,23 @@ window.addEventListener('message', (ev) => {
 
 /* ============ инициализация ============ */
 $('demoBtn').onclick = () => { $('scenario').value = JSON.stringify(DEMO, null, 1); log('демо-сценарий загружен'); };
+$('loadBtn').onclick = () => $('fileIn').click();
+$('fileIn').onchange = () => {
+  const f = $('fileIn').files[0];
+  if (!f) return;
+  const rd = new FileReader();
+  rd.onload = () => {
+    try {
+      const sc = JSON.parse(rd.result);
+      // scenario_export.py выдаёт {entities,request,warnings,counts} — берём request
+      $('scenario').value = JSON.stringify(sc.request || sc, null, 1);
+      log(`сценарий загружен из файла «${f.name}»${sc.request ? ' (экспорт платформы)' : ''}`, 'ok');
+      if (sc.warnings && sc.warnings.length) sc.warnings.forEach((w) => log('⚠ ' + w, 'warn'));
+    } catch (e) { log(`файл не является JSON сценарием: ${e.message}`, 'err'); }
+  };
+  rd.readAsText(f);
+  $('fileIn').value = '';
+};
 $('calcBtn').onclick = calcPlan;
 $('exportBtn').onclick = exportTables;
 $('reloadFrame').onclick = loadFrame;

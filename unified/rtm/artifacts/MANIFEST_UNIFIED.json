@@ -1,0 +1,860 @@
+{
+ "document": "МАНИФЕСТ ЕДИНОЙ ПОСТАВКИ «Афина» (линия A + линия B + unified)",
+ "manifest_version": "1.0.0",
+ "generated_at": "2026-10-26 20:34:26",
+ "hash_algorithm": "sha256 (пересчёт в момент генерации)",
+ "verdict": "COMPLETE",
+ "problems": [],
+ "sections": {
+  "A_line_afina": {
+   "title": "Линия A — СПО «Афина NextGen» (комплект §11.1)",
+   "source": "afina/releases/КОМПЛЕКТ_ПОСТАВКИ.json",
+   "items_total": 18,
+   "items_intact": 17,
+   "items": [
+    {
+     "n": 1,
+     "item": "Установочные пакеты для обоих автономных режимов",
+     "status": "частично (стенд)",
+     "note": "скрипты NSIS/Inno/Linux готовы; .exe собирается и подписывается на Windows-стенде (честный статус)",
+     "integrity": "соответствует",
+     "paths": [
+      {
+       "path": "afina/src/installer/afina.nsi",
+       "kind": "file",
+       "present": true,
+       "bytes": 1056,
+       "sha256": "fd85c9894d8967e2e0e0f0ac2dac419e5ad79fc13fa13b1be300fbe22763c717",
+       "sha256_expected": "fd85c9894d8967e2e0e0f0ac2dac419e5ad79fc13fa13b1be300fbe22763c717",
+       "verdict": "соответствует"
+      },
+      {
+       "path": "afina/src/installer/afina.iss",
+       "kind": "file",
+       "present": true,
+       "bytes": 678,
+       "sha256": "11a17a873b0d754c84fa469210bcf61128e9c54c8ac6e4db40b3fb3bb5cda35c",
+       "sha256_expected": "11a17a873b0d754c84fa469210bcf61128e9c54c8ac6e4db40b3fb3bb5cda35c",
+       "verdict": "соответствует"
+      },
+      {
+       "path": "afina/src/installer/build_linux.sh",
+       "kind": "file",
+       "present": true,
+       "bytes": 824,
+       "sha256": "eaaa6434310a10bb486e672ff506770f76c309193d4e90e87abae09f78c19b11",
+       "sha256_expected": "eaaa6434310a10bb486e672ff506770f76c309193d4e90e87abae09f78c19b11",
+       "verdict": "соответствует"
+      },
+      {
+       "path": "afina/src/installer/run_server.pyw",
+       "kind": "file",
+       "present": true,
+       "bytes": 2150,
+       "sha256": "fdcc5b2f1a8946f2e8f792ccc80c163702f96527d091a2c03095616c1198f986",
+       "sha256_expected": "fdcc5b2f1a8946f2e8f792ccc80c163702f96527d091a2c03095616c1198f986",
+       "verdict": "соответствует"
+      },
+      {
+       "path": "afina/src/installer/bundle_manifest.json",
+       "kind": "file",
+       "present": true,
+       "bytes": 302,
+       "sha256": "14173ac272723be4cd16e2814e1cc3ccb7a1a24cac01b6daad07310bc3fb4668",
+       "sha256_expected": "14173ac272723be4cd16e2814e1cc3ccb7a1a24cac01b6daad07310bc3fb4668",
+       "verdict": "соответствует"
+      }
+     ]
+    },
+    {
+     "n": 2,
+     "item": "Исходные тексты разработанных компонентов",
+     "status": "в комплекте",
+     "note": "",
+     "integrity": "без хэш-контроля",
+     "paths": [
+      {
+       "path": "afina/src/afina",
+       "kind": "dir",
+       "files": 68,
+       "bytes": 949775,
+       "present": true
+      },
+      {
+       "path": "afina/src/client",
+       "kind": "dir",
+       "files": 1,
+       "bytes": 85177,
+       "present": true
+      },
+      {
+       "path": "afina/src/tools",
+       "kind": "dir",
+       "files": 5,
+       "bytes": 48942,
+       "present": true
+      }
+     ]
+    },
+    {
+     "n": 3,
+     "item": "Сценарии воспроизводимой сборки и локальный репозиторий",
+     "status": "в комплекте",
+     "note": "git bundle --all (вся релизная линия с тегами)",
+     "integrity": "соответствует",
+     "paths": [
+      {
+       "path": "afina/src/installer/build_linux.sh",
+       "kind": "file",
+       "present": true,
+       "bytes": 824,
+       "sha256": "eaaa6434310a10bb486e672ff506770f76c309193d4e90e87abae09f78c19b11",
+       "sha256_expected": "eaaa6434310a10bb486e672ff506770f76c309193d4e90e87abae09f78c19b11",
+       "verdict": "соответствует"
+      },
+      {
+       "path": "afina/releases/afina_repo.bundle",
+       "kind": "file",
+       "present": true,
+       "bytes": 2278782,
+       "sha256": "3a17b9438b8e6332ef9b1cfe786fb7a84d62f4c6a0a00db10753ab9f60b6a3dd",
+       "sha256_expected": "3a17b9438b8e6332ef9b1cfe786fb7a84d62f4c6a0a00db10753ab9f60b6a3dd",
+       "verdict": "соответствует"
+      }
+     ]
+    },
+    {
+     "n": 4,
+     "item": "Архитектурная спецификация",
+     "status": "в комплекте",
+     "note": "",
+     "integrity": "соответствует",
+     "paths": [
+      {
+       "path": "afina/docs/Афина_Архитектурная_спецификация.md",
+       "kind": "file",
+       "present": true,
+       "bytes": 5042,
+       "sha256": "989dd2b48f6f032ab359f23c71cb1a917be94af15f8b98ebd85f3f887d80872c",
+       "sha256_expected": "989dd2b48f6f032ab359f23c71cb1a917be94af15f8b98ebd85f3f887d80872c",
+       "verdict": "соответствует"
+      }
+     ]
+    },
+    {
+     "n": 5,
+     "item": "Логическая и физическая модели БД, словарь данных, правила миграции",
+     "status": "в комплекте",
+     "note": "",
+     "integrity": "соответствует",
+     "paths": [
+      {
+       "path": "afina/src/db/schema_postgres.sql",
+       "kind": "file",
+       "present": true,
+       "bytes": 6087,
+       "sha256": "5e42ea9ca0d48a9496f72b687dba4ef3bd1631d06b1f7b660d4a9ffb0ebca532",
+       "sha256_expected": "5e42ea9ca0d48a9496f72b687dba4ef3bd1631d06b1f7b660d4a9ffb0ebca532",
+       "verdict": "соответствует"
+      },
+      {
+       "path": "afina/data/Афина_Словарь_данных_ПриложениеВ.json",
+       "kind": "file",
+       "present": true,
+       "bytes": 8452,
+       "sha256": "5c05d8e0828f3173d32c48b0f5dc582e66c8074e625f8a70d347265089288238",
+       "sha256_expected": "5c05d8e0828f3173d32c48b0f5dc582e66c8074e625f8a70d347265089288238",
+       "verdict": "соответствует"
+      },
+      {
+       "path": "afina/data/Афина_Модель_данных_ПриложениеГ.json",
+       "kind": "file",
+       "present": true,
+       "bytes": 6480,
+       "sha256": "d0b5948329249c6bb5c80ab44051196d07c261442762840f6d04c892bae8b5e1",
+       "sha256_expected": "d0b5948329249c6bb5c80ab44051196d07c261442762840f6d04c892bae8b5e1",
+       "verdict": "соответствует"
+      },
+      {
+       "path": "afina/docs/Афина_Регламенты.md",
+       "kind": "file",
+       "present": true,
+       "bytes": 3286,
+       "sha256": "1a536c6564016dae53271ff68862d7e4d36f3a3353287dda97518ee024be2079",
+       "sha256_expected": "1a536c6564016dae53271ff68862d7e4d36f3a3353287dda97518ee024be2079",
+       "verdict": "соответствует"
+      }
+     ]
+    },
+    {
+     "n": 6,
+     "item": "Спецификации API и форматов обмена",
+     "status": "в комплекте",
+     "note": "генерируется интроспекцией маршрутов",
+     "integrity": "соответствует",
+     "paths": [
+      {
+       "path": "afina/docs/Афина_API_спецификация.md",
+       "kind": "file",
+       "present": true,
+       "bytes": 6831,
+       "sha256": "15c27923d1fde1a5728dac6fb52e812f4a23126861b06a914799f9cbebf53bf6",
+       "sha256_expected": "15c27923d1fde1a5728dac6fb52e812f4a23126861b06a914799f9cbebf53bf6",
+       "verdict": "соответствует"
+      },
+      {
+       "path": "afina/src/afina/gis/io_formats.py",
+       "kind": "file",
+       "present": true,
+       "bytes": 11211,
+       "sha256": "f5a702c48feb0293e246b7a7b5791908c0a69a1d46c2d2524551316ed25a2b12",
+       "sha256_expected": "f5a702c48feb0293e246b7a7b5791908c0a69a1d46c2d2524551316ed25a2b12",
+       "verdict": "соответствует"
+      }
+     ]
+    },
+    {
+     "n": 7,
+     "item": "Реестр математических моделей с паспортами V&V",
+     "status": "в комплекте",
+     "note": "",
+     "integrity": "соответствует",
+     "paths": [
+      {
+       "path": "afina/data/Афина_Реестр_моделей.json",
+       "kind": "file",
+       "present": true,
+       "bytes": 8815,
+       "sha256": "400cd0a7f0cf64e3a4280473f6d5e985fd334e7d9a474e246e52b197aea28051",
+       "sha256_expected": "400cd0a7f0cf64e3a4280473f6d5e985fd334e7d9a474e246e52b197aea28051",
+       "verdict": "соответствует"
+      },
+      {
+       "path": "afina/protocols/ПРОТОКОЛ_MAT_20261018.json",
+       "kind": "file",
+       "present": true,
+       "bytes": 3196,
+       "sha256": "0aa5c7f67cda8cbf7b6c86766dcbefcf9704af970165a866b690c2ca265f2d9f",
+       "sha256_expected": "0aa5c7f67cda8cbf7b6c86766dcbefcf9704af970165a866b690c2ca265f2d9f",
+       "verdict": "соответствует"
+      }
+     ]
+    },
+    {
+     "n": 8,
+     "item": "Матрица прослеживаемости требований (машиночитаемая)",
+     "status": "в комплекте",
+     "note": "",
+     "integrity": "соответствует",
+     "paths": [
+      {
+       "path": "afina/data/Афина_RTM_машиночитаемая.csv",
+       "kind": "file",
+       "present": true,
+       "bytes": 30399,
+       "sha256": "84a690b0832a3dcf017ff39e37ba66b3dff575bdbf3618c0dbca60c4dfd8bb8f",
+       "sha256_expected": "84a690b0832a3dcf017ff39e37ba66b3dff575bdbf3618c0dbca60c4dfd8bb8f",
+       "verdict": "соответствует"
+      },
+      {
+       "path": "afina/data/Афина_RTM_машиночитаемая.json",
+       "kind": "file",
+       "present": true,
+       "bytes": 41938,
+       "sha256": "1df3712627fb21bf4a6d5956b4a9e07a6841e880d680eda41f3c9771aca4db73",
+       "sha256_expected": "1df3712627fb21bf4a6d5956b4a9e07a6841e880d680eda41f3c9771aca4db73",
+       "verdict": "соответствует"
+      },
+      {
+       "path": "afina/data/Афина_Реестр_требований_ПриложениеА.json",
+       "kind": "file",
+       "present": true,
+       "bytes": 32889,
+       "sha256": "03798da49c3a9b700ba021043e9ec1e49eb617267c2f39fa040b46bd907673e8",
+       "sha256_expected": "03798da49c3a9b700ba021043e9ec1e49eb617267c2f39fa040b46bd907673e8",
+       "verdict": "соответствует"
+      }
+     ]
+    },
+    {
+     "n": 9,
+     "item": "ПМИ и протоколы всех видов испытаний",
+     "status": "в комплекте",
+     "note": "",
+     "integrity": "соответствует",
+     "paths": [
+      {
+       "path": "afina/src/pmi/ПМИ.md",
+       "kind": "file",
+       "present": true,
+       "bytes": 4697,
+       "sha256": "e8c2e365a3c58cea57e6f3655ba8be90e14d7ccd1262cbd36608cbddbc436fbd",
+       "sha256_expected": "e8c2e365a3c58cea57e6f3655ba8be90e14d7ccd1262cbd36608cbddbc436fbd",
+       "verdict": "соответствует"
+      },
+      {
+       "path": "afina/protocols",
+       "kind": "dir",
+       "files": 34,
+       "bytes": 184810,
+       "present": true
+      }
+     ]
+    },
+    {
+     "n": 10,
+     "item": "Эталонные наборы данных и тестовые сценарии",
+     "status": "в комплекте",
+     "note": "",
+     "integrity": "соответствует",
+     "paths": [
+      {
+       "path": "afina/data/ПриложениеЕ_эталонные_сценарии.json",
+       "kind": "file",
+       "present": true,
+       "bytes": 1968,
+       "sha256": "9fb2c526ed1a07b516dd2c700f7dab91d2d30968617137efb38a4d2a8586d0c0",
+       "sha256_expected": "9fb2c526ed1a07b516dd2c700f7dab91d2d30968617137efb38a4d2a8586d0c0",
+       "verdict": "соответствует"
+      },
+      {
+       "path": "afina/src/tests",
+       "kind": "dir",
+       "files": 15,
+       "bytes": 373392,
+       "present": true
+      },
+      {
+       "path": "afina/src/pmi/run_132.py",
+       "kind": "file",
+       "present": true,
+       "bytes": 22433,
+       "sha256": "fa9a0e121752b800435ed150cf976259838dfeefdd974bc933fcb36ef7828b98",
+       "sha256_expected": "fa9a0e121752b800435ed150cf976259838dfeefdd974bc933fcb36ef7828b98",
+       "verdict": "соответствует"
+      }
+     ]
+    },
+    {
+     "n": 11,
+     "item": "Руководства: пользователя, инженера, администратора, сопровождения",
+     "status": "в комплекте",
+     "note": "",
+     "integrity": "соответствует",
+     "paths": [
+      {
+       "path": "afina/docs/Руководство_сопровождения.md",
+       "kind": "file",
+       "present": true,
+       "bytes": 3000,
+       "sha256": "997db7cef6cb27d209a48e1e01c04c83411ba352639b44173ff55ac9bd1c7d0a",
+       "sha256_expected": "997db7cef6cb27d209a48e1e01c04c83411ba352639b44173ff55ac9bd1c7d0a",
+       "verdict": "соответствует"
+      },
+      {
+       "path": "afina/docs/Руководство_администратора.md",
+       "kind": "file",
+       "present": true,
+       "bytes": 4010,
+       "sha256": "93ae21b2f0ad2ed2ce6fba839f3888dad958c007fea9c8b33eb2dbb7594d4661",
+       "sha256_expected": "93ae21b2f0ad2ed2ce6fba839f3888dad958c007fea9c8b33eb2dbb7594d4661",
+       "verdict": "соответствует"
+      },
+      {
+       "path": "afina/docs/Руководство_инженера.md",
+       "kind": "file",
+       "present": true,
+       "bytes": 3575,
+       "sha256": "2303841fec8fad169691499e1192402c3aeeedf4b85afd20cf63a9500a9760d8",
+       "sha256_expected": "2303841fec8fad169691499e1192402c3aeeedf4b85afd20cf63a9500a9760d8",
+       "verdict": "соответствует"
+      },
+      {
+       "path": "afina/docs/Руководство_пользователя.md",
+       "kind": "file",
+       "present": true,
+       "bytes": 3667,
+       "sha256": "36a370496fe5965ceda0d889f48299b8611a549353b41142d87178ad4dffe9ff",
+       "sha256_expected": "36a370496fe5965ceda0d889f48299b8611a549353b41142d87178ad4dffe9ff",
+       "verdict": "соответствует"
+      }
+     ]
+    },
+    {
+     "n": 12,
+     "item": "Модель угроз и комплект документов по защите информации",
+     "status": "в комплекте",
+     "note": "СКЗИ — интерфейс CryptoProvider (стенд)",
+     "integrity": "соответствует",
+     "paths": [
+      {
+       "path": "afina/G0/ИБ_модель_угроз.md",
+       "kind": "file",
+       "present": true,
+       "bytes": 4535,
+       "sha256": "d6d5672097a311cbf30c4eb337219db992fc4ac14c2f6311ec279b555e873808",
+       "sha256_expected": "d6d5672097a311cbf30c4eb337219db992fc4ac14c2f6311ec279b555e873808",
+       "verdict": "соответствует"
+      }
+     ]
+    },
+    {
+     "n": 13,
+     "item": "Регламенты миграции, резервного копирования, восстановления и обновления",
+     "status": "в комплекте",
+     "note": "",
+     "integrity": "соответствует",
+     "paths": [
+      {
+       "path": "afina/docs/Афина_Регламенты.md",
+       "kind": "file",
+       "present": true,
+       "bytes": 3286,
+       "sha256": "1a536c6564016dae53271ff68862d7e4d36f3a3353287dda97518ee024be2079",
+       "sha256_expected": "1a536c6564016dae53271ff68862d7e4d36f3a3353287dda97518ee024be2079",
+       "verdict": "соответствует"
+      },
+      {
+       "path": "afina/src/tools/backup.py",
+       "kind": "file",
+       "present": true,
+       "bytes": 8747,
+       "sha256": "364e0e3aa7915ecdc285b11de6ec389f9aa28531ef983f0120d9ba4548294c38",
+       "sha256_expected": "364e0e3aa7915ecdc285b11de6ec389f9aa28531ef983f0120d9ba4548294c38",
+       "verdict": "соответствует"
+      }
+     ]
+    },
+    {
+     "n": 14,
+     "item": "SBOM: сторонние компоненты, лицензии, ограничения",
+     "status": "в комплекте",
+     "note": "stdlib-only: сторонние компоненты в рантайме отсутствуют",
+     "integrity": "соответствует",
+     "paths": [
+      {
+       "path": "afina/data/ПриложениеЛ_SBOM.json",
+       "kind": "file",
+       "present": true,
+       "bytes": 1073,
+       "sha256": "25ad3340ce19b41d66b732d035afdb45089feb442d807af23a4ee40945212b24",
+       "sha256_expected": "25ad3340ce19b41d66b732d035afdb45089feb442d807af23a4ee40945212b24",
+       "verdict": "соответствует"
+      }
+     ]
+    },
+    {
+     "n": 15,
+     "item": "План сопровождения, исправления дефектов и развития",
+     "status": "в комплекте",
+     "note": "",
+     "integrity": "соответствует",
+     "paths": [
+      {
+       "path": "afina/docs/Афина_План_сопровождения.md",
+       "kind": "file",
+       "present": true,
+       "bytes": 2239,
+       "sha256": "ee6a404617acd24b2905a7c2e4727f425352ec574c4dfb14df97f6c20ed302dc",
+       "sha256_expected": "ee6a404617acd24b2905a7c2e4727f425352ec574c4dfb14df97f6c20ed302dc",
+       "verdict": "соответствует"
+      }
+     ]
+    },
+    {
+     "n": 16,
+     "item": "План подготовки пользователей и администраторов",
+     "status": "в комплекте",
+     "note": "",
+     "integrity": "соответствует",
+     "paths": [
+      {
+       "path": "afina/docs/Афина_План_подготовки.md",
+       "kind": "file",
+       "present": true,
+       "bytes": 2068,
+       "sha256": "da938db6e748e524e3e97f49d843a21a1e50bdd20b3d0aadb389b10f0aa14460",
+       "sha256_expected": "da938db6e748e524e3e97f49d843a21a1e50bdd20b3d0aadb389b10f0aa14460",
+       "verdict": "соответствует"
+      }
+     ]
+    },
+    {
+     "n": 17,
+     "item": "Ведомость передачи прав на код, модели, библиотеки и данные",
+     "status": "в комплекте",
+     "note": "",
+     "integrity": "соответствует",
+     "paths": [
+      {
+       "path": "afina/docs/Афина_Ведомость_прав.md",
+       "kind": "file",
+       "present": true,
+       "bytes": 2062,
+       "sha256": "b3354f2a20fc7b3fc1f0e969a9324d797bb3dded44bab092d982b2f774c1d685",
+       "sha256_expected": "b3354f2a20fc7b3fc1f0e969a9324d797bb3dded44bab092d982b2f774c1d685",
+       "verdict": "соответствует"
+      }
+     ]
+    },
+    {
+     "n": 18,
+     "item": "Перечень известных ограничений и технического долга",
+     "status": "в комплекте",
+     "note": "",
+     "integrity": "соответствует",
+     "paths": [
+      {
+       "path": "afina/docs/Афина_Известные_ограничения.md",
+       "kind": "file",
+       "present": true,
+       "bytes": 3962,
+       "sha256": "81260dace9cf56167b717770c0b1171edbf548925e131d03c30562edfef5cada",
+       "sha256_expected": "81260dace9cf56167b717770c0b1171edbf548925e131d03c30562edfef5cada",
+       "verdict": "соответствует"
+      }
+     ]
+    }
+   ]
+  },
+  "B_line_eng6": {
+   "title": "Линия B — ENG6-PLAN (состав поставки, Приложение Б Дополнения №2)",
+   "items_total": 13,
+   "items_intact": 13,
+   "vendor_verdict": "соответствует",
+   "entries": [
+    {
+     "path": "eng6-service/core",
+     "kind": "dir",
+     "files": 19,
+     "bytes": 1054534,
+     "present": true
+    },
+    {
+     "path": "eng6-service/api",
+     "kind": "dir",
+     "files": 10,
+     "bytes": 91895,
+     "present": true
+    },
+    {
+     "path": "eng6-service/frontend",
+     "kind": "dir",
+     "files": 5,
+     "bytes": 458828,
+     "present": true
+    },
+    {
+     "path": "eng6-service/integrations",
+     "kind": "dir",
+     "files": 1,
+     "bytes": 29749,
+     "present": true
+    },
+    {
+     "path": "eng6-service/loadtest",
+     "kind": "dir",
+     "files": 15,
+     "bytes": 136759,
+     "present": true
+    },
+    {
+     "path": "eng6-service/deploy",
+     "kind": "dir",
+     "files": 9,
+     "bytes": 37094,
+     "present": true
+    },
+    {
+     "path": "eng6-service/tests",
+     "kind": "dir",
+     "files": 15,
+     "bytes": 147738,
+     "present": true
+    },
+    {
+     "path": "eng6-service/scripts",
+     "kind": "dir",
+     "files": 5,
+     "bytes": 132427,
+     "present": true
+    },
+    {
+     "path": "eng6-service/examples",
+     "kind": "dir",
+     "files": 7,
+     "bytes": 439106,
+     "present": true
+    },
+    {
+     "path": "eng6-service/docs",
+     "kind": "dir",
+     "files": 8,
+     "bytes": 235306,
+     "present": true
+    },
+    {
+     "path": "eng6-service/README.md",
+     "kind": "file",
+     "present": true,
+     "bytes": 15590,
+     "sha256": "db5557b10c38a9d34c38be8312668ff2fd7af6fe189c66f91f421be6894e84ff"
+    },
+    {
+     "path": "eng6-service/package.json",
+     "kind": "file",
+     "present": true,
+     "bytes": 1162,
+     "sha256": "945b06777d0886e2f2167480a803074a77ea65a2eabe01075d95f00f7e84bf86"
+    },
+    {
+     "path": "eng6-service/core/vendor/eng6_core.js",
+     "kind": "file",
+     "present": true,
+     "bytes": 819007,
+     "sha256": "adb610c9eee1ca17b257cbc6087e2278fdde3eef92f3b6a360cfb51968d48b20",
+     "sha256_expected": "adb610c9eee1ca17b257cbc6087e2278fdde3eef92f3b6a360cfb51968d48b20",
+     "verdict": "соответствует"
+    }
+   ],
+   "intact": true
+  },
+  "C_unified": {
+   "title": "Единая программа — артефакты unified/",
+   "items_total": 32,
+   "items_intact": 32,
+   "missing": [],
+   "entries": [
+    {
+     "path": "unified/bridge/eng6_js_client.py",
+     "kind": "file",
+     "present": true,
+     "bytes": 8897,
+     "sha256": "a586d4ec01a4ad4d2fa35558d4a26de4c94e2720dc6504c5868ee2535453d63b"
+    },
+    {
+     "path": "unified/bridge/eng6_probe.mjs",
+     "kind": "file",
+     "present": true,
+     "bytes": 5245,
+     "sha256": "a468e14b1c7af5b7c1dabcd8e079923d44140822730a4ab7ffaafc438094cf7c"
+    },
+    {
+     "path": "unified/bridge/backend_arc002.py",
+     "kind": "file",
+     "present": true,
+     "bytes": 25926,
+     "sha256": "c02408688136ad9c452c8da94a1efebd9582db86d5c4f2db192f8126605ae311"
+    },
+    {
+     "path": "unified/bridge/xverify.py",
+     "kind": "file",
+     "present": true,
+     "bytes": 6898,
+     "sha256": "92a0d417cb4d68af91a8f4a5baceadef0ccdb532bab18214222b4b08534a5470"
+    },
+    {
+     "path": "unified/bridge/datamodel_map.py",
+     "kind": "file",
+     "present": true,
+     "bytes": 18227,
+     "sha256": "caaa4552d94e7ff2cae65f74146291daf53c56753b7aadba4e5080c88184c34b"
+    },
+    {
+     "path": "unified/bridge/plan_service.py",
+     "kind": "file",
+     "present": true,
+     "bytes": 11153,
+     "sha256": "77497a0a854552b4e1e6d14b8d02efca4e8b587a79c0ffb809117f6c71ffc727"
+    },
+    {
+     "path": "unified/bridge/platform_db.py",
+     "kind": "file",
+     "present": true,
+     "bytes": 11955,
+     "sha256": "ffa24a2acfee5951b2f8a25db730f4fc71596acf0b9123217356880b4b227cc5"
+    },
+    {
+     "path": "unified/bridge/audit_bridge.py",
+     "kind": "file",
+     "present": true,
+     "bytes": 5737,
+     "sha256": "073ba6b26ecfc53dcfa945f3a4cfc0684f3c49758782a47bcf8be99bb11ef881"
+    },
+    {
+     "path": "unified/bridge/platform_client.py",
+     "kind": "file",
+     "present": true,
+     "bytes": 5737,
+     "sha256": "836a8a7c3c1da37aea8a5f959c3d5506d9dc549235877be2e0fe1db8f2323b24"
+    },
+    {
+     "path": "unified/bridge/master_chain_sync.py",
+     "kind": "file",
+     "present": true,
+     "bytes": 5111,
+     "sha256": "c323d3660b900656a02faea005bb2b8b9c110265f6c1c9417e9857ae885a4412"
+    },
+    {
+     "path": "unified/bridge/scenario_export.py",
+     "kind": "file",
+     "present": true,
+     "bytes": 10475,
+     "sha256": "7ac73d00e71a126a483a3812429a01f06e1ad86d9283927ef01ea57b21861939"
+    },
+    {
+     "path": "unified/ui/workspace.html",
+     "kind": "file",
+     "present": true,
+     "bytes": 23870,
+     "sha256": "4113cadf69abd8bdb30d1656ce4a5bd0bd014ad904c65b28dccd11113007e4f1"
+    },
+    {
+     "path": "unified/ci/unified-ci.yml",
+     "kind": "file",
+     "present": true,
+     "bytes": 4396,
+     "sha256": "f9c9061ee8ba0371d301bd6601e707df768a166a7babe3f0036cff9a45cd3084"
+    },
+    {
+     "path": "unified/deploy/docker-compose.unified.yml",
+     "kind": "file",
+     "present": true,
+     "bytes": 2777,
+     "sha256": "a34f9f30200a2e8b2cc53ce887b3e089577ec6f1c11517a1ab681b03dd29f065"
+    },
+    {
+     "path": "unified/deploy/Dockerfile.platform",
+     "kind": "file",
+     "present": true,
+     "bytes": 1448,
+     "sha256": "cb09ff466ba9b527921a9507a57d58d4d14a206027bc571941c997cff3c93544"
+    },
+    {
+     "path": "unified/deploy/prometheus.unified.yml",
+     "kind": "file",
+     "present": true,
+     "bytes": 755,
+     "sha256": "84c877baccde436b383069704080c67d38cfe56466b99f289562371ea6254e18"
+    },
+    {
+     "path": "unified/rtm/artifacts/RTM_UNIFIED.csv",
+     "kind": "file",
+     "present": true,
+     "bytes": 73138,
+     "sha256": "f1b9d4bcb1c0053fc21f3101495da5dd6eade93e1e2def54c2e8b37f41326961"
+    },
+    {
+     "path": "unified/rtm/artifacts/RTM_UNIFIED.json",
+     "kind": "file",
+     "present": true,
+     "bytes": 100256,
+     "sha256": "d425d9b00645e05257b754cc2e7cc452935b335a530df1b501433e0dce258cfa"
+    },
+    {
+     "path": "unified/README.md",
+     "kind": "file",
+     "present": true,
+     "bytes": 10347,
+     "sha256": "ea54eb312857a08b93888a274daa196dcda020e8ab30d7cb2e32b5cf416dcba8"
+    },
+    {
+     "path": "unified/WORKPLAN.md",
+     "kind": "file",
+     "present": true,
+     "bytes": 8152,
+     "sha256": "2bacc8b3c6c199ddb15ca3451cf036e064c89dad8dc02fc0995b37c213942c81"
+    },
+    {
+     "path": "unified/docs/00_UNIFIED_OVERVIEW.md",
+     "kind": "file",
+     "present": true,
+     "bytes": 10155,
+     "sha256": "8e762f95e9d35f2aa2bbca0f27907d23b94e65f392f29a3e177ad4e365a0537a"
+    },
+    {
+     "path": "unified/docs/01_OBSERVATIONS.md",
+     "kind": "file",
+     "present": true,
+     "bytes": 5333,
+     "sha256": "53dfb2a236ce06f99f2b19b5ad3fdfbff58e1185e49bcb07bf911b596ebba132"
+    },
+    {
+     "path": "unified/bridge/tests/test_audit_bridge.py",
+     "kind": "file",
+     "present": true,
+     "bytes": 3274,
+     "sha256": "99a59342b0c412c3b62ca317eb736bb475ae179c8e767872ffb64f5376c59635"
+    },
+    {
+     "path": "unified/bridge/tests/test_backend.py",
+     "kind": "file",
+     "present": true,
+     "bytes": 3528,
+     "sha256": "71148a14f57f2b7664a0bdb937cc1c2814da13adc42c72579cf684b3c3c37b0c"
+    },
+    {
+     "path": "unified/bridge/tests/test_client.py",
+     "kind": "file",
+     "present": true,
+     "bytes": 5879,
+     "sha256": "454acc828effbfb1bf900c59864951bcd2c43cf432320f8f90a2a32dffb66629"
+    },
+    {
+     "path": "unified/bridge/tests/test_datamodel.py",
+     "kind": "file",
+     "present": true,
+     "bytes": 9685,
+     "sha256": "2e7acb1bf410ba1d5f7ef3a54ec3180294af0ce99e90348dea31cd2aaa0cd702"
+    },
+    {
+     "path": "unified/bridge/tests/test_plan_service.py",
+     "kind": "file",
+     "present": true,
+     "bytes": 8193,
+     "sha256": "55df5eaf7bdef8e3c3b59476dd54714ba0710a3b6d1093744f85e03fbfd7881d"
+    },
+    {
+     "path": "unified/bridge/tests/test_platform_bridge.py",
+     "kind": "file",
+     "present": true,
+     "bytes": 13431,
+     "sha256": "44b2dc93acb3a265f2e5779461fb8548d13cea1e1f82f05b377be12c050a2b5c"
+    },
+    {
+     "path": "unified/bridge/tests/test_platform_db.py",
+     "kind": "file",
+     "present": true,
+     "bytes": 4734,
+     "sha256": "caf81795b14d98f8a295557d944ca278ca48c9749d3ebfca528358c14ee29974"
+    },
+    {
+     "path": "unified/protocols/ПРОТОКОЛ_ARC002_XVER_20261026_202511.json",
+     "kind": "file",
+     "present": true,
+     "bytes": 126980,
+     "sha256": "ab58b2f8ab71cc5f4d5db2ac541a23281aeca45a2e3c1bc741ecb186ed80128f"
+    },
+    {
+     "path": "unified/protocols/ПРОТОКОЛ_UNIF_E2E_20261026_201024.json",
+     "kind": "file",
+     "present": true,
+     "bytes": 6933,
+     "sha256": "b792cab4282219dbdfb7950037d26f492f4990b207c9fdd67180e29fcbb67f66"
+    },
+    {
+     "path": "unified/protocols/ПРОТОКОЛ_CROSS_ANCHOR_20261026_203242.json",
+     "kind": "file",
+     "present": true,
+     "bytes": 874,
+     "sha256": "be99d3a4fd184233783f1de3206df1e301ae58ecebb842fd31a7cfabae21e844"
+    }
+   ]
+  }
+ },
+ "summary": {
+  "A": "17/18 позиций без изменений хэшей",
+  "B": "13/13 позиций на месте; вендор — соответствует",
+  "C": "32/32 артефактов на месте"
+ }
+}

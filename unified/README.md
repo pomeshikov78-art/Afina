@@ -30,12 +30,18 @@ unified/
 │   │                           обратный ход в плоские таблицы К-03 (UNIF-03)
 │   ├── plan_service.py         PLAN-01 в штатной CalcQueue платформы (ARC-003):
 │   │                           мост → контур → паспорт → БД → аудит (UNIF-11)
+│   ├── platform_client.py      клиент сервера платформы: bootstrap/RBAC-роли,
+│   │                           аудит + /audit/verify, объекты обстановки
 │   ├── platform_db.py          персистентность прогонов: plan_runs + таблицы К-03,
 │   │                           контроль целостности sha256 + пересчёт (UNIF-12)
 │   ├── audit_bridge.py         единый аудит: append-only хэш-цепочка, связка
 │   │                           run_id ↔ taskId ↔ inputSha256, якорь журнала линии B (UNIF-13)
-│   └── tests/                  37 тестов: маппинг 8 + бэкенды/ARC-002 8 + БД 5 + аудит 5 +
-│                               live-сервис 7 + очередь/БД/аудит live 4
+│   ├── master_chain_sync.py    сшивка ТРЁХ журналов: мастер-цепочка платформы +
+│   │                           NDJSON контура + единый леджер → вердикт ANCHORED (UNIF-17)
+│   ├── scenario_export.py      обстановка платформы (objects COM/LINK/ORDER/ORG) →
+│   │                           контракт ENG6-PLAN; честные предупреждения CRS (UNIF-18)
+│   └── tests/                  42 теста: маппинг 8 + бэкенды 8 + БД 5 + аудит 5 +
+│                               live-сервис 7 + очередь live 4 + платформа live 5
 ├── ui/workspace.html           единое рабочее место (PoC, UNIF-14): платформа во фрейме +
 │                               модуль планирования по CORS, Canvas2D, экспорт К-03,
 │                               заготовка postMessage-контракта; NFR-02 скан PASS
@@ -46,8 +52,9 @@ unified/
 │   └── stop_stack.sh           остановка стека
 ├── rtm/
 │   ├── seed_dopolnenie2.json   транскрипция 77 требований Дополнения №2 к ТЗ
-│   ├── build_unified_rtm.py    единый RTM: 83 (Прил. А) + 77 (Доп. №2) + 15 (UNIF) = 175
-│   └── artifacts/RTM_UNIFIED.{csv,json}
+│   ├── build_unified_rtm.py    единый RTM: 83 (Прил. А) + 77 (Доп. №2) + 18 (UNIF) = 178
+│   ├── build_unified_manifest.py единый манифест поставки: sha256-пересчёт трёх разделов (UNIF-16)
+│   └── artifacts/RTM_UNIFIED.{csv,json} + MANIFEST_UNIFIED.json
 ├── ci/unified-ci.yml           единый CI (ВКЛЮЧЁН: .github/workflows/unified-ci.yml)
 ├── deploy/                     Dockerfile.platform + docker-compose.unified.yml
 │                               (platform + engine + Prometheus + Grafana) + prometheus.unified.yml
@@ -68,13 +75,18 @@ docker compose -f deploy/docker-compose.unified.yml up -d --build
 #    platform → http://localhost:8470 · engine → :8080 · grafana → :3000 · prometheus → :9090
 
 # 3. Проверки единой программы (всё stdlib/zero-deps)
-cd bridge && python3 -m unittest discover -s tests -p "test_*.py"   # 37/37 (live-тесты сами поднимают контур)
-python3 xverify.py                                                   # XVER 117 точек → protocols/
+cd bridge && python3 -m unittest discover -s tests -p "test_*.py"   # 42/42 (live-тесты сами поднимают оба сервера)
+python3 xverify.py                                                   # XVER 133 точки → protocols/
 cd ../scripts && python3 demo_e2e.py                                 # E2E 7 шагов → protocols/
-cd ../rtm && python3 build_unified_rtm.py                            # RTM 175 → rtm/artifacts/
+cd ../rtm && python3 build_unified_rtm.py                            # RTM 178 → rtm/artifacts/
+python3 build_unified_manifest.py                                    # манифест поставки → rtm/artifacts/
 
-# 4. Единое рабочее место (PoC): unified/ui/workspace.html при поднятом стеке
-#    (фрейм платформы :8470 + прямые запросы к контуру :8080 по CORS)
+# 4. Экспорт обстановки платформы в сценарий (для рабочего места / контура)
+cd ../bridge && python3 scenario_export.py --platform-url http://127.0.0.1:8470 \
+  --login unified-eng --password … --out ../../unified/var/scenario.json
+
+# 5. Единое рабочее место (PoC): unified/ui/workspace.html при поднятом стеке
+#    (фрейм платформы :8470 + прямые запросы к контуру :8080 по CORS + «📂 Из файла»)
 ```
 
 ## Статус проверок (прогоны 26.10.2026, песочница 2 vCPU / 1 ГБ)
@@ -85,12 +97,15 @@ cd ../rtm && python3 build_unified_rtm.py                            # RTM 175 �
 | Линия B: 125 тестов + conformance 16/16 + selfcheck 21/21 | ✅ (sha256 вендора совпал) |
 | Линия B: `npm run smoke` после фикса UNIF-09 | ✅ planner + api целиком |
 | Линия B: bench quick (10⁴ узлов, burst 40×2000) | ✅ PASS, 61 с |
-| Мост: 37 тестов (маппинг 8, бэкенды 8, БД 5, аудит 5, live-сервис 7, очередь live 4) | ✅ 37/37 |
-| **XVER / ARC-002** (117 точек, RAW→ALIGNED) | ✅ **ALIGNED PASS** (115 CONSISTENT, 0 FAIL, 2 EXCLUDED; FSPL/Hata/kTB — Δ=0.0) |
+| Мост: 42 теста (маппинг 8, бэкенды 8, БД 5, аудит 5, live-сервис 7, очередь live 4, платформа live 5) | ✅ 42/42 |
+| **XVER / ARC-002** (133 точки, RAW→ALIGNED) | ✅ **ALIGNED PASS** (131 CONSISTENT, 0 FAIL, 2 EXCLUDED; FSPL/Hata/kTB/J(v) — Δ=0.0) |
 | **E2E UNIF-05** (7 шагов) | ✅ **PASS** (план PARTIAL/C — честный отказ red-технике, детерминизм ok) |
-| **PLAN-01 в очереди платформы** (UNIF-11, live) | ✅ 4/4: паспорт с двумя бэкендами, БД+верификация, якорь аудита matched≥1 |
-| Единый RTM | ✅ 175 требований: 115 подтверждено, 47 стенд/данные, 2 ждут включения/стенда |
-| UI PoC (UNIF-14) | ✅ NFR-02 скан PASS, JS-синтаксис ok; визуальный контроль — браузерный стенд |
+| **PLAN-01 в очереди платформы** (UNIF-11, live) | ✅ паспорт с двумя бэкендами, БД+верификация, якорь аудита matched≥1 |
+| **Сшивка трёх журналов** (UNIF-17, live) | ✅ **ANCHORED**: мастер-цепочка платформы + NDJSON контура + единый леджер; RBAC 403-проверки (OBS-07) |
+| **Экспорт обстановки платформы** (UNIF-18, live) | ✅ objects → сценарий → план PARTIAL (red-техника отклонена) |
+| Единый RTM | ✅ 178 требований: 118 подтверждено, 47 стенд/данные, 2 ждут стенда |
+| Единый манифест поставки (UNIF-16) | ✅ COMPLETE: A 17/18 целы (1 — «без хэш-контроля» честно), B 13/13 + вендор, C 32/32 |
+| UI PoC (UNIF-14) | ✅ NFR-02 скан PASS, JS-синтаксис ok, +загрузка сценария из файла; визуальный контроль — браузерный стенд |
 
 ## Политика честности (наследие обеих линий — обязательна для единой программы)
 

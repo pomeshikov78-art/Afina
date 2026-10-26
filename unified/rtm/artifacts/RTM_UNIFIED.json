@@ -1,12 +1,12 @@
 {
  "document": "RTM_UNIFIED — единая матрица трассируемости требований",
- "generated_at": "2026-10-26 20:01:41",
+ "generated_at": "2026-10-26 20:36:09",
  "sources": {
   "A": "afina/data/Афина_RTM_машиночитаемая.csv (83)",
   "B": "unified/rtm/seed_dopolnenie2.json (77)",
-  "UNIF": "unified/rtm/build_unified_rtm.py (15)"
+  "UNIF": "unified/rtm/build_unified_rtm.py (18)"
  },
- "total": 175,
+ "total": 178,
  "rows": [
   {
    "source": "A:ТЗ.АФИНА.11.0 Прил.А",
@@ -1622,9 +1622,9 @@
    "source": "UNIF:совмещённая платформа",
    "requirement": "UNIF-02",
    "priority": "P0",
-   "text": "Кросс-верификация моделей двух линий (XVER): FSPL, Окамура–Хата, COST-231, Френель, шумовая площадка kTB (RF-07⇄noiseDbm, единицы Гц⇄кГц — ENG-004); двухстадийный протокол RAW→ALIGNED",
-   "acceptance_criteria": "ALIGNED PASS: все пары в допуске; расхождения документированы (CM, √1000, hata-suburban), вендор не изменяется",
-   "tests": "unified/bridge/xverify.py → unified/protocols/ПРОТОКОЛ_ARC002_XVER_*.json (102 точки, RAW→ALIGNED PASS, 26.10.2026); NOISE_FLOOR_DB Δ=0.0 дБм (15 точек)",
+   "text": "Кросс-верификация моделей двух линий (XVER): FSPL, Окамура–Хата, COST-231, Френель, шумовая площадка kTB (RF-07⇄noiseDbm, Гц⇄кГц — ENG-004), дифракция J(v) (ITU-R P.526); двухстадийный протокол RAW→ALIGNED",
+   "acceptance_criteria": "ALIGNED PASS: все пары в допуске; расхождения документированы (CM, √1000, hata-suburban, порог J(v)), вендор не изменяется",
+   "tests": "unified/bridge/xverify.py → unified/protocols/ПРОТОКОЛ_ARC002_XVER_*.json (102 точки, RAW→ALIGNED PASS, 26.10.2026); 133 точки: NOISE_FLOOR_DB Δ=0.0 дБм, DIFFRACTION_J Δ=0.0 дБ (16 точек); OBS-06 (порог отсечки −0.7/−0.78)",
    "protocols": "",
    "status": "подтверждено прогоном 26.10.2026 (песочница 2 vCPU/1 ГБ)"
   },
@@ -1682,7 +1682,7 @@
    "source": "UNIF:совмещённая платформа",
    "requirement": "UNIF-08",
    "priority": "P1",
-   "text": "Единый RTM: Прил. А (83) + Дополнение №2 (77) + UNIF (15) с источниками, доказательствами и честными статусами",
+   "text": "Единый RTM: Прил. А (83) + Дополнение №2 (77) + UNIF (18) с источниками, доказательствами и честными статусами",
    "acceptance_criteria": "CSV+JSON генерируются скриптом; статусы ссылаются на протоколы/тесты",
    "tests": "unified/rtm/build_unified_rtm.py → rtm/artifacts/RTM_UNIFIED.{csv,json}",
    "protocols": "",
@@ -1757,6 +1757,36 @@
    "tests": ".gitignore (корень), .github/workflows/unified-ci.yml",
    "protocols": "",
    "status": "подтверждено коммитом 26.10.2026; эффект — на стороне GitHub"
+  },
+  {
+   "source": "UNIF:совмещённая платформа",
+   "requirement": "UNIF-16",
+   "priority": "P1",
+   "text": "Единый манифест поставки: три раздела (линия A комплект §11.1, линия B Приложение Б, unified) с пересчётом sha256 каждого файла в момент генерации",
+   "acceptance_criteria": "вердикт COMPLETE/DEGRADED/INCOMPLETE по факту сверки; вендор ENG6 — эталонный sha256; изменения/отсутствия не замалчиваются",
+   "tests": "unified/rtm/build_unified_manifest.py → rtm/artifacts/MANIFEST_UNIFIED.json (COMPLETE: A 17/18 целы, B 13/13+вендор, C 32/32)",
+   "protocols": "",
+   "status": "подтверждено прогоном 26.10.2026 (песочница 2 vCPU/1 ГБ)"
+  },
+  {
+   "source": "UNIF:совмещённая платформа",
+   "requirement": "UNIF-17",
+   "priority": "P0",
+   "text": "Сшивка трёх журналов (шаг 9): мастер-хэш-цепочка платформы (/audit/verify) + NDJSON контура (связка по inputSha256) + единый леджер; вердикт ANCHORED только при согласии всех трёх",
+   "acceptance_criteria": "cross_anchor на живом стеке: platform.verify ok, engine matched≥1, ledger ok; протокол CROSS_ANCHOR в unified/protocols/",
+   "tests": "unified/bridge/master_chain_sync.py; tests/test_platform_bridge.py (live, 5/5)",
+   "protocols": "",
+   "status": "подтверждено прогоном 26.10.2026 (песочница 2 vCPU/1 ГБ)"
+  },
+  {
+   "source": "UNIF:совмещённая платформа",
+   "requirement": "UNIF-18",
+   "priority": "P1",
+   "text": "Экспорт обстановки платформы в контракт ENG6-PLAN: objects (COM/LINK/ORDER/ORG) → сущности Прил. Г → build_plan_request; RBAC (Инженер-расчётчик создаёт, Администратор аудирует); честные предупреждения (CRS в метрах, пропуски)",
+   "acceptance_criteria": "сквозной live-цикл: объекты через API платформы → экспорт → PLAN-01 в очереди → PARTIAL (red-техника отклонена) → три журнала ANCHORED",
+   "tests": "unified/bridge/scenario_export.py + platform_client.py; tests/test_platform_bridge.py 5/5",
+   "protocols": "",
+   "status": "подтверждено прогоном 26.10.2026 (песочница 2 vCPU/1 ГБ)"
   }
  ]
 }

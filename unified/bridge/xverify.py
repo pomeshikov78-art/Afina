@@ -73,6 +73,10 @@ def render_md(proto: dict) -> str:
               "| ID | Модель/env | Обоснование |", "|---|---|---|"]
     for inc in proto["known_incompatible"]:
         lines.append(f"| {inc['id']} | {inc['model']}/{inc['env']} | {inc['reason']} |")
+    if proto.get("model_notes"):
+        lines += ["", "## Примечания к парам моделей", "", "| Модель | Примечание |", "|---|---|"]
+        for m, note in proto["model_notes"].items():
+            lines.append(f"| {m} | {note} |")
     lines += ["", "## Стадии сверки", ""]
     lines += _stage_table(proto["stages"]["raw"], proto["tolerances"])
     lines += [""]
