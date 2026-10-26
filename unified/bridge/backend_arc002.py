@@ -55,6 +55,7 @@ if AFINA_SRC not in sys.path:
     sys.path.insert(0, AFINA_SRC)
 
 from afina.eng6 import models as py_models  # noqa: E402  (линия A)
+from afina.eng6 import net as py_net        # noqa: E402
 from afina.eng6 import rf as py_rf          # noqa: E402
 from afina.eng6.passport import Passport, stable_hash, verify_reproducibility  # noqa: E402
 
@@ -78,6 +79,13 @@ PAIRED_MODELS: Dict[str, Dict[str, Any]] = {
     "DIFFRACTION_J": {"probe": "knife_j", "tol": 0.01, "unit": "дБ",
                       "note": "XVER-KNIFE-THRESH: пороги отсечки −0.7 (Python) и −0.78 (вендор); "
                               "полоса (−0.78;−0.7] вне сетки, расхождение ≤0.35 дБ измерено отдельно"},
+    # NET-01 (оптический бюджет ВОЛС) ⇄ ENG6.FIBER.loss: формулы совпадают после
+    # параметризации (XVER-FIBER-PARAMS) — ENG6 фиксирует шаг сросток 4 км и
+    # 2 коннектора; Python NET-01 принимает явные количества. Допуск 0.011 дБ —
+    # бюджет Python округляет до 2 знаков.
+    "FIBER_LOSS_DB": {"probe": "fiber_loss", "tol": 0.011, "unit": "дБ",
+                      "note": "XVER-FIBER-PARAMS: согласование параметризации (connectors=2, "
+                              "splices=⌊км/4⌋), а не физики; RAW показывает разницу дефолтных комплектов"},
 }
 
 # Документированные семантические согласования (стадия ALIGNED).
@@ -93,6 +101,13 @@ ALIGNMENTS: Dict[str, Dict[str, Any]] = {
         "b_scale_div": math.sqrt(1000.0),
         "note": "ENG6.PROP.fresnelR возвращает значение в √1000 раз больше эталона RF-06 "
                 "(смешение м/км в формуле вендора); после деления на √1000 совпадение точное",
+    },
+    "FIBER_LOSS_DB": {
+        "id": "XVER-FIBER-PARAMS",
+        "a_kwargs": {"connectors": 2, "splice_pitch_km": 4},
+        "note": "ENG6.FIBER.loss фиксирует 2 коннектора и сростки каждые 4 км; Python NET-01 "
+                "принимает явные количества. Согласование параметризации: connectors=2, "
+                "splices=⌊км/4⌋ → формулы идентичны (км·att + сростки·splice + коннекторы·conn)",
     },
 }
 
@@ -188,6 +203,24 @@ class PythonRefBackend(ComputeBackend):
             if v <= -0.7:
                 return 0.0
             return 6.9 + 20.0 * math.log10(math.sqrt((v - 0.1) ** 2 + 1.0) + v - 0.1)
+        if m == "FIBER_LOSS_DB":
+            # NET-01: суммарные потери ВОЛС. Без согласования — дефолты Python
+            # (4 коннектора × 0.5 дБ, 2 сростки × 0.1 дБ); с согласованием
+            # XVER-FIBER-PARAMS — параметризация ENG6 (2 коннектора, сростки ⌊км/4⌋).
+            km = float(point["len_km"])
+            kw = dict(point.get("a_kwargs") or {})
+            pitch = kw.get("splice_pitch_km")
+            splices = int(km // float(pitch)) if pitch else int(point.get("splices", 2))
+            connectors = int(kw.get("connectors", point.get("connectors", 4)))
+            budget = py_net.OpticalLink(
+                fiber_km=km,
+                attenuation_db_per_km=float(point["att_db_km"]),
+                connectors=connectors,
+                connector_loss_db=float(point["conn_db"]),
+                splices=splices,
+                splice_loss_db=float(point["splice_db"]),
+                splitters=[]).budget()
+            return budget["total_loss_db"]
         kw = dict(point.get("a_kwargs") or {})
         if m == "COST231_HATA":
             # rf.path_loss_db не пробрасывает cm_db → вызываем модель напрямую (код линии A не изменяется)
@@ -243,7 +276,7 @@ class Eng6ProbeBackend(ComputeBackend):
             pair = PAIRED_MODELS[p["model"]]
             q: Dict[str, Any] = {"model": pair["probe"]}
             for k in ("f_mhz", "d_km", "h_bs_m", "h_ms_m", "env", "n", "d1_km", "d2_km", "f_ghz",
-                      "bw_khz", "nf_db", "v"):
+                      "bw_khz", "nf_db", "v", "len_km", "att_db_km", "splice_db", "conn_db"):
                 if p.get(k) is not None:
                     q[k] = p[k]
             payload.append(q)
@@ -331,6 +364,12 @@ def default_grid() -> List[Dict[str, Any]]:
     # (−0.78; −0.7] (XVER-KNIFE-THRESH); значение внутри полосы измеряется отдельно.
     for v in (-2.0, -1.0, -0.8, -0.5, -0.2, 0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 6.0, 8.0, 10.0):
         pts.append({"model": "DIFFRACTION_J", "v": v})
+    # NET-01 ⇄ FIBER.loss: два комплекта параметров (дефолт ENG6 0.22/0.05/0.3 и
+    # дефолт Python 0.35/0.1/0.5), длины от внутриобъектных до магистральных
+    for att, splice, conn in ((0.22, 0.05, 0.3), (0.35, 0.1, 0.5)):
+        for km in (0.5, 1.0, 4.0, 8.0, 13.7, 25.0, 100.0):
+            pts.append({"model": "FIBER_LOSS_DB", "len_km": km,
+                        "att_db_km": att, "splice_db": splice, "conn_db": conn})
     return pts
 
 

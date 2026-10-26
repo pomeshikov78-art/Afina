@@ -63,6 +63,10 @@ function evaluate(E, p) {
     case 'knife_j':
       // ENG6: PROP.knifeEdgeJ(v) — дифракционные потери J(v), ITU-R P.526 аппроксимация
       return E.PROP.knifeEdgeJ(Number(p.v));
+    case 'fiber_loss':
+      // ENG6: FIBER.loss({attDbKm,spliceDb,connDb}, lenKm) = km·att + ⌊km/4⌋·splice + 2·conn
+      return E.FIBER.loss({ attDbKm: Number(p.att_db_km), spliceDb: Number(p.splice_db), connDb: Number(p.conn_db) },
+                          Number(p.len_km));
     default:
       throw new Error('MODEL_UNSUPPORTED: ' + p.model);
   }

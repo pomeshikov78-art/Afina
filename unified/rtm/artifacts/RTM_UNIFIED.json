@@ -1,6 +1,6 @@
 {
  "document": "RTM_UNIFIED — единая матрица трассируемости требований",
- "generated_at": "2026-10-26 20:44:51",
+ "generated_at": "2026-10-26 21:12:59",
  "sources": {
   "A": "afina/data/Афина_RTM_машиночитаемая.csv (83)",
   "B": "unified/rtm/seed_dopolnenie2.json (77)",
@@ -1622,9 +1622,9 @@
    "source": "UNIF:совмещённая платформа",
    "requirement": "UNIF-02",
    "priority": "P0",
-   "text": "Кросс-верификация моделей двух линий (XVER): FSPL, Окамура–Хата, COST-231, Френель, шумовая площадка kTB (RF-07⇄noiseDbm, Гц⇄кГц — ENG-004), дифракция J(v) (ITU-R P.526); двухстадийный протокол RAW→ALIGNED",
+   "text": "Кросс-верификация моделей двух линий (XVER): FSPL, Окамура–Хата, COST-231, Френель, шумовая площадка kTB (RF-07⇄noiseDbm, Гц⇄кГц — ENG-004), дифракция J(v) (ITU-R P.526), оптический бюджет (NET-01⇄FIBER.loss); двухстадийный протокол RAW→ALIGNED",
    "acceptance_criteria": "ALIGNED PASS: все пары в допуске; расхождения документированы (CM, √1000, hata-suburban, порог J(v)), вендор не изменяется",
-   "tests": "unified/bridge/xverify.py → unified/protocols/ПРОТОКОЛ_ARC002_XVER_*.json (102 точки, RAW→ALIGNED PASS, 26.10.2026); 133 точки: NOISE_FLOOR_DB Δ=0.0 дБм, DIFFRACTION_J Δ=0.0 дБ (16 точек); OBS-06 (порог отсечки −0.7/−0.78)",
+   "tests": "unified/bridge/xverify.py → unified/protocols/ПРОТОКОЛ_ARC002_XVER_*.json (102 точки, RAW→ALIGNED PASS, 26.10.2026); 147 точек: NOISE_FLOOR_DB/DIFFRACTION_J/FIBER_LOSS Δ в допуске; OBS-06 (порог J(v)), OBS-10 (REL/NET — решение; FIBER — параметризация)",
    "protocols": "",
    "status": "подтверждено прогоном 26.10.2026 (песочница 2 vCPU/1 ГБ)"
   },
@@ -1773,8 +1773,8 @@
    "requirement": "UNIF-17",
    "priority": "P0",
    "text": "Сшивка трёх журналов (шаг 9): мастер-хэш-цепочка платформы (/audit/verify) + NDJSON контура (связка по inputSha256) + единый леджер; вердикт ANCHORED только при согласии всех трёх",
-   "acceptance_criteria": "cross_anchor на живом стеке: platform.verify ok, engine matched≥1, ledger ok; протокол CROSS_ANCHOR в unified/protocols/",
-   "tests": "unified/bridge/master_chain_sync.py; tests/test_platform_bridge.py (live, 5/5)",
+   "acceptance_criteria": "cross_anchor на живом стеке: platform.verify ok, engine matched≥1, ledger ok; АВТО-якорь в продуктивном цикле PLAN-01; протокол CROSS_ANCHOR в unified/protocols/",
+   "tests": "unified/bridge/master_chain_sync.py + plan_service (auto_anchor); tests/test_platform_bridge.py (live, 5/5)",
    "protocols": "",
    "status": "подтверждено прогоном 26.10.2026 (песочница 2 vCPU/1 ГБ)"
   },
@@ -1782,9 +1782,9 @@
    "source": "UNIF:совмещённая платформа",
    "requirement": "UNIF-18",
    "priority": "P1",
-   "text": "Экспорт обстановки платформы в контракт ENG6-PLAN: objects (COM/LINK/ORDER/ORG) → сущности Прил. Г → build_plan_request; RBAC (Инженер-расчётчик создаёт, Администратор аудирует); честные предупреждения (CRS в метрах, пропуски)",
+   "text": "Экспорт обстановки платформы в контракт ENG6-PLAN: objects (COM/LINK/ORDER/ORG) → сущности Прил. Г → build_plan_request; RBAC (Инженер-расчётчик создаёт, Администратор аудирует); CRS: градусы WGS-84 + UTM-метры через ГИС-ядро линии A (round-trip), недекодированные единицы — честный пропуск (ENG-004)",
    "acceptance_criteria": "сквозной live-цикл: объекты через API платформы → экспорт → PLAN-01 в очереди → PARTIAL (red-техника отклонена) → три журнала ANCHORED",
-   "tests": "unified/bridge/scenario_export.py + platform_client.py; tests/test_platform_bridge.py 5/5",
+   "tests": "unified/bridge/scenario_export.py + platform_client.py; tests/test_scenario_export.py 8/8 (UTM round-trip 1e-6) + test_platform_bridge.py 5/5 (live)",
    "protocols": "",
    "status": "подтверждено прогоном 26.10.2026 (песочница 2 vCPU/1 ГБ)"
   }

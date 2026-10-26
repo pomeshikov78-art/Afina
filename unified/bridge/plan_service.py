@@ -36,23 +36,32 @@ from backend_arc002 import (Eng6PlanBackend, Eng6ProbeBackend, make_passport,  #
                             stable_hash)
 from datamodel_map import build_plan_request, plan_to_platform_tables  # noqa: E402
 from eng6_js_client import Eng6JsClient  # noqa: E402
+from master_chain_sync import cross_anchor  # noqa: E402
 import platform_db  # noqa: E402
 
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 
 
 class UnifiedPlanService:
-    """Связка: очередь платформы → мост → ENG6-PLAN → БД + аудит + паспорт."""
+    """Связка: очередь платформы → мост → ENG6-PLAN → БД + аудит + паспорт.
+
+    platform_client (опционально) — клиент сервера «Афины» с ролью, имеющей
+    audit_read: при auto_anchor=True после каждого прогона выполняется сшивка
+    трёх журналов (UNIF-17) и её вердикт возвращается в результате задания.
+    """
 
     def __init__(self, db_path: str, engine_url: str = "http://127.0.0.1:8080",
                  ledger_path: Optional[str] = None, requestor: str = "afina-platform",
-                 requestor_header: str = "afina-platform"):
+                 requestor_header: str = "afina-platform",
+                 platform_client=None, auto_anchor: bool = True):
         self.db_path = db_path
         self.client = Eng6JsClient(engine_url, requestor=requestor_header)
         self.backend = Eng6PlanBackend(self.client)
         self.ledger = UnifiedAuditLedger(ledger_path or os.path.join(
             os.path.dirname(os.path.abspath(db_path)) or ".", "unified_audit.ndjson"))
         self.requestor = requestor
+        self.platform_client = platform_client
+        self.auto_anchor = auto_anchor
         self._probe_fp: Optional[Dict[str, Any]] = None
 
     def _probe_fingerprint(self) -> Optional[Any]:
@@ -169,6 +178,18 @@ class UnifiedPlanService:
                 anchors["note"] = f"якорь не приложен: {type(e).__name__}: {e}"
         else:
             anchors["note"] = "якорь пропущен: нет канонического хэша ядра"
+
+        # 6. авто-сшивка трёх журналов (UNIF-17): платформа + контур + леджер
+        cross: Dict[str, Any] = {"performed": False}
+        if self.platform_client is not None and self.auto_anchor and engine_sha:
+            try:
+                proto = cross_anchor(self.ledger, self.platform_client, self.client,
+                                     run_id=run_id, engine_task_id=engine_task_id,
+                                     input_sha256=engine_sha, actor=actor)
+                cross = {"performed": True, "verdict": proto["verdict"], "reasons": proto["reasons"]}
+            except Exception as e:
+                cross = {"performed": True, "verdict": "ERROR",
+                         "reasons": [f"{type(e).__name__}: {e}"]}
         cb(1.0)
 
         return {
@@ -181,6 +202,7 @@ class UnifiedPlanService:
             "passport": passport.to_dict(),
             "audit_seq": entry["seq"],
             "anchors": anchors,
+            "cross_anchor": cross,
             "request_sha256": request_sha,
             "engine_input_sha256": engine_sha,
         }

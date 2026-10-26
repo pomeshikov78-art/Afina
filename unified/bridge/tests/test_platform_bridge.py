@@ -90,11 +90,12 @@ class TestPlatformBridgeLive(unittest.TestCase):
         cls.pc_eng = PlatformClient(cls.plat_url)
         cls.pc_eng.login("unified-eng", cls.eng_password)
 
-        # очередь платформы + единый сервис планирования
+        # очередь платформы + единый сервис планирования (с авто-сшивкой журналов)
         cls.queue = CalcQueue(persist_path=os.path.join(cls.tmp, "queue.json"), workers=1)
         cls.svc = UnifiedPlanService(os.path.join(cls.tmp, "unified.db"), cls.eng_url,
                                      ledger_path=os.path.join(cls.tmp, "unified_audit.ndjson"),
-                                     requestor="bridge-live")
+                                     requestor="bridge-live",
+                                     platform_client=cls.pc, auto_anchor=True)
         cls.svc.register(cls.queue)
 
     @classmethod
@@ -193,6 +194,10 @@ class TestPlatformBridgeLive(unittest.TestCase):
         self.assertIn(out["status"], ("PARTIAL", "FEASIBLE", "OPTIMAL"))
         # red-техника не размещена → заявка d-r2 отклонена → PARTIAL (FR-RES-03)
         self.assertEqual(out["status"], "PARTIAL")
+        # авто-сшивка трёх журналов выполнена внутри продуктивного цикла (UNIF-17)
+        self.assertTrue(out["cross_anchor"]["performed"])
+        self.assertEqual(out["cross_anchor"]["verdict"], "ANCHORED",
+                         json.dumps(out["cross_anchor"].get("reasons"), ensure_ascii=False))
         TestPlatformBridgeLive.plan_out = out
 
     def test_04_cross_anchor_three_journals(self):

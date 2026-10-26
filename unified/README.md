@@ -25,7 +25,7 @@ unified/
 │   ├── backend_arc002.py       абстракция вычислительного бэкенда: PythonRef ⇄ Eng6Probe
 │   │                           ⇄ Eng6PlanService; паспорт с отпечатками обоих путей (UNIF-04)
 │   ├── xverify.py              стенд кросс-верификации XVER, двухстадийный протокол
-│   │                           RAW→ALIGNED, 117 точек (UNIF-02, закрывает P0 ARC-002)
+│   │                           RAW→ALIGNED, 147 точек (UNIF-02, закрывает P0 ARC-002)
 │   ├── datamodel_map.py        Прил. Г (19 сущностей) ⇄ контракт ENG6-PLAN, прямой и
 │   │                           обратный ход в плоские таблицы К-03 (UNIF-03)
 │   ├── plan_service.py         PLAN-01 в штатной CalcQueue платформы (ARC-003):
@@ -39,9 +39,10 @@ unified/
 │   ├── master_chain_sync.py    сшивка ТРЁХ журналов: мастер-цепочка платформы +
 │   │                           NDJSON контура + единый леджер → вердикт ANCHORED (UNIF-17)
 │   ├── scenario_export.py      обстановка платформы (objects COM/LINK/ORDER/ORG) →
-│   │                           контракт ENG6-PLAN; честные предупреждения CRS (UNIF-18)
-│   └── tests/                  42 теста: маппинг 8 + бэкенды 8 + БД 5 + аудит 5 +
-│                               live-сервис 7 + очередь live 4 + платформа live 5
+│   │                           контракт ENG6-PLAN; CRS: градусы + UTM через ГИС-ядро
+│   │                           линии A (round-trip 1e-6); честные пропуски (UNIF-18)
+│   └── tests/                  50 тестов: маппинг 8 + бэкенды 8 + БД 5 + аудит 5 +
+│                               экспорт 8 + live-сервис 7 + очередь live 4 + платформа live 5
 ├── ui/workspace.html           единое рабочее место (PoC, UNIF-14): платформа во фрейме +
 │                               модуль планирования по CORS, Canvas2D, экспорт К-03,
 │                               заготовка postMessage-контракта; NFR-02 скан PASS
@@ -75,8 +76,8 @@ docker compose -f deploy/docker-compose.unified.yml up -d --build
 #    platform → http://localhost:8470 · engine → :8080 · grafana → :3000 · prometheus → :9090
 
 # 3. Проверки единой программы (всё stdlib/zero-deps)
-cd bridge && python3 -m unittest discover -s tests -p "test_*.py"   # 42/42 (live-тесты сами поднимают оба сервера)
-python3 xverify.py                                                   # XVER 133 точки → protocols/
+cd bridge && python3 -m unittest discover -s tests -p "test_*.py"   # 50/50 (live-тесты сами поднимают оба сервера)
+python3 xverify.py                                                   # XVER 147 точек → protocols/
 cd ../scripts && python3 demo_e2e.py                                 # E2E 7 шагов → protocols/
 cd ../rtm && python3 build_unified_rtm.py                            # RTM 178 → rtm/artifacts/
 python3 build_unified_manifest.py                                    # манифест поставки → rtm/artifacts/
@@ -97,11 +98,11 @@ cd ../bridge && python3 scenario_export.py --platform-url http://127.0.0.1:8470 
 | Линия B: 125 тестов + conformance 16/16 + selfcheck 21/21 | ✅ (sha256 вендора совпал) |
 | Линия B: `npm run smoke` после фикса UNIF-09 | ✅ planner + api целиком |
 | Линия B: bench quick (10⁴ узлов, burst 40×2000) | ✅ PASS, 61 с |
-| Мост: 42 теста (маппинг 8, бэкенды 8, БД 5, аудит 5, live-сервис 7, очередь live 4, платформа live 5) | ✅ 42/42 |
-| **XVER / ARC-002** (133 точки, RAW→ALIGNED) | ✅ **ALIGNED PASS** (131 CONSISTENT, 0 FAIL, 2 EXCLUDED; FSPL/Hata/kTB/J(v) — Δ=0.0) |
+| Мост: 50 тестов (маппинг 8, бэкенды 8, БД 5, аудит 5, экспорт 8, live-сервис 7, очередь live 4, платформа live 5) | ✅ 50/50 |
+| **XVER / ARC-002** (147 точек, RAW→ALIGNED) | ✅ **ALIGNED PASS** (145 CONSISTENT, 0 FAIL, 2 EXCLUDED; FSPL/Hata/kTB/J(v) — Δ=0.0; NET-01⇄FIBER — параметризация согласована) |
 | **E2E UNIF-05** (7 шагов) | ✅ **PASS** (план PARTIAL/C — честный отказ red-технике, детерминизм ok) |
 | **PLAN-01 в очереди платформы** (UNIF-11, live) | ✅ паспорт с двумя бэкендами, БД+верификация, якорь аудита matched≥1 |
-| **Сшивка трёх журналов** (UNIF-17, live) | ✅ **ANCHORED**: мастер-цепочка платформы + NDJSON контура + единый леджер; RBAC 403-проверки (OBS-07) |
+| **Сшивка трёх журналов** (UNIF-17, live) | ✅ **ANCHORED**, встроена в продуктивный цикл PLAN-01 (авто-якорь); RBAC 403-проверки (OBS-07) |
 | **Экспорт обстановки платформы** (UNIF-18, live) | ✅ objects → сценарий → план PARTIAL (red-техника отклонена) |
 | Единый RTM | ✅ 178 требований: 118 подтверждено, 47 стенд/данные, 2 ждут стенда |
 | Единый манифест поставки (UNIF-16) | ✅ COMPLETE: A 17/18 целы (1 — «без хэш-контроля» честно), B 13/13 + вендор, C 32/32 |

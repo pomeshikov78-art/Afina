@@ -68,6 +68,44 @@ def _attrs(row: Dict[str, Any]) -> Dict[str, Any]:
     return a if isinstance(a, dict) else {}
 
 
+_UTM_RE = __import__("re").compile(r"^UTM[-_ ]?(\d{1,2})([NS]?)$")
+
+
+def _to_wgs84(x: Any, y: Any, attrs: Dict[str, Any], oid: str,
+              warnings: List[str], conversions: List[str]):
+    """Координаты объекта → (lat, lng) в градусах WGS-84 либо None (честный пропуск).
+
+    Случаи:
+      * |x|≤180 и |y|≤90 — градусы WGS-84 (как есть);
+      * иначе attrs.crs = «UTM-<зона><N|S>» — метры UTM; пересчёт штатным
+        ГИС-ядром линии A (afina.gis.crs.utm_to_latlon, Snyder/итеративное
+        обращение) — фиксируется в conversions;
+      * иначе — пропуск с предупреждением (CRS не объявлен: молчаливая
+        интерпретация метров как градусов запрещена, ENG-004/AUT-001).
+    """
+    x, y = float(x), float(y)
+    if abs(x) <= 180.0 and abs(y) <= 90.0:
+        return y, x
+    crs = str(attrs.get("crs") or "").strip().upper()
+    m = _UTM_RE.match(crs)
+    if m:
+        from afina.gis.crs import utm_to_latlon   # ГИС-ядро линии A (импорт, не правка)
+        zone = int(m.group(1))
+        north = (m.group(2) or "N") != "S"
+        ll = utm_to_latlon(x, y, zone, north)
+        lat, lng = float(ll["lat"]), float(ll["lon"])
+        if -90.0 <= lat <= 90.0 and -180.0 <= lng <= 180.0:
+            conversions.append(f"COM/{oid}: {crs} ({x}, {y}) → WGS-84 ({lat:.6f}, {lng:.6f}) "
+                               f"[{ll.get('operation', 'utm_to_latlon')}]")
+            return lat, lng
+        warnings.append(f"COM/{oid}: UTM-пересчёт дал координаты вне WGS-84 — объект пропущен")
+        return None
+    warnings.append(f"COM/{oid}: координаты ({x}, {y}) не в градусах WGS-84 и attrs.crs "
+                    f"не объявлен («UTM-<зона><N|S>») — объект пропущен; молчаливая "
+                    f"интерпретация единиц запрещена (ENG-004)")
+    return None
+
+
 def export_entities(client: PlatformClient, project: Optional[str] = None) -> Dict[str, Any]:
     """Объекты платформы → сущности Прил. Г (assets/geo/relations/orders/org_units)."""
     rows = client.list_objects()
@@ -79,6 +117,7 @@ def export_entities(client: PlatformClient, project: Optional[str] = None) -> Di
     orders: List[Dict[str, Any]] = []
     org_units: Dict[str, Dict[str, Any]] = {}
     warnings: List[str] = []
+    conversions: List[str] = []
 
     for r in rows:
         cls = (r.get("class") or "").upper()
@@ -94,12 +133,11 @@ def export_entities(client: PlatformClient, project: Optional[str] = None) -> Di
             if x is None or y is None:
                 warnings.append(f"COM/{oid}: нет координат — пропущен")
                 continue
-            if abs(float(x)) > 180.0 or abs(float(y)) > 90.0:
-                warnings.append(f"COM/{oid}: координаты ({x},{y}) не в градусах WGS-84 "
-                                f"(CRS проекта в метрах?) — объект пропущен; требуется "
-                                f"пересчёт на стороне платформы (AUT-001)")
+            ll = _to_wgs84(x, y, a, oid, warnings, conversions)
+            if ll is None:
                 continue
-            node = {"id": oid, "lat": float(y), "lng": float(x),
+            lat, lng = ll
+            node = {"id": oid, "lat": lat, "lng": lng,
                     "type": a.get("node_type") or "radio",
                     "name": r.get("name") or oid}
             if a.get("org_unit"):
@@ -146,7 +184,8 @@ def export_entities(client: PlatformClient, project: Optional[str] = None) -> Di
             warnings.append(f"{cls}/{oid}: класс не участвует в планировании — пропущен")
 
     return {"assets": list(assets.values()), "geo_objects": geo, "relations": rels,
-            "orders": orders, "org_units": org_units or None, "warnings": warnings}
+            "orders": orders, "org_units": org_units or None, "warnings": warnings,
+            "conversions": conversions}
 
 
 def export_request(client: PlatformClient, project: Optional[str] = None,
@@ -163,6 +202,7 @@ def export_request(client: PlatformClient, project: Optional[str] = None,
         meta=meta or {"name": f"Экспорт обстановки платформы {time.strftime('%Y-%m-%d %H:%M:%S')}",
                       "author": "scenario_export"})
     return {"entities": ent, "request": request, "warnings": ent["warnings"],
+            "conversions": ent.get("conversions", []),
             "counts": {"assets": len(ent["assets"]), "nodes": len(ent["geo_objects"]),
                        "links": len(ent["relations"]), "demands": len(ent["orders"])}}
 
