@@ -1,0 +1,84 @@
+# unified/deploy/docker-compose.unified.yml — единое развёртывание совмещённой платформы.
+#
+#   docker compose -f unified/deploy/docker-compose.unified.yml up -d --build
+#
+# Состав: platform («Афина», Python, :8470) + engine (ENG6-PLAN, Node, :8080)
+#         + Prometheus (:9090) + Grafana (:3000).
+# Оба приложения zero-dependency; режим Б (Air-Gap) — перенос образов/бандлов
+# по регламенту AUT-T07 (манифест sha256).
+#
+# ВНИМАНИЕ (NFR линии B): production-конфигурация engine без TLS не запускается
+# (fail-fast). Для демонстрации оставлен ENG6_ENV=development; в контуре
+# заказчика — TLS на ingress и ENG6_ENV=production.
+
+name: afina-unified
+
+services:
+  engine:
+    build:
+      context: ../..
+      dockerfile: eng6-service/deploy/Dockerfile
+    image: afina/eng6-plan:1.0.0
+    environment:
+      ENG6_ENV: development          # в проде: production + TLS (см. warning выше)
+      ENG6_PORT: "8080"
+      ENG6_WORKERS: "2"
+      ENG6_MAX_QUEUE: "64"
+    ports:
+      - "8080:8080"
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/readyz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    deploy:
+      resources:
+        limits: {memory: 1G, cpus: "2"}
+
+  platform:
+    build:
+      context: ../..
+      dockerfile: unified/deploy/Dockerfile.platform
+    image: afina/platform:1.0.0
+    environment:
+      AFINA_ENG6_URL: http://engine:8080   # мост unified/bridge (UNIF-01)
+    ports:
+      - "8470:8470"
+    volumes:
+      - afina-data:/data
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    depends_on:
+      engine:
+        condition: service_healthy
+
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    volumes:
+      - ./prometheus.unified.yml:/etc/prometheus/prometheus.yml:ro
+      - ../../eng6-service/deploy/prometheus/rules:/etc/prometheus/rules:ro
+    ports:
+      - "9090:9090"
+    depends_on: [engine]
+
+  grafana:
+    image: grafana/grafana:10.4.5
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: afina-demo   # в контуре заказчика — секрет из хранилища
+    volumes:
+      - ../../eng6-service/deploy/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ../../eng6-service/deploy/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "3000:3000"
+    depends_on: [prometheus]
+
+volumes:
+  afina-data:

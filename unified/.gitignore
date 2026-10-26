@@ -1,0 +1,7 @@
+# Служебные файлы стека и кэш — не в git
+var/
+__pycache__/
+*.pyc
+*.db
+*.db-journal
+node_modules/

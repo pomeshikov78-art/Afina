@@ -1,0 +1,884 @@
+{
+ "document": "ПРОТОКОЛ ARC-002 — сверка двух вычислительных путей (XVER)",
+ "protocol_version": "1.0.0",
+ "generated_at": "2026-10-26 03:34:10",
+ "requirement": {
+  "id": "ARC-002",
+  "priority": "P0",
+  "criteria": "Один расчёт воспроизведён на двух типах вычислительного пути в пределах допуска"
+ },
+ "path_a": {
+  "backend": "ENG6+-Python-reference",
+  "version": "1.0.0",
+  "sha256": "c37c1176baa4a55894493681c18c52c55cb3931941529d7ce0d3064019bc52b7",
+  "path": "afina/eng6 (RF-01…09)",
+  "runtime": "python 3.11.2"
+ },
+ "path_b": {
+  "backend": "ENG6-JS-vendor-probe",
+  "version": "5.1.0",
+  "sha256": "adb610c9eee1ca17b257cbc6087e2278fdde3eef92f3b6a360cfb51968d48b20",
+  "vendor_bytes": 819007,
+  "prop_primitives": 15,
+  "runtime": "node (изолированный V8-контекст)"
+ },
+ "grid_points": 56,
+ "tolerances_db": {
+  "FSPL": 0.05,
+  "OKUMURA_HATA": 0.5,
+  "COST231_HATA": 0.5
+ },
+ "summary": {
+  "consistent": 47,
+  "degraded": 9,
+  "failed": 0,
+  "max_delta_db_by_model": {
+   "OKUMURA_HATA": 0.0,
+   "COST231_HATA": 3.0,
+   "FSPL": 0.0
+  }
+ },
+ "verdict": "DEGRADED",
+ "rows": [
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 150.0,
+    "d_km": 1.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 81.582702,
+   "b_db": 81.582702,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 150.0,
+    "d_km": 1.0,
+    "h_bs_m": 50.0,
+    "h_ms_m": 6.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 71.741951,
+   "b_db": 71.741951,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 150.0,
+    "d_km": 5.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 106.20382,
+   "b_db": 106.20382,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 150.0,
+    "d_km": 5.0,
+    "h_bs_m": 50.0,
+    "h_ms_m": 6.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 95.347389,
+   "b_db": 95.347389,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 150.0,
+    "d_km": 12.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 119.596706,
+   "b_db": 119.596706,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 150.0,
+    "d_km": 12.0,
+    "h_bs_m": 50.0,
+    "h_ms_m": 6.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 108.187786,
+   "b_db": 108.187786,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 150.0,
+    "d_km": 20.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 127.411296,
+   "b_db": 127.411296,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 150.0,
+    "d_km": 20.0,
+    "h_bs_m": 50.0,
+    "h_ms_m": 6.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 115.680006,
+   "b_db": 115.680006,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 450.0,
+    "d_km": 1.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 91.490568,
+   "b_db": 91.490568,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 450.0,
+    "d_km": 1.0,
+    "h_bs_m": 50.0,
+    "h_ms_m": 6.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 79.550483,
+   "b_db": 79.550483,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 450.0,
+    "d_km": 5.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 116.111685,
+   "b_db": 116.111685,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 450.0,
+    "d_km": 5.0,
+    "h_bs_m": 50.0,
+    "h_ms_m": 6.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 103.155921,
+   "b_db": 103.155921,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 450.0,
+    "d_km": 12.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 129.504572,
+   "b_db": 129.504572,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 450.0,
+    "d_km": 12.0,
+    "h_bs_m": 50.0,
+    "h_ms_m": 6.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 115.996318,
+   "b_db": 115.996318,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 450.0,
+    "d_km": 20.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 137.319162,
+   "b_db": 137.319162,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 450.0,
+    "d_km": 20.0,
+    "h_bs_m": 50.0,
+    "h_ms_m": 6.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 123.488538,
+   "b_db": 123.488538,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 900.0,
+    "d_km": 1.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 96.622035,
+   "b_db": 96.622035,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 900.0,
+    "d_km": 1.0,
+    "h_bs_m": 50.0,
+    "h_ms_m": 6.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 83.357418,
+   "b_db": 83.357418,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 900.0,
+    "d_km": 5.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 121.243153,
+   "b_db": 121.243153,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 900.0,
+    "d_km": 5.0,
+    "h_bs_m": 50.0,
+    "h_ms_m": 6.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 106.962856,
+   "b_db": 106.962856,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 900.0,
+    "d_km": 12.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 134.636039,
+   "b_db": 134.636039,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 900.0,
+    "d_km": 12.0,
+    "h_bs_m": 50.0,
+    "h_ms_m": 6.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 119.803254,
+   "b_db": 119.803254,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 900.0,
+    "d_km": 20.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 142.450629,
+   "b_db": 142.450629,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 900.0,
+    "d_km": 20.0,
+    "h_bs_m": 50.0,
+    "h_ms_m": 6.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 127.295473,
+   "b_db": 127.295473,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 1500.0,
+    "d_km": 1.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 99.84927,
+   "b_db": 99.84927,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 1500.0,
+    "d_km": 1.0,
+    "h_bs_m": 50.0,
+    "h_ms_m": 6.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 85.608519,
+   "b_db": 85.608519,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 1500.0,
+    "d_km": 5.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 124.470387,
+   "b_db": 124.470387,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 1500.0,
+    "d_km": 5.0,
+    "h_bs_m": 50.0,
+    "h_ms_m": 6.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 109.213956,
+   "b_db": 109.213956,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 1500.0,
+    "d_km": 12.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 137.863274,
+   "b_db": 137.863274,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 1500.0,
+    "d_km": 12.0,
+    "h_bs_m": 50.0,
+    "h_ms_m": 6.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 122.054354,
+   "b_db": 122.054354,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 1500.0,
+    "d_km": 20.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 145.677864,
+   "b_db": 145.677864,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "OKUMURA_HATA",
+    "f_mhz": 1500.0,
+    "d_km": 20.0,
+    "h_bs_m": 50.0,
+    "h_ms_m": 6.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 129.546574,
+   "b_db": 129.546574,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "COST231_HATA",
+    "f_mhz": 1500.0,
+    "d_km": 1.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "urban"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 132.12298,
+   "b_db": 135.12298,
+   "delta_db": 3.0,
+   "verdict": "DEGRADED"
+  },
+  {
+   "point": {
+    "model": "COST231_HATA",
+    "f_mhz": 1500.0,
+    "d_km": 5.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "urban"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 156.744097,
+   "b_db": 159.744097,
+   "delta_db": 3.0,
+   "verdict": "DEGRADED"
+  },
+  {
+   "point": {
+    "model": "COST231_HATA",
+    "f_mhz": 1500.0,
+    "d_km": 15.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "urban"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 173.550625,
+   "b_db": 176.550625,
+   "delta_db": 3.0,
+   "verdict": "DEGRADED"
+  },
+  {
+   "point": {
+    "model": "COST231_HATA",
+    "f_mhz": 1800.0,
+    "d_km": 1.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "urban"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 134.756548,
+   "b_db": 137.756548,
+   "delta_db": 3.0,
+   "verdict": "DEGRADED"
+  },
+  {
+   "point": {
+    "model": "COST231_HATA",
+    "f_mhz": 1800.0,
+    "d_km": 5.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "urban"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 159.377665,
+   "b_db": 162.377665,
+   "delta_db": 3.0,
+   "verdict": "DEGRADED"
+  },
+  {
+   "point": {
+    "model": "COST231_HATA",
+    "f_mhz": 1800.0,
+    "d_km": 15.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "urban"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 176.184193,
+   "b_db": 179.184193,
+   "delta_db": 3.0,
+   "verdict": "DEGRADED"
+  },
+  {
+   "point": {
+    "model": "COST231_HATA",
+    "f_mhz": 2000.0,
+    "d_km": 1.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "urban"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 136.278442,
+   "b_db": 139.278442,
+   "delta_db": 3.0,
+   "verdict": "DEGRADED"
+  },
+  {
+   "point": {
+    "model": "COST231_HATA",
+    "f_mhz": 2000.0,
+    "d_km": 5.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "urban"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 160.89956,
+   "b_db": 163.89956,
+   "delta_db": 3.0,
+   "verdict": "DEGRADED"
+  },
+  {
+   "point": {
+    "model": "COST231_HATA",
+    "f_mhz": 2000.0,
+    "d_km": 15.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "urban"
+   },
+   "tolerance_db": 0.5,
+   "a_db": 177.706087,
+   "b_db": 180.706087,
+   "delta_db": 3.0,
+   "verdict": "DEGRADED"
+  },
+  {
+   "point": {
+    "model": "FSPL",
+    "f_mhz": 30.0,
+    "d_km": 0.5,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.05,
+   "a_db": 55.961825,
+   "b_db": 55.961825,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "FSPL",
+    "f_mhz": 30.0,
+    "d_km": 5.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.05,
+   "a_db": 75.961825,
+   "b_db": 75.961825,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "FSPL",
+    "f_mhz": 30.0,
+    "d_km": 50.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.05,
+   "a_db": 95.961825,
+   "b_db": 95.961825,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "FSPL",
+    "f_mhz": 450.0,
+    "d_km": 0.5,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.05,
+   "a_db": 79.48365,
+   "b_db": 79.48365,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "FSPL",
+    "f_mhz": 450.0,
+    "d_km": 5.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.05,
+   "a_db": 99.48365,
+   "b_db": 99.48365,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "FSPL",
+    "f_mhz": 450.0,
+    "d_km": 50.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.05,
+   "a_db": 119.48365,
+   "b_db": 119.48365,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "FSPL",
+    "f_mhz": 900.0,
+    "d_km": 0.5,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.05,
+   "a_db": 85.50425,
+   "b_db": 85.50425,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "FSPL",
+    "f_mhz": 900.0,
+    "d_km": 5.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.05,
+   "a_db": 105.50425,
+   "b_db": 105.50425,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "FSPL",
+    "f_mhz": 900.0,
+    "d_km": 50.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.05,
+   "a_db": 125.50425,
+   "b_db": 125.50425,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "FSPL",
+    "f_mhz": 2400.0,
+    "d_km": 0.5,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.05,
+   "a_db": 94.023625,
+   "b_db": 94.023625,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "FSPL",
+    "f_mhz": 2400.0,
+    "d_km": 5.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.05,
+   "a_db": 114.023625,
+   "b_db": 114.023625,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "FSPL",
+    "f_mhz": 2400.0,
+    "d_km": 50.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.05,
+   "a_db": 134.023625,
+   "b_db": 134.023625,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "FSPL",
+    "f_mhz": 5800.0,
+    "d_km": 0.5,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.05,
+   "a_db": 101.68796,
+   "b_db": 101.68796,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "FSPL",
+    "f_mhz": 5800.0,
+    "d_km": 5.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.05,
+   "a_db": 121.68796,
+   "b_db": 121.68796,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  },
+  {
+   "point": {
+    "model": "FSPL",
+    "f_mhz": 5800.0,
+    "d_km": 50.0,
+    "h_bs_m": 30.0,
+    "h_ms_m": 2.0,
+    "env": "open"
+   },
+   "tolerance_db": 0.05,
+   "a_db": 141.68796,
+   "b_db": 141.68796,
+   "delta_db": 0.0,
+   "verdict": "CONSISTENT"
+  }
+ ]
+}

@@ -1,0 +1,509 @@
+{
+ "meta": {
+  "profile": "quick",
+  "at": "2026-10-26T02:43:52.879Z",
+  "node": "v20.20.2",
+  "platform": "linux x64",
+  "cpus": 2,
+  "argv": [
+   "--profile=quick"
+  ],
+  "engine": {
+   "version": "5.1.0",
+   "sha256": "adb610c9eee1ca17b257cbc6087e2278fdde3eef92f3b6a360cfb51968d48b20"
+  }
+ },
+ "core": [
+  {
+   "n": 100,
+   "statusReasons": [
+    {
+     "code": "DEMANDS_PARTIAL",
+     "message": "Частично удовлетворено заявок: 1",
+     "count": 1
+    },
+    {
+     "code": "SPOF_PRESENT",
+     "message": "Единых точек отказа: 10 узл., 12 лин."
+    },
+    {
+     "code": "HIGH_UTILIZATION",
+     "message": "Утилизация каналов до 100% — выше порога 85%"
+    }
+   ],
+   "links": 354,
+   "demands": 2,
+   "status": "PARTIAL",
+   "totalMs": 32.3,
+   "phases": {
+    "validate": 3.306,
+    "fleet": 11.147,
+    "physics": 3.901,
+    "graph": 0.583,
+    "backbone": 1.485,
+    "routing": 1.602,
+    "improve": 0.491,
+    "redundancy": 0.506,
+    "survivability": 1.627,
+    "schedule": 1.646,
+    "metrics": 2.152
+   },
+   "metrics": {
+    "linksFeasible": 354,
+    "linksActive": 15,
+    "demandsSatisfied": 1,
+    "demandsRejected": 0,
+    "throughputKbps": 64.69,
+    "utilMaxPct": 100,
+    "connectivityPct": 67.5,
+    "totalCost": 318,
+    "grade": "D",
+    "objectiveValue": 0.53407
+   },
+   "memBefore": {
+    "rssMb": 58.1,
+    "heapMb": 7.4,
+    "externalMb": 2,
+    "heapTotalMb": 16.2
+   },
+   "memAfter": {
+    "rssMb": 61.2,
+    "heapMb": 10.8,
+    "externalMb": 2.1,
+    "heapTotalMb": 17.1
+   },
+   "memDeltaMb": 3.1,
+   "responseBytes": 26577,
+   "physicsMode": "fast"
+  },
+  {
+   "n": 1000,
+   "statusReasons": [
+    {
+     "code": "DEMANDS_REJECTED",
+     "message": "Отклонено заявок: 6 из 20",
+     "count": 6
+    },
+    {
+     "code": "DEMANDS_PARTIAL",
+     "message": "Частично удовлетворено заявок: 5",
+     "count": 5
+    },
+    {
+     "code": "SPOF_PRESENT",
+     "message": "Единых точек отказа: 99 узл., 105 лин."
+    },
+    {
+     "code": "HIGH_UTILIZATION",
+     "message": "Утилизация каналов до 100% — выше порога 85%"
+    }
+   ],
+   "links": 3565,
+   "demands": 20,
+   "status": "PARTIAL",
+   "totalMs": 200.1,
+   "phases": {
+    "validate": 12.762,
+    "fleet": 8.229,
+    "physics": 65.432,
+    "graph": 2.228,
+    "backbone": 22.381,
+    "routing": 16.159,
+    "improve": 0.097,
+    "redundancy": 47.889,
+    "survivability": 15.865,
+    "schedule": 3.657,
+    "metrics": 1.946
+   },
+   "metrics": {
+    "linksFeasible": 3563,
+    "linksActive": 376,
+    "demandsSatisfied": 9,
+    "demandsRejected": 6,
+    "throughputKbps": 337.86,
+    "utilMaxPct": 100,
+    "connectivityPct": 97.117,
+    "totalCost": 4322,
+    "grade": "D",
+    "objectiveValue": 0.54511
+   },
+   "memBefore": {
+    "rssMb": 68.5,
+    "heapMb": 8.7,
+    "externalMb": 1.9,
+    "heapTotalMb": 17.3
+   },
+   "memAfter": {
+    "rssMb": 71.5,
+    "heapMb": 14.3,
+    "externalMb": 3.6,
+    "heapTotalMb": 19.3
+   },
+   "memDeltaMb": 3,
+   "responseBytes": 376578,
+   "physicsMode": "fast"
+  },
+  {
+   "n": 5000,
+   "statusReasons": [
+    {
+     "code": "DEMANDS_REJECTED",
+     "message": "Отклонено заявок: 47 из 100",
+     "count": 47
+    },
+    {
+     "code": "DEMANDS_PARTIAL",
+     "message": "Частично удовлетворено заявок: 32",
+     "count": 32
+    },
+    {
+     "code": "SPOF_PRESENT",
+     "message": "Единых точек отказа: 693 узл., 770 лин."
+    },
+    {
+     "code": "HIGH_UTILIZATION",
+     "message": "Утилизация каналов до 100% — выше порога 85%"
+    }
+   ],
+   "links": 17702,
+   "demands": 100,
+   "status": "PARTIAL",
+   "totalMs": 672.5,
+   "phases": {
+    "validate": 105.963,
+    "fleet": 12.278,
+    "physics": 143.017,
+    "graph": 17.45,
+    "backbone": 17.275,
+    "routing": 213.058,
+    "improve": 0.187,
+    "redundancy": 53.875,
+    "survivability": 21.983,
+    "schedule": 66.615,
+    "metrics": 4.513
+   },
+   "metrics": {
+    "linksFeasible": 17702,
+    "linksActive": 1237,
+    "demandsSatisfied": 21,
+    "demandsRejected": 47,
+    "throughputKbps": 1462.14,
+    "utilMaxPct": 100,
+    "connectivityPct": 88.074,
+    "totalCost": 15618,
+    "grade": "D",
+    "objectiveValue": 0.52153
+   },
+   "memBefore": {
+    "rssMb": 76.7,
+    "heapMb": 11.5,
+    "externalMb": 2,
+    "heapTotalMb": 22.2
+   },
+   "memAfter": {
+    "rssMb": 89.7,
+    "heapMb": 18.6,
+    "externalMb": 8.3,
+    "heapTotalMb": 27.2
+   },
+   "memDeltaMb": 13,
+   "responseBytes": 1168084,
+   "physicsMode": "fast"
+  },
+  {
+   "n": 10000,
+   "statusReasons": [
+    {
+     "code": "DEMANDS_REJECTED",
+     "message": "Отклонено заявок: 88 из 200",
+     "count": 88
+    },
+    {
+     "code": "DEMANDS_PARTIAL",
+     "message": "Частично удовлетворено заявок: 39",
+     "count": 39
+    },
+    {
+     "code": "SPOF_PRESENT",
+     "message": "Единых точек отказа: 1697 узл., 1893 лин."
+    },
+    {
+     "code": "HIGH_UTILIZATION",
+     "message": "Утилизация каналов до 100% — выше порога 85%"
+    }
+   ],
+   "links": 35320,
+   "demands": 200,
+   "status": "PARTIAL",
+   "totalMs": 1143.7,
+   "phases": {
+    "validate": 185.526,
+    "fleet": 48.057,
+    "physics": 222.707,
+    "graph": 44.504,
+    "backbone": 38.376,
+    "routing": 338.943,
+    "improve": 0.171,
+    "redundancy": 37.932,
+    "survivability": 28.413,
+    "schedule": 78.04,
+    "metrics": 26.067
+   },
+   "metrics": {
+    "linksFeasible": 35320,
+    "linksActive": 2364,
+    "demandsSatisfied": 73,
+    "demandsRejected": 88,
+    "throughputKbps": 2452.59,
+    "utilMaxPct": 100,
+    "connectivityPct": 86.92,
+    "totalCost": 27890,
+    "grade": "D",
+    "objectiveValue": 0.53591
+   },
+   "memBefore": {
+    "rssMb": 94.3,
+    "heapMb": 15.2,
+    "externalMb": 2.1,
+    "heapTotalMb": 29
+   },
+   "memAfter": {
+    "rssMb": 107.4,
+    "heapMb": 29.7,
+    "externalMb": 13.2,
+    "heapTotalMb": 35.6
+   },
+   "memDeltaMb": 13.1,
+   "responseBytes": 2106464,
+   "physicsMode": "fast"
+  }
+ ],
+ "api": [
+  {
+   "mode": "sync",
+   "nodes": 1000,
+   "requestBytes": 580461,
+   "sent": 96,
+   "wallS": 12.9,
+   "rps": 7.47,
+   "codes": {
+    "200": 38,
+    "429": 58
+   },
+   "latencyMs": {
+    "p50": 1120.5,
+    "p90": 3539.12,
+    "p95": 3829.65,
+    "p99": 4426.63,
+    "min": 337.03,
+    "max": 4426.63,
+    "avg": 1432.4
+   },
+   "serverComputeMs": {
+    "p50": 126.2,
+    "p95": 357.18,
+    "max": 524.62
+   },
+   "serverQueueMs": {
+    "p50": 336.86,
+    "p95": 830.51,
+    "max": 1216.93
+   },
+   "pool": {
+    "workers": 2,
+    "busy": 0,
+    "idle": 2,
+    "ready": 2,
+    "queueLength": 0,
+    "maxQueue": 512,
+    "pending": 0,
+    "workerHeapMb": 264,
+    "stats": {
+     "submitted": 39,
+     "completed": 39,
+     "failed": 0,
+     "timedOut": 0,
+     "rejectedQueueFull": 0,
+     "workerRestarts": 0,
+     "oom": 0
+    },
+    "cpus": 2,
+    "totalMemMb": 1058,
+    "freeMemMb": 517
+   },
+   "memory": {
+    "rssBytes": 297472000,
+    "heapBytes": 19695072,
+    "uptimeS": 13.705,
+    "loadavg": [
+     0.7,
+     0.21,
+     0.07
+    ]
+   }
+  },
+  {
+   "mode": "sync-small",
+   "nodes": 7,
+   "requestBytes": 3370,
+   "sent": 240,
+   "wallS": 10,
+   "rps": 24,
+   "codes": {
+    "200": 240
+   },
+   "latencyMs": {
+    "p50": 7.14,
+    "p95": 10.53,
+    "p99": 14.98,
+    "max": 18.08
+   },
+   "serverComputeMs": {
+    "p50": 2.93,
+    "p95": 4.3,
+    "max": 13.79
+   }
+  },
+  {
+   "mode": "async",
+   "nodes": 1000,
+   "submitted": 12,
+   "accepted": 12,
+   "rejected429": 0,
+   "states": {
+    "SUCCEEDED": 12
+   },
+   "e2eMs": {
+    "p50": 3.3,
+    "p95": 596.87,
+    "max": 596.87
+   },
+   "queueWaitMs": {
+    "p50": 595.22,
+    "max": 721.72
+   },
+   "computeMs": {
+    "p50": 161.98,
+    "max": 216.74
+   },
+   "wallS": 2.2
+  }
+ ],
+ "burst": [
+  {
+   "nodes": 2000,
+   "workers": 2,
+   "maxQueue": 16,
+   "concurrency": 40,
+   "asyncCodes": {
+    "202": 28,
+    "429": 12
+   },
+   "asyncCodes2": {
+    "202": 34,
+    "429": 6
+   },
+   "syncCodes": {
+    "200": 2,
+    "429": 28
+   },
+   "junkCodes": [
+    422,
+    422,
+    422
+   ],
+   "accepted": 28,
+   "rejected429": 12,
+   "drained": [
+    {
+     "id": "plan_mvonl50k_koyo_g",
+     "state": "SUCCEEDED",
+     "status": "PARTIAL",
+     "computeMs": 321.39,
+     "queueWaitMs": 5777.61
+    },
+    {
+     "id": "plan_mvonl5b8_h4h3_i",
+     "state": "SUCCEEDED",
+     "status": "PARTIAL",
+     "computeMs": 259.72,
+     "queueWaitMs": 5732.28
+    },
+    {
+     "id": "plan_mvonl4uo_hjjr_f",
+     "state": "SUCCEEDED",
+     "status": "PARTIAL",
+     "computeMs": 277.52,
+     "queueWaitMs": 5895.48
+    },
+    {
+     "id": "plan_mvonl5ws_injg_k",
+     "state": "SUCCEEDED",
+     "status": "PARTIAL",
+     "computeMs": 187.34,
+     "queueWaitMs": 5229.66
+    },
+    {
+     "id": "plan_mvonl5gk_a9wd_j",
+     "state": "SUCCEEDED",
+     "status": "PARTIAL",
+     "computeMs": 218.58,
+     "queueWaitMs": 5695.42
+    },
+    {
+     "id": "plan_mvonl7ry_c593_s",
+     "state": "SUCCEEDED",
+     "status": "PARTIAL",
+     "computeMs": 215.85,
+     "queueWaitMs": 4120.15
+    }
+   ],
+   "healthAfter": {
+    "status": 200,
+    "readyz": 200,
+    "rssMb": 525.7,
+    "queueLength": 0,
+    "workerRestarts": 0,
+    "completed": 66,
+    "failed": 0,
+    "timedOut": 0
+   },
+   "verdict": "PASS"
+  }
+ ],
+ "summary": {
+  "wallS": 61.1,
+  "memFinal": {
+   "rssMb": 57.3,
+   "heapMb": 7.3,
+   "externalMb": 1.9,
+   "heapTotalMb": 8.4
+  },
+  "prometheusSample": {
+   "planTotal": [
+    "eng6_plan_total{mode=\"sync\",status=\"PARTIAL\"} 279",
+    "eng6_plan_total{mode=\"async\",status=\"PARTIAL\"} 12"
+   ],
+   "planDurationCount": [
+    "eng6_plan_duration_ms_count{mode=\"sync\"} 279",
+    "eng6_plan_duration_ms_count{mode=\"async\"} 12"
+   ],
+   "queueLength": [
+    "eng6_queue_length 0"
+   ],
+   "workersBusy": [
+    "eng6_workers_busy 0"
+   ],
+   "requestsTotal": [
+    "eng6_http_requests_total{code=\"200\",method=\"GET\",path=\"GET /api/v1/meta\"} 1",
+    "eng6_http_requests_total{code=\"200\",method=\"POST\",path=\"POST /api/v1/plan/sync\"} 279",
+    "eng6_http_requests_total{code=\"429\",method=\"POST\",path=\"POST /api/v1/plan/sync\"} 58",
+    "eng6_http_requests_total{code=\"200\",method=\"GET\",path=\"GET /healthz\"} 1"
+   ],
+   "memoryRss": [
+    "eng6_process_memory_rss_bytes 310231040"
+   ]
+  },
+  "isolated": true
+ }
+}

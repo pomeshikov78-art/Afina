@@ -1,0 +1,236 @@
+{
+ "document": "ПРОТОКОЛ UNIF-E2E — сквозной сценарий совмещённой платформы",
+ "generated_at": "2026-10-26 03:53:25",
+ "requirement": {
+  "id": "UNIF-08",
+  "criteria": "Сквозная цепочка: сущности платформы → ENG6-PLAN → таблицы платформы + паспорт + ARC-002"
+ },
+ "engine": {
+  "base_url": "http://127.0.0.1:43441",
+  "core_sha256": "adb610c9eee1ca17b257cbc6087e2278fdde3eef92f3b6a360cfb51968d48b20",
+  "conformance_ok": true
+ },
+ "passport": {
+  "run_id": "CALC-2026-D3DC34",
+  "function": "PLAN-01",
+  "model_id": "ENG6-PLAN",
+  "model_version": "1.1.0",
+  "mode": "Verification",
+  "level": "L2",
+  "inputs_hash": "41f545fa5fbaeb4107445271c819f16979efba33b89bf1c963c55dd919eb9c00",
+  "inputs_ref": {
+   "request_sha256": "6d2a80eff21d0157f7db17b037c593a79d78fa7195abf42068c393157dac0965",
+   "scenario": "батальонный рубеж (синтетика E2E)",
+   "nodes": 6
+  },
+  "crs": "WGS84",
+  "units": {},
+  "precision": {
+   "grid_m": null,
+   "tol": 1e-06
+  },
+  "environment": {
+   "python": "3.11.2",
+   "platform": "Linux-4.19.91-c8dfc93.al7.x86_64-x86_64-with-glibc2.36",
+   "backend": "ENG6-PLAN-service + ENG6-JS-vendor-probe",
+   "backends": "[{\"backend\": \"ENG6-PLAN-service\", \"version\": \"5.1.0\", \"sha256\": \"adb610c9eee1ca17b257cbc6087e2278fdde3eef92f3b6a360cfb51968d48b20\", \"service_version\": \"1.0.0\", \"endpoints\": 11}, {\"backend\": \"ENG6-JS-vendor-probe\", \"version\": \"5.1.0\", \"sha256\": \"adb610c9eee1ca17b257cbc6087e2278fdde3eef92f3b6a360cfb51968d48b20\", \"vendor_bytes\": 819007, \"prop_primitives\": 15, \"runtime\": \"node (изолированный V8-контекст)\"}]"
+  },
+  "started_at": 1792986805.5109665,
+  "finished_at": 1792986805.511362,
+  "status": "error",
+  "warnings": [
+   "warn/UNIT_DEGRADED",
+   "crit/UNIT_NOT_READY",
+   "crit/UNIT_NOT_READY",
+   "crit/ENG6_CROSSCHECK_REJECTED_BY_ENG6"
+  ],
+  "applicability": null,
+  "uncertainty_db": null,
+  "results_ref": "b8961a3503222dab205116c6e3ac9689e13a0219fffcd8a8ca9595fbc66f42e4",
+  "reproducibility": null,
+  "duration_s": 0.0,
+  "schema_version": "1.0"
+ },
+ "plan_summary": {
+  "status": "INFEASIBLE",
+  "metrics": {
+   "objectiveValue": 0.195,
+   "grade": "F",
+   "gradeByObjective": "B",
+   "gradeByService": "F",
+   "serviceLevelByCountPct": 0,
+   "serviceLevelByBandwidthPct": 0,
+   "nodesTotal": 6,
+   "nodesDeployed": 0,
+   "linksCandidate": 5,
+   "linksFeasible": 5,
+   "linksActive": 0,
+   "totalCost": 0,
+   "budget": 200,
+   "budgetUsedPct": 0,
+   "demandsTotal": 4,
+   "demandsSatisfied": 0,
+   "demandsPartial": 0,
+   "demandsRejected": 4,
+   "demandServedPct": 0,
+   "throughputKbps": 0,
+   "capacityTotalKbps": 0,
+   "loadTotalKbps": 0,
+   "utilMaxPct": 0,
+   "utilAvgPct": 0,
+   "avgDelayMs": 0,
+   "maxDelayMs": 0,
+   "delayViolations": 0,
+   "minAvailabilityPct": null,
+   "connectivityPct": 0,
+   "componentsCount": 0,
+   "candidateComponentsCount": 1,
+   "largestComponentPct": 0,
+   "spofNodes": 0,
+   "bridgeLinks": 0,
+   "minCutKbps": null,
+   "avgMarginDb": 0,
+   "minMarginDb": null,
+   "linksBelow10Db": 0,
+   "marginHistogram": {
+    "<0": 0,
+    "0-3": 0,
+    "3-10": 0,
+    "10-20": 0,
+    ">20": 0
+   },
+   "redundancyAdded": 0,
+   "scheduleMakespanMin": 0,
+   "scheduleWaves": 0,
+   "crewUtilPct": 0
+  },
+  "schedule": {
+   "makespanMin": 0,
+   "waves": 0
+  }
+ },
+ "steps": [
+  {
+   "step": 1,
+   "name": "контур готов",
+   "ok": true,
+   "base_url": "http://127.0.0.1:43441"
+  },
+  {
+   "step": 2,
+   "name": "конформанс-гейт К-04",
+   "ok": true,
+   "selfTest": 33,
+   "regression": 5
+  },
+  {
+   "step": 3,
+   "name": "маппинг Прил.Г → контракт ENG6-PLAN",
+   "ok": true,
+   "nodes": 6,
+   "links": 5,
+   "fleet": 6,
+   "demands": 4,
+   "request_sha256": "6d2a80eff21d0157f7db17b037c593a79d78fa7195abf42068c393157dac0965"
+  },
+  {
+   "step": 4,
+   "name": "расчёт plan/sync + NFR-04",
+   "ok": false,
+   "status": "INFEASIBLE",
+   "grade": "F",
+   "compute_ms": 21.4,
+   "deterministic": true,
+   "core_sha256": "adb610c9eee1ca17b257cbc6087e2278fdde3eef92f3b6a360cfb51968d48b20"
+  },
+  {
+   "step": 5,
+   "name": "обратный маппинг → таблицы платформы (К-03)",
+   "ok": true,
+   "tables": {
+    "route": 4,
+    "schedule_summary": 1,
+    "survivability": 1,
+    "metrics": 1,
+    "issues": 4,
+    "calc_run": 1
+   }
+  },
+  {
+   "step": 6,
+   "name": "паспорт запуска ENG-001",
+   "ok": false,
+   "run_id": "CALC-2026-D3DC34",
+   "duration_s": 0.0,
+   "backends": [
+    "ENG6-PLAN-service",
+    "ENG6-JS-vendor-probe"
+   ]
+  },
+  {
+   "step": 7,
+   "name": "кросс-верификация ARC-002 (RAW→ALIGNED)",
+   "ok": true,
+   "verdict": "PASS",
+   "points": 102,
+   "aligned": {
+    "consistent": 100,
+    "degraded": 0,
+    "failed": 0,
+    "excluded": 2,
+    "max_delta_by_model": {
+     "OKUMURA_HATA": 0.0,
+     "COST231_HATA": 0.0,
+     "FSPL": 0.0,
+     "FRESNEL_R1": 0.000928
+    }
+   }
+  }
+ ],
+ "xver_summary": {
+  "verdict": "PASS",
+  "raw": {
+   "consistent": 79,
+   "degraded": 23,
+   "failed": 0,
+   "excluded": 0,
+   "max_delta_by_model": {
+    "OKUMURA_HATA": 9.942608,
+    "COST231_HATA": 3.0,
+    "FSPL": 0.0,
+    "FRESNEL_R1": 968.378151
+   }
+  },
+  "aligned": {
+   "consistent": 100,
+   "degraded": 0,
+   "failed": 0,
+   "excluded": 2,
+   "max_delta_by_model": {
+    "OKUMURA_HATA": 0.0,
+    "COST231_HATA": 0.0,
+    "FSPL": 0.0,
+    "FRESNEL_R1": 0.000928
+   }
+  },
+  "alignments": {
+   "COST231_HATA": {
+    "id": "XVER-COST231-CM",
+    "note": "ENG6.PROP.cost231 при переданном env применяет CM=+3 дБ; Python-стороне явно передаётся cm_db=3.0 (измерено: Δ=+3.0 дБ на всех точках RAW)"
+   },
+   "FRESNEL_R1": {
+    "id": "XVER-FRESNEL",
+    "note": "ENG6.PROP.fresnelR возвращает значение в √1000 раз больше эталона RF-06 (смешение м/км в формуле вендора); после деления на √1000 совпадение точное"
+   }
+  },
+  "known_incompatible": [
+   {
+    "id": "XVER-HATA-SUBURBAN",
+    "reason": "ENG6.hata трактует suburban как urban; Python применяет стандартную поправку −2·lg²(f/28)−5.4 дБ. Вендор неизменяем (§9.3.1 Доп. №2). Для suburb при планировании через ENG6-JS применять env='urban' (консервативно) или поправку платформы.",
+    "model": "OKUMURA_HATA",
+    "env": "suburban"
+   }
+  ]
+ },
+ "verdict": "FAIL"
+}

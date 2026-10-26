@@ -1,0 +1,99 @@
+# unified/ci/unified-ci.yml — единый CI совмещённой платформы (UNIF-06).
+#
+# Включение: скопировать в .github/workflows/unified-ci.yml корня репозитория
+# (в песочнице разработки GitHub Actions недоступны — файл поставляется как
+# готовый артефакт; статус UNIF-06 в RTM — «скрипт готов; требует включения»).
+#
+# Матрица: Python 3.11 (линия A + мост) × Node 20 (линия B + вендор ENG6).
+# Протоколы (XVER/E2E/RTM) — артефакты сборки, в git не коммитятся из CI.
+
+name: unified-ci
+
+on:
+  push:
+    branches: [main, unified-platform]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  line-a-python:
+    name: Линия A · «Афина» (Python 3.11, 145 тестов)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Юнит-набор G1–G5
+        working-directory: afina/src
+        run: python -m unittest discover -s tests -p "test_*.py" -v 2>&1 | tail -5
+
+  line-b-node:
+    name: Линия B · ENG6-PLAN (Node 20, 125 тестов + conformance + selfcheck + smoke)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '20'}
+      - name: Зависимости (zero-deps; jsdom — devDependency смоука UI)
+        working-directory: eng6-service
+        run: npm install --no-audit --no-fund
+      - name: 125 тестов (unit + conformance)
+        working-directory: eng6-service
+        run: npm test
+      - name: Selfcheck (21 приёмочная проверка, sha256 вендора)
+        working-directory: eng6-service
+        run: npm run selfcheck
+      - name: Смоуки (planner + api) — после фикса UNIF-09
+        working-directory: eng6-service
+        run: npm run smoke
+      - name: Нагрузочный quick-профиль (core/api/burst)
+        working-directory: eng6-service
+        run: npm run bench
+
+  bridge-integration:
+    name: Мост · XVER + E2E + единый RTM (Python 3.11 × Node 20)
+    runs-on: ubuntu-latest
+    needs: [line-a-python, line-b-node]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - uses: actions/setup-node@v4
+        with: {node-version: '20'}
+      - name: Тесты моста (23: маппинг 16 + бэкенды 7… + интеграция с живым сервисом)
+        working-directory: unified/bridge
+        run: python -m unittest discover -s tests -p "test_*.py" -v
+      - name: Кросс-верификация ARC-002 (XVER, RAW→ALIGNED)
+        working-directory: unified/bridge
+        run: python xverify.py --out ../protocols
+      - name: Сквозной сценарий UNIF (платформа → ENG6-PLAN → таблицы + паспорт)
+        working-directory: unified/scripts
+        run: python demo_e2e.py
+      - name: Единый RTM (170 требований)
+        working-directory: unified/rtm
+        run: python build_unified_rtm.py
+      - name: Артефакты — протоколы и RTM
+        uses: actions/upload-artifact@v4
+        with:
+          name: unified-protocols
+          path: |
+            unified/protocols/
+            unified/rtm/out/
+          retention-days: 90
+
+  docker:
+    name: Сборка образов (engine: тесты внутри сборки; platform)
+    runs-on: ubuntu-latest
+    needs: [bridge-integration]
+    steps:
+      - uses: actions/checkout@v4
+      - name: engine (multi-stage, 125 тестов + конформанс внутри сборки)
+        run: docker build -f eng6-service/deploy/Dockerfile -t afina/eng6-plan:ci eng6-service
+      - name: platform (python:3.11-slim, non-root, healthcheck)
+        run: docker build -f unified/deploy/Dockerfile.platform -t afina/platform:ci .
+      - name: compose-конфигурация валидна
+        run: docker compose -f unified/deploy/docker-compose.unified.yml config --quiet

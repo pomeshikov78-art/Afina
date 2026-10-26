@@ -18,7 +18,7 @@ const show = (label, r) => {
     console.log('approx:', JSON.stringify(r.diagnostics.approximation));
     if (r.diagnostics.infeasibility) console.log('infeas:', JSON.stringify(r.diagnostics.infeasibility.causes), '\n  relax:', JSON.stringify(r.diagnostics.infeasibility.minimalRelaxations).slice(0, 600));
     if (r.diagnostics.eng6Analysis && !r.diagnostics.eng6Analysis.skipped) console.log('eng6 ratings:', JSON.stringify(r.diagnostics.eng6Analysis.ratings), 'network:', JSON.stringify(r.diagnostics.eng6Analysis.network));
-    else console.log('eng6:', JSON.stringify(r.diagnostics.eng6Analysis).slice(0, 200));
+    else console.log('eng6:', JSON.stringify(r.diagnostics.eng6Analysis ?? null).slice(0, 200));
   }
 };
 

@@ -1,0 +1,30 @@
+# unified/deploy/Dockerfile.platform — образ платформы «Афина» (линия A + мост).
+#
+# Zero-dependency: python:3.11-slim, stdlib-only код, внешних пакетов нет.
+# non-root, read-only root FS (том только /data), HEALTHCHECK по /healthz.
+FROM python:3.11-slim AS runtime
+
+RUN useradd --uid 1001 --create-home afina
+WORKDIR /app
+
+# код платформы (линия A) и мост совмещённой платформы
+COPY afina/src/afina /app/afina
+COPY afina/src/client /app/client
+COPY unified/bridge /app/unified/bridge
+
+# данные: реестр требований (Прил. А) и ТЗ — для ИИ-RAG и валидаторов
+COPY afina/data/Афина_Реестр_требований_ПриложениеА.json /app/data/requirements.json
+COPY afina/Афина_Техническое_задание.md /app/data/tz.md
+
+ENV PYTHONUNBUFFERED=1 \
+    AFINA_ENG6_URL=http://engine:8080
+RUN mkdir -p /data && chown -R afina:afina /app /data
+USER afina
+VOLUME /data
+EXPOSE 8470
+
+HEALTHCHECK --interval=15s --timeout=5s --start-period=10s --retries=3 \
+  CMD python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8470/healthz',timeout=4).status==200 else 1)"
+
+CMD ["python", "-m", "afina.server.app", "--db", "/data/afina.db", "--port", "8470", \
+     "--requirements", "/app/data/requirements.json", "--tz", "/app/data/tz.md"]
