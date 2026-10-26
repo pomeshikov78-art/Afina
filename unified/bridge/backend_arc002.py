@@ -86,6 +86,20 @@ PAIRED_MODELS: Dict[str, Dict[str, Any]] = {
     "FIBER_LOSS_DB": {"probe": "fiber_loss", "tol": 0.011, "unit": "дБ",
                       "note": "XVER-FIBER-PARAMS: согласование параметризации (connectors=2, "
                               "splices=⌊км/4⌋), а не физики; RAW показывает разницу дефолтных комплектов"},
+    # Композитный уровень: настоящий ENG6.calcLink (РРЛ, flat-рельеф, нулевые
+    # дождь/туман, open-clutter loss=0, misc=0, feeder=0). При f ≤ 900 МГц
+    # газопоглощение ENG6 равно 0 → остаётся только prop=FSPL, и связка
+    # «预算 Python RF-07 ⇄ calcLink» обязана совпасть до округления Python (2 знака).
+    # При f ≥ 1400 МГц проявляется честный зазор: RF-07 не моделирует поглощение
+    # в газах (OBS-11) — такие точки в сетку НЕ входят (не подгонка, а граница
+    # применимости пары; зазор измерен и задокументирован отдельно).
+    "CALC_LINK_PROP_DB": {"probe": "calc_link_prop", "tol": 0.01, "unit": "дБ",
+                          "note": "breakdown.prop calcLink (РРЛ/flat) ⇄ RF-01 FSPL"},
+    "CALC_LINK_RX_DBM": {"probe": "calc_link_rx", "tol": 0.011, "unit": "дБм",
+                         "note": "rxPowerDbm calcLink ⇄ RF-07 LinkBudget.rx_level_dbm; "
+                                 "допуск = округление бюджета Python до 2 знаков"},
+    "CALC_LINK_NOISE_DBM": {"probe": "calc_link_noise", "tol": 0.011, "unit": "дБм",
+                            "note": "noiseDbm calcLink ⇄ kTB Python (−174+10lg B_Гц+NF)"},
 }
 
 # Документированные семантические согласования (стадия ALIGNED).
@@ -221,6 +235,21 @@ class PythonRefBackend(ComputeBackend):
                 splice_loss_db=float(point["splice_db"]),
                 splitters=[]).budget()
             return budget["total_loss_db"]
+        if m == "CALC_LINK_PROP_DB":
+            # RF-01 FSPL: эталон распространения для РРЛ-ветви calcLink
+            return py_rf.path_loss_db("FSPL", float(point["f_mhz"]), float(point["d_km"]), 30.0, 30.0)
+        if m in ("CALC_LINK_RX_DBM", "CALC_LINK_NOISE_DBM"):
+            # RF-07: бюджет линии с теми же параметрами, что у сценария зонда
+            # (feeder=0, diffraction=0 — flat; усиления одинаковы на обоих концах)
+            pl = py_rf.path_loss_db("FSPL", float(point["f_mhz"]), float(point["d_km"]), 30.0, 30.0)
+            lb = py_rf.LinkBudget(
+                tx_power_dbm=float(point["tx_dbm"]), tx_feeder_loss_db=0.0,
+                tx_ant_gain_dbi=float(point["gain_dbi"]), path_loss_db=pl,
+                diffraction_db=0.0, rx_ant_gain_dbi=float(point["gain_dbi"]),
+                rx_feeder_loss_db=0.0, noise_figure_db=float(point.get("nf_db", 6.0)),
+                bandwidth_hz=float(point.get("bw_khz", 25.0)) * 1000.0)
+            res = lb.result()
+            return res["rx_level_dbm"] if m == "CALC_LINK_RX_DBM" else res["noise_floor_dbm"]
         kw = dict(point.get("a_kwargs") or {})
         if m == "COST231_HATA":
             # rf.path_loss_db не пробрасывает cm_db → вызываем модель напрямую (код линии A не изменяется)
@@ -276,7 +305,8 @@ class Eng6ProbeBackend(ComputeBackend):
             pair = PAIRED_MODELS[p["model"]]
             q: Dict[str, Any] = {"model": pair["probe"]}
             for k in ("f_mhz", "d_km", "h_bs_m", "h_ms_m", "env", "n", "d1_km", "d2_km", "f_ghz",
-                      "bw_khz", "nf_db", "v", "len_km", "att_db_km", "splice_db", "conn_db"):
+                      "bw_khz", "nf_db", "v", "len_km", "att_db_km", "splice_db", "conn_db",
+                      "tx_dbm", "gain_dbi"):
                 if p.get(k) is not None:
                     q[k] = p[k]
             payload.append(q)
@@ -370,6 +400,15 @@ def default_grid() -> List[Dict[str, Any]]:
         for km in (0.5, 1.0, 4.0, 8.0, 13.7, 25.0, 100.0):
             pts.append({"model": "FIBER_LOSS_DB", "len_km": km,
                         "att_db_km": att, "splice_db": splice, "conn_db": conn})
+    # Композитный уровень ⇄ ENG6.calcLink (РРЛ, flat, f ≤ 900 МГц — gas=0, см. OBS-11)
+    for f in (150.0, 450.0, 900.0):
+        for d in (1.0, 5.0, 10.0, 20.0):
+            for tx, g in ((43.0, 30.0), (33.0, 14.0)):
+                base = {"f_mhz": f, "d_km": d, "tx_dbm": tx, "gain_dbi": g,
+                        "bw_khz": 25.0, "nf_db": 6.0}
+                pts.append({"model": "CALC_LINK_PROP_DB", **base})
+                pts.append({"model": "CALC_LINK_RX_DBM", **base})
+                pts.append({"model": "CALC_LINK_NOISE_DBM", **base})
     return pts
 
 

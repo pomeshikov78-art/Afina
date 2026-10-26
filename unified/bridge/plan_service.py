@@ -53,12 +53,14 @@ class UnifiedPlanService:
     def __init__(self, db_path: str, engine_url: str = "http://127.0.0.1:8080",
                  ledger_path: Optional[str] = None, requestor: str = "afina-platform",
                  requestor_header: str = "afina-platform",
-                 platform_client=None, auto_anchor: bool = True):
+                 platform_client=None, auto_anchor: bool = True,
+                 ledger_max_bytes: int = 0):
         self.db_path = db_path
         self.client = Eng6JsClient(engine_url, requestor=requestor_header)
         self.backend = Eng6PlanBackend(self.client)
         self.ledger = UnifiedAuditLedger(ledger_path or os.path.join(
-            os.path.dirname(os.path.abspath(db_path)) or ".", "unified_audit.ndjson"))
+            os.path.dirname(os.path.abspath(db_path)) or ".", "unified_audit.ndjson"),
+            max_bytes=ledger_max_bytes)
         self.requestor = requestor
         self.platform_client = platform_client
         self.auto_anchor = auto_anchor

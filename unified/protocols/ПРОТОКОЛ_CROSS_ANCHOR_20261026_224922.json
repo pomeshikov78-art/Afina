@@ -1,0 +1,34 @@
+{
+ "document": "ПРОТОКОЛ сшивки трёх журналов (master-chain cross-anchor)",
+ "protocol_version": "1.0.0",
+ "generated_at": "2026-10-26 22:49:22",
+ "run_id": "CALC-2026-C8FFBA",
+ "engine_task_id": "sync_mvpumnl4_csxw_1",
+ "input_sha256": "34473069380827d1eb859d0bd1276f58ca2c91493d0c0ee44becbf6033206b43",
+ "verdict": "ANCHORED",
+ "reasons": [],
+ "platform": {
+  "verify": {
+   "ok": true,
+   "entries": 16
+  },
+  "entries": 16,
+  "audit_sha256": "9156a65da454303ba8818ccea7909564b46fb76156de31138935eb2b9a53d3d6",
+  "error": null
+ },
+ "engine": {
+  "matched": 2,
+  "anchor_sha256": "4ec294ce60c3721e26bd6151d4b2cce8db7f8736f6812edbb962dbfa136fbd3f",
+  "error": null
+ },
+ "unified_ledger": {
+  "verify": {
+   "ok": true,
+   "entries": 3,
+   "rotations": 0,
+   "total_seq": 3
+  },
+  "anchor_seq": 4,
+  "anchor_hash": "5ae9962c575b01e3a0db8d78bd227f02ac71c7e21ee54cd9fd0310277c645449"
+ }
+}

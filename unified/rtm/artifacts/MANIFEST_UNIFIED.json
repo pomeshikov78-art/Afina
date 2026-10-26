@@ -1,7 +1,7 @@
 {
  "document": "МАНИФЕСТ ЕДИНОЙ ПОСТАВКИ «Афина» (линия A + линия B + unified)",
  "manifest_version": "1.0.0",
- "generated_at": "2026-10-26 21:12:59",
+ "generated_at": "2026-10-26 22:46:59",
  "hash_algorithm": "sha256 (пересчёт в момент генерации)",
  "verdict": "COMPLETE",
  "problems": [],
@@ -636,15 +636,15 @@
      "path": "unified/bridge/eng6_probe.mjs",
      "kind": "file",
      "present": true,
-     "bytes": 5532,
-     "sha256": "b6465493b01438f91bb005e5a5802b0f43de5e658a587bf0dd8cdf19fc3ae771"
+     "bytes": 7854,
+     "sha256": "10b2d7f284fc2552539dee719e8794352c5b970b6c26d523a1cebff79680eb99"
     },
     {
      "path": "unified/bridge/backend_arc002.py",
      "kind": "file",
      "present": true,
-     "bytes": 28961,
-     "sha256": "0288b7693f12bc8fb568bf6454e6deb237e7a84f19dbdec74ec9e8bbcf623b4e"
+     "bytes": 32263,
+     "sha256": "1c11ea0144aa9aee59fec3566c60f2f4b9780705bdcaab89ad3fdcac9bb43456"
     },
     {
      "path": "unified/bridge/xverify.py",
@@ -664,8 +664,8 @@
      "path": "unified/bridge/plan_service.py",
      "kind": "file",
      "present": true,
-     "bytes": 12552,
-     "sha256": "0da04db49f11a89dace5faf37f42dc085bd24b2f9f9934edfd0c8ab7c19a0df2"
+     "bytes": 12636,
+     "sha256": "5f12caaa7a84c5ffa1972468c6c053ddf3f138c689f90fc424af37ed1bf56072"
     },
     {
      "path": "unified/bridge/platform_db.py",
@@ -678,8 +678,8 @@
      "path": "unified/bridge/audit_bridge.py",
      "kind": "file",
      "present": true,
-     "bytes": 5737,
-     "sha256": "073ba6b26ecfc53dcfa945f3a4cfc0684f3c49758782a47bcf8be99bb11ef881"
+     "bytes": 9609,
+     "sha256": "3742d1049c4451e2c92a9b67ffd73dd67d12d8b1126af25e9c273a2e3bc02e05"
     },
     {
      "path": "unified/bridge/platform_client.py",
@@ -741,29 +741,29 @@
      "path": "unified/rtm/artifacts/RTM_UNIFIED.csv",
      "kind": "file",
      "present": true,
-     "bytes": 75870,
-     "sha256": "606b4ca114b845375020d8a9772883785d9dd6990a663d53ecdf44a12759121d"
+     "bytes": 76218,
+     "sha256": "4b5d96cef52c7762eb5aa759350fd733152bbee91997c6ed51c27fd113f584b0"
     },
     {
      "path": "unified/rtm/artifacts/RTM_UNIFIED.json",
      "kind": "file",
      "present": true,
-     "bytes": 103443,
-     "sha256": "40463923432cc4256466315f84baf952bab85506a77d76923dec740cbe022d0a"
+     "bytes": 103791,
+     "sha256": "f3a59244bd404790ca16e687b22a538162d625453d74f359d68b85474d453cfc"
     },
     {
      "path": "unified/README.md",
      "kind": "file",
      "present": true,
-     "bytes": 12577,
-     "sha256": "ec7fadc465d2a7a075e84f2227e46c66cbaa535d06c05b5625b3bf75afb77dda"
+     "bytes": 13053,
+     "sha256": "0c51337496898bca5d3f7bfe6f96f03b34e22c3e40fd31a00dd1bfec29c8c26e"
     },
     {
      "path": "unified/WORKPLAN.md",
      "kind": "file",
      "present": true,
-     "bytes": 8884,
-     "sha256": "4e4ddefb18f12eec2f9b1ab27e400c56ba2f0424d5f2813bae5e77a42b30a90b"
+     "bytes": 9732,
+     "sha256": "0348ec2dce29766335ce2602432f1975a7c36f23ba3c30dff91e6bddb5e45992"
     },
     {
      "path": "unified/docs/00_UNIFIED_OVERVIEW.md",
@@ -776,15 +776,15 @@
      "path": "unified/docs/01_OBSERVATIONS.md",
      "kind": "file",
      "present": true,
-     "bytes": 11117,
-     "sha256": "ab9fc62738586aa1dd9a21ef46745a27e29f9034247f553e44fac770de0aa84d"
+     "bytes": 12925,
+     "sha256": "0da93dc8c0d80ca90cf9b1051655fe9630ed8d440ef554244c88e08acf5e01ee"
     },
     {
      "path": "unified/bridge/tests/test_audit_bridge.py",
      "kind": "file",
      "present": true,
-     "bytes": 3274,
-     "sha256": "99a59342b0c412c3b62ca317eb736bb475ae179c8e767872ffb64f5376c59635"
+     "bytes": 6571,
+     "sha256": "be5ca209db617b6013832251a94951e3ca3eb686e9de8702f820a6ca02cfa2fc"
     },
     {
      "path": "unified/bridge/tests/test_backend.py",
@@ -836,25 +836,25 @@
      "sha256": "0786fc995324a889db374bcaa2b56a317eb0e6bcd70525142115e37b75c5990c"
     },
     {
-     "path": "unified/protocols/ПРОТОКОЛ_ARC002_XVER_20261026_210738.json",
+     "path": "unified/protocols/ПРОТОКОЛ_ARC002_XVER_20261026_224139.json",
      "kind": "file",
      "present": true,
-     "bytes": 141382,
-     "sha256": "98d5544874a497f44212187695d040ace2491dcc7eddbab898d3976f06e41aee"
+     "bytes": 218706,
+     "sha256": "374b0aaf84c3a245b4002276c4219ac74ebef434c37f39c05f1a92380cd5392b"
     },
     {
-     "path": "unified/protocols/ПРОТОКОЛ_UNIF_E2E_20261026_201024.json",
+     "path": "unified/protocols/ПРОТОКОЛ_UNIF_E2E_20261026_211438.json",
      "kind": "file",
      "present": true,
-     "bytes": 6933,
-     "sha256": "b792cab4282219dbdfb7950037d26f492f4990b207c9fdd67180e29fcbb67f66"
+     "bytes": 7527,
+     "sha256": "8b9f8c663f8c4968773f5edd9bbe2737ff650393709dfcc878557b1fed489c78"
     },
     {
-     "path": "unified/protocols/ПРОТОКОЛ_CROSS_ANCHOR_20261026_211116.json",
+     "path": "unified/protocols/ПРОТОКОЛ_CROSS_ANCHOR_20261026_211437.json",
      "kind": "file",
      "present": true,
      "bytes": 874,
-     "sha256": "f62d96c3f9bf323fef702c2dee4f588aaf4a887ffdf47356ee286e603bd3835d"
+     "sha256": "b713404b3a337640cc3627a23929c7b4f78d367243f3ae1a7b881852f04d9c69"
     }
    ]
   }

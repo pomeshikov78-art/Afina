@@ -25,6 +25,36 @@
  */
 import { loadEng6 } from '../../eng6-service/core/eng6.mjs';
 import { canonicalHash } from '../../eng6-service/core/validate.mjs';
+import { buildScenario, normalizeEnvironment } from '../../eng6-service/core/scenario.mjs';
+
+// Широта узла B так, что haversine(R=6371) даёт ровно d_km от узла A (55.0, 37.0)
+const KM_PER_DEG_LAT = (Math.PI * 6371) / 180; // 111.19492664455874
+
+function calcLinkPoint(E, p) {
+  const d = Number(p.d_km);
+  const a = { id: 'xv-a', type: 'relay', status: 'active', lat: 55.0, lng: 37.0,
+              txPowerDbm: Number(p.tx_dbm), txGainDbi: Number(p.gain_dbi), rxGainDbi: Number(p.gain_dbi),
+              rxSensDbm: -110, antHeightM: 30, feederLossDb: 0, noiseFigureDb: Number(p.nf_db ?? 6) };
+  const b = { id: 'xv-b', type: 'relay', status: 'active', lat: 55.0 + d / KM_PER_DEG_LAT, lng: 37.0,
+              txPowerDbm: Number(p.tx_dbm), txGainDbi: Number(p.gain_dbi), rxGainDbi: Number(p.gain_dbi),
+              rxSensDbm: -110, antHeightM: 30, feederLossDb: 0, noiseFigureDb: Number(p.nf_db ?? 6) };
+  const links = [{ id: 'xv-l', from: 'xv-a', to: 'xv-b', type: 'RRL',
+                   freqMhz: Number(p.f_mhz), bwKhz: Number(p.bw_khz ?? 25), mod: 'QPSK', fec: 'none' }];
+  // среда: нулевые дождь/туман, open-clutter (loss=0), плоский рельеф, misc=0 —
+  // остаётся только prop (+gas, который при f≤900 МГц равен 0 — см. XVER-GRID)
+  const env = normalizeEnvironment({ clutterType: 'open', miscLossDb: 0,
+    weather: { rainRateMmHr: 0, fogDensity: 0, temperatureC: 15, humidityPercent: 60 },
+    terrain: { source: 'flat' } });
+  const out = buildScenario({ nodes: [a, b], links, environment: env, meta: { id: 'xver-calc-link' }, quality: 'balanced' });
+  const r = E.calcLink(out.scenario.links[0], out.scenario, { quality: 'balanced', miscLossDb: 0 });
+  if (r.status !== 'ok') throw new Error('calcLink status=' + r.status);
+  let prop = 0;
+  for (const k of Object.keys(r.breakdown || {})) {
+    const v = (r.breakdown || {})[k];
+    if (typeof v === 'number' && Number.isFinite(v) && k === 'prop') prop = v;
+  }
+  return { prop, rx: r.rxPowerDbm, noise: r.noiseDbm, distKm: r.distKm, model: r.model };
+}
 
 function readStdin() {
   return new Promise((resolve) => {
@@ -67,6 +97,12 @@ function evaluate(E, p) {
       // ENG6: FIBER.loss({attDbKm,spliceDb,connDb}, lenKm) = km·att + ⌊km/4⌋·splice + 2·conn
       return E.FIBER.loss({ attDbKm: Number(p.att_db_km), spliceDb: Number(p.splice_db), connDb: Number(p.conn_db) },
                           Number(p.len_km));
+    case 'calc_link_prop':
+      return calcLinkPoint(E, p).prop;
+    case 'calc_link_rx':
+      return calcLinkPoint(E, p).rx;
+    case 'calc_link_noise':
+      return calcLinkPoint(E, p).noise;
     default:
       throw new Error('MODEL_UNSUPPORTED: ' + p.model);
   }

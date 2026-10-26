@@ -68,5 +68,70 @@ class TestUnifiedAuditLedger(unittest.TestCase):
         self.assertEqual(a["extra"]["matched_records"], 0)
 
 
+class TestLedgerRotation(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp(prefix="afina-audit-rot-")
+        self.path = os.path.join(self.tmp, "unified_audit.ndjson")
+
+    def test_rotation_keeps_chain_continuous(self):
+        led = UnifiedAuditLedger(self.path, max_bytes=400)
+        n = 25
+        for i in range(n):
+            led.record("plan_completed", run_id=f"CALC-2026-{i:04d}", status="PARTIAL")
+        archives = sorted(f for f in os.listdir(self.tmp) if f.startswith("unified_audit.ndjson."))
+        self.assertGreaterEqual(len(archives), 1, "ротация не произошла")
+        v = led.verify()
+        self.assertTrue(v["ok"], v)
+        self.assertEqual(v["rotations"], len(archives))
+        # seq непрерывен сквозь ротации: записей n + по одному якорю на ротацию
+        self.assertEqual(v["total_seq"], n + len(archives))
+        # текущий файл меньше лимита + одна запись (условие ротации — до записи)
+        self.assertLessEqual(os.path.getsize(self.path), 400 + 500)
+
+    def test_rotation_first_entry_is_anchor(self):
+        led = UnifiedAuditLedger(self.path, max_bytes=200)
+        for i in range(10):
+            led.record("e", run_id=f"R{i}")
+        first = led.entries()[0]
+        self.assertEqual(first["event"], "chain_rotation")
+        self.assertEqual(first["status"], "rotated")
+        self.assertIn("archive", first.get("extra", {}))
+
+    def test_archive_tamper_detected(self):
+        led = UnifiedAuditLedger(self.path, max_bytes=200)
+        for i in range(12):
+            led.record("e", run_id=f"R{i}", status="PARTIAL")
+        self.assertTrue(led.verify()["ok"])
+        # подмена СЕРЕДИНЫ архива (не последней записи) — обнаруживается рекурсивной проверкой
+        arch = sorted(os.path.join(self.tmp, f) for f in os.listdir(self.tmp)
+                      if f.startswith("unified_audit.ndjson."))[0]
+        lines = open(arch, encoding="utf-8").read().splitlines()
+        mid = len(lines) // 2
+        rec = json.loads(lines[mid])
+        rec["status"] = "OPTIMAL"
+        lines[mid] = json.dumps(rec, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+        open(arch, "w", encoding="utf-8").write("\n".join(lines) + "\n")
+        v = led.verify()
+        self.assertFalse(v["ok"])
+        self.assertEqual(v["reason"], "HASH_MISMATCH")
+
+    def test_missing_archive_detected(self):
+        led = UnifiedAuditLedger(self.path, max_bytes=200)
+        for i in range(12):
+            led.record("e", run_id=f"R{i}")
+        arch = [f for f in os.listdir(self.tmp) if f.startswith("unified_audit.ndjson.")][0]
+        os.remove(os.path.join(self.tmp, arch))
+        v = led.verify()
+        self.assertFalse(v["ok"])
+        self.assertEqual(v["reason"], "ARCHIVE_MISSING")
+
+    def test_no_rotation_by_default(self):
+        led = UnifiedAuditLedger(self.path)          # max_bytes=0 — ротация выключена
+        for i in range(50):
+            led.record("e", run_id=f"R{i}")
+        self.assertEqual(led.verify()["rotations"], 0)
+        self.assertEqual(led.verify()["entries"], 50)
+
+
 if __name__ == "__main__":
     unittest.main()
