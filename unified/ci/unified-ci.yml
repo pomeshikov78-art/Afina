@@ -73,6 +73,8 @@ jobs:
       - name: Сквозной сценарий UNIF (платформа → ENG6-PLAN → таблицы + паспорт)
         working-directory: unified/scripts
         run: python demo_e2e.py
+      - name: Проверка установки (15 серверных проверок, авто-подъём стека)
+        run: python unified/scripts/verify_install.py
       - name: Единый RTM (183 требования) и манифест поставки
         working-directory: unified/rtm
         run: |

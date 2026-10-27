@@ -110,13 +110,21 @@ def section_c() -> dict:
     entries += [file_entry(os.path.join("unified", p), REPO) for p in
                 ("ui/workspace.html", "ci/unified-ci.yml", "deploy/docker-compose.unified.yml",
                  "deploy/Dockerfile.platform", "deploy/prometheus.unified.yml",
+                 "deploy/schema_unified_postgres.sql",
+                 "scripts/demo_e2e.py", "scripts/validate_deploy.py", "scripts/verify_install.py",
+                 "scripts/start_stack.sh", "scripts/stop_stack.sh",
+                 "rtm/build_unified_rtm.py", "rtm/build_unified_manifest.py",
+                 "rtm/seed_dopolnenie2.json",
                  "rtm/artifacts/RTM_UNIFIED.csv", "rtm/artifacts/RTM_UNIFIED.json",
-                 "README.md", "WORKPLAN.md", "docs/00_UNIFIED_OVERVIEW.md", "docs/01_OBSERVATIONS.md")]
+                 "README.md", "WORKPLAN.md", "docs/00_UNIFIED_OVERVIEW.md", "docs/01_OBSERVATIONS.md",
+                 "docs/02_REPO_ANALYSIS_2026-10-26.md", "docs/03_IP_AUDIT_LETTER_DRAFT.md",
+                 "docs/04_LINE_A_CHANGES.md")]
     entries += [file_entry(os.path.join("unified", "bridge", "tests", f), REPO) for f in
                 sorted(os.listdir(os.path.join(UNIFIED, "bridge", "tests")))
                 if f.startswith("test_") and f.endswith(".py")]
     # последние протоколы каждого типа
-    for pat in ("ПРОТОКОЛ_ARC002_XVER_*.json", "ПРОТОКОЛ_UNIF_E2E_*.json", "ПРОТОКОЛ_CROSS_ANCHOR_*.json"):
+    for pat in ("ПРОТОКОЛ_ARC002_XVER_*.json", "ПРОТОКОЛ_UNIF_E2E_*.json",
+                "ПРОТОКОЛ_CROSS_ANCHOR_*.json", "ОТЧЁТ_VALIDATE_DEPLOY_*.json"):
         hits = sorted(glob.glob(os.path.join(UNIFIED, "protocols", pat)))
         if hits:
             entries.append(file_entry(hits[-1], REPO))

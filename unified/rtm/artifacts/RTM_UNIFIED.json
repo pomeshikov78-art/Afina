@@ -1,12 +1,12 @@
 {
  "document": "RTM_UNIFIED — единая матрица трассируемости требований",
- "generated_at": "2026-10-27 01:39:34",
+ "generated_at": "2026-10-27 03:28:06",
  "sources": {
   "A": "afina/data/Афина_RTM_машиночитаемая.csv (83)",
   "B": "unified/rtm/seed_dopolnenie2.json (77)",
   "UNIF": "unified/rtm/build_unified_rtm.py (18)"
  },
- "total": 183,
+ "total": 184,
  "rows": [
   {
    "source": "A:ТЗ.АФИНА.11.0 Прил.А",
@@ -1825,6 +1825,16 @@
    "text": "Сухая валидация артефактов развёртывания без Docker: compose (сервисы/контексты/volume-пути/depends_on), цели Prometheus ⊆ сервисы, COPY-источники Dockerfile.platform",
    "acceptance_criteria": "18/18 проверок PASS; ограничение (мини-разбор формата, полная валидация — docker compose config в CI) зафиксировано в отчёте",
    "tests": "unified/scripts/validate_deploy.py → protocols/ОТЧЁТ_VALIDATE_DEPLOY_*.json (PASS 18/18)",
+   "protocols": "",
+   "status": "подтверждено прогоном 27.10.2026 (песочница 2 vCPU/1 ГБ)"
+  },
+  {
+   "source": "UNIF:совмещённая платформа",
+   "requirement": "UNIF-24",
+   "priority": "P1",
+   "text": "Инструмент проверки установки: одна команда — 15 серверных проверок (среда, healthz, sha256 ядра, конформанс 33+5, эталонный расчёт, детерминизм, 422, /metrics, bootstrap+RBAC, мастер-цепочка, XVER, NFR-02-скан UI) с авто-подъёмом стека на свободных портах и инструкцией для браузера",
+   "acceptance_criteria": "вердикт «ВСЁ РАБОТАЕТ» на чистой установке; код возврата 0/1/2; ничего не устанавливает и не изменяет (БД временная)",
+   "tests": "unified/scripts/verify_install.py — прогон 27.10.2026: 15/15 ✅; шаг CI в bridge-integration",
    "protocols": "",
    "status": "подтверждено прогоном 27.10.2026 (песочница 2 vCPU/1 ГБ)"
   },
