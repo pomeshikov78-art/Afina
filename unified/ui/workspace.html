@@ -486,6 +486,13 @@ document.getElementById('pullBtn').onclick = () => {
 };
 
 /* ============ инициализация ============ */
+// параметры запуска из URL (установщик открывает:
+//   workspace.html?engine=http://127.0.0.1:8080&platform=http://127.0.0.1:8470)
+try {
+  const qs = new URLSearchParams(location.search);
+  if (qs.get('engine')) $('engineUrl').value = qs.get('engine').replace(/\/+$/, '');
+  if (qs.get('platform')) $('platformUrl').value = qs.get('platform').replace(/\/+$/, '');
+} catch (e) { /* file:// без параметров — значения по умолчанию */ }
 $('demoBtn').onclick = () => { $('scenario').value = JSON.stringify(DEMO, null, 1); log('демо-сценарий загружен'); };
 $('loadBtn').onclick = () => $('fileIn').click();
 $('fileIn').onchange = () => {

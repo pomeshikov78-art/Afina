@@ -13,3 +13,5 @@ eng6-service/var/audit-smoke.ndjson
 # включение: создать .github/workflows/unified-ci.yml через веб-интерфейс GitHub
 # (скопировать содержимое unified/ci/unified-ci.yml) либо push токеном с scope workflow.
 .github/
+unified/installer/build/
+unified/installer/dist/

@@ -1,7 +1,7 @@
 {
  "document": "МАНИФЕСТ ЕДИНОЙ ПОСТАВКИ «Афина» (линия A + линия B + unified)",
  "manifest_version": "1.0.0",
- "generated_at": "2026-10-27 03:29:26",
+ "generated_at": "2026-10-27 04:14:15",
  "hash_algorithm": "sha256 (пересчёт в момент генерации)",
  "verdict": "COMPLETE",
  "problems": [],
@@ -621,8 +621,8 @@
   },
   "C_unified": {
    "title": "Единая программа — артефакты unified/",
-   "items_total": 49,
-   "items_intact": 49,
+   "items_total": 54,
+   "items_intact": 54,
    "missing": [],
    "entries": [
     {
@@ -713,8 +713,8 @@
      "path": "unified/ui/workspace.html",
      "kind": "file",
      "present": true,
-     "bytes": 35304,
-     "sha256": "897963f638a4f216d9d29a53146de51520ef41b0e4eb9d9848206bd14a77f6fe"
+     "bytes": 35809,
+     "sha256": "f67a1fdca5e2381a8832489fdd83e13a8483573a71a97a89e833454265a823c7"
     },
     {
      "path": "unified/ci/unified-ci.yml",
@@ -790,15 +790,15 @@
      "path": "unified/rtm/build_unified_rtm.py",
      "kind": "file",
      "present": true,
-     "bytes": 25157,
-     "sha256": "1338b8ae0ebeef34767dd580b086292865f2e8da9abd77f31da1faf286f35ce1"
+     "bytes": 26403,
+     "sha256": "7d195a323180287c7304730882c98416c5d5c6502380f98faa4f72152a153c83"
     },
     {
      "path": "unified/rtm/build_unified_manifest.py",
      "kind": "file",
      "present": true,
-     "bytes": 9817,
-     "sha256": "0b6e291cbbb7ef929e1a8d3c595db6f3f1464b75ca473f90475ea25b3183d62e"
+     "bytes": 9997,
+     "sha256": "917b9367921e11ebbf345fb7b108074df86367711226118024567fe64a6e39eb"
     },
     {
      "path": "unified/rtm/seed_dopolnenie2.json",
@@ -811,15 +811,15 @@
      "path": "unified/rtm/artifacts/RTM_UNIFIED.csv",
      "kind": "file",
      "present": true,
-     "bytes": 81349,
-     "sha256": "2603518d9063a38ce937f06b27899f0a7ffd1cd2b5e733cc0d62804ffcbdf4f8"
+     "bytes": 82546,
+     "sha256": "e9568d1ae99cbb6aec616778d0133be06a02df90d1f63ace303dafcb005ef1b8"
     },
     {
      "path": "unified/rtm/artifacts/RTM_UNIFIED.json",
      "kind": "file",
      "present": true,
-     "bytes": 109822,
-     "sha256": "de9b71a358df7a9c055fb4615027b4be77cc16cbce17b068bd9e105c1b09760c"
+     "bytes": 111168,
+     "sha256": "e52b821904d0972a05ec88feb568e38ffc7e3ca21836f80d448ff986df0b5092"
     },
     {
      "path": "unified/README.md",
@@ -848,6 +848,41 @@
      "present": true,
      "bytes": 16554,
      "sha256": "0b4e72a6f20221b0861d2c170e4f9ee1bdf223614f9c0005f44c29b696f850ef"
+    },
+    {
+     "path": "unified/installer/afina_unified.nsi",
+     "kind": "file",
+     "present": true,
+     "bytes": 5333,
+     "sha256": "c04cfc5acd376b225f8cebf673e4e92d13a3a471ffc1cbd834501714136b8185"
+    },
+    {
+     "path": "unified/installer/build_windows_exe.py",
+     "kind": "file",
+     "present": true,
+     "bytes": 14792,
+     "sha256": "180cb2321ede017a708555c2c2575065839fbea8e4b3d5a155b4664200e6c02c"
+    },
+    {
+     "path": "unified/installer/run_unified.pyw",
+     "kind": "file",
+     "present": true,
+     "bytes": 8285,
+     "sha256": "e466966fb8328d8c7f9b99521369e5f2fe7679a16c4a38bff333f2dd0c4b46f5"
+    },
+    {
+     "path": "unified/installer/stop_unified.py",
+     "kind": "file",
+     "present": true,
+     "bytes": 1342,
+     "sha256": "0e1a7e01dec3958a432ebab9e7ed648dee45f4ef5f07387a9f971b234d470547"
+    },
+    {
+     "path": "unified/installer/README.md",
+     "kind": "file",
+     "present": true,
+     "bytes": 6359,
+     "sha256": "54f18b42f4fadcbba6d826505a53fbc253cc1b701e64f367da60b392cea60d19"
     },
     {
      "path": "unified/docs/02_REPO_ANALYSIS_2026-10-26.md",
@@ -974,6 +1009,6 @@
  "summary": {
   "A": "17/18 позиций без изменений хэшей",
   "B": "13/13 позиций на месте; вендор — соответствует",
-  "C": "49/49 артефактов на месте"
+  "C": "54/54 артефактов на месте"
  }
 }
