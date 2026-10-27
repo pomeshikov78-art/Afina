@@ -1,0 +1,267 @@
+{
+ "document": "ПРОТОКОЛ UNIF-E2E — сквозной сценарий совмещённой платформы",
+ "generated_at": "2026-10-27 01:39:34",
+ "requirement": {
+  "id": "UNIF-08",
+  "criteria": "Сквозная цепочка: сущности платформы → ENG6-PLAN → таблицы платформы + паспорт + ARC-002"
+ },
+ "engine": {
+  "base_url": "http://127.0.0.1:53353",
+  "core_sha256": "adb610c9eee1ca17b257cbc6087e2278fdde3eef92f3b6a360cfb51968d48b20",
+  "conformance_ok": true
+ },
+ "passport": {
+  "run_id": "CALC-2026-F029B3",
+  "function": "PLAN-01",
+  "model_id": "ENG6-PLAN",
+  "model_version": "1.1.0",
+  "mode": "Verification",
+  "level": "L2",
+  "inputs_hash": "8e18ddae1b81786a88421dd1f4f772e91b4ed6f7d3f8098f494e1950c13f12fc",
+  "inputs_ref": {
+   "request_sha256": "b874165500d9f3c5189411ceb4dda12606a7c01fe76e4b4d09c10864f198e551",
+   "scenario": "батальонный рубеж (синтетика E2E)",
+   "nodes": 6
+  },
+  "crs": "WGS84",
+  "units": {},
+  "precision": {
+   "grid_m": null,
+   "tol": 1e-06
+  },
+  "environment": {
+   "python": "3.11.2",
+   "platform": "Linux-4.19.91-c8dfc93.al7.x86_64-x86_64-with-glibc2.36",
+   "backend": "ENG6-PLAN-service + ENG6-JS-vendor-probe",
+   "backends": "[{\"backend\": \"ENG6-PLAN-service\", \"version\": \"5.1.0\", \"sha256\": \"adb610c9eee1ca17b257cbc6087e2278fdde3eef92f3b6a360cfb51968d48b20\", \"service_version\": \"1.0.0\", \"endpoints\": 11}, {\"backend\": \"ENG6-JS-vendor-probe\", \"version\": \"5.1.0\", \"sha256\": \"adb610c9eee1ca17b257cbc6087e2278fdde3eef92f3b6a360cfb51968d48b20\", \"vendor_bytes\": 819007, \"prop_primitives\": 15, \"runtime\": \"node (изолированный V8-контекст)\"}]"
+  },
+  "started_at": 1793065174.0184186,
+  "finished_at": 1793065174.019086,
+  "status": "done",
+  "warnings": [
+   "warn/UNIT_DEGRADED",
+   "info/IMPROVEMENTS_APPLIED",
+   "warn/BRIDGE_LINK",
+   "warn/BRIDGE_LINK",
+   "warn/BRIDGE_LINK",
+   "warn/BRIDGE_LINK"
+  ],
+  "applicability": null,
+  "uncertainty_db": null,
+  "results_ref": "2d5be5f0061d6fbaae51c4ff8eb555c0e01466210d69a09da471ddbc517bdd24",
+  "reproducibility": null,
+  "duration_s": 0.001,
+  "schema_version": "1.0"
+ },
+ "plan_summary": {
+  "status": "PARTIAL",
+  "metrics": {
+   "objectiveValue": 0.30345,
+   "grade": "C",
+   "gradeByObjective": "C",
+   "gradeByService": "C",
+   "serviceLevelByCountPct": 75,
+   "serviceLevelByBandwidthPct": 75,
+   "nodesTotal": 6,
+   "nodesDeployed": 5,
+   "linksCandidate": 5,
+   "linksFeasible": 5,
+   "linksActive": 4,
+   "totalCost": 102,
+   "budget": 200,
+   "budgetUsedPct": 51,
+   "demandsTotal": 4,
+   "demandsSatisfied": 3,
+   "demandsPartial": 0,
+   "demandsRejected": 1,
+   "demandServedPct": 75,
+   "throughputKbps": 48,
+   "capacityTotalKbps": 163.46,
+   "loadTotalKbps": 96,
+   "utilMaxPct": 97.88,
+   "utilAvgPct": 58.73,
+   "avgDelayMs": 74.545,
+   "maxDelayMs": 74.547,
+   "delayViolations": 0,
+   "minAvailabilityPct": 100,
+   "connectivityPct": 100,
+   "componentsCount": 1,
+   "candidateComponentsCount": 1,
+   "largestComponentPct": 100,
+   "spofNodes": 1,
+   "bridgeLinks": 4,
+   "minCutKbps": null,
+   "avgMarginDb": 61.31,
+   "minMarginDb": 58.93,
+   "linksBelow10Db": 0,
+   "marginHistogram": {
+    "<0": 0,
+    "0-3": 0,
+    "3-10": 0,
+    "10-20": 0,
+    ">20": 4
+   },
+   "redundancyAdded": 0,
+   "scheduleMakespanMin": 100.86,
+   "scheduleWaves": 2,
+   "crewUtilPct": 60.5
+  },
+  "schedule": {
+   "makespanMin": 100.86,
+   "waves": 2
+  }
+ },
+ "steps": [
+  {
+   "step": 1,
+   "name": "контур готов",
+   "ok": true,
+   "base_url": "http://127.0.0.1:53353"
+  },
+  {
+   "step": 2,
+   "name": "конформанс-гейт К-04",
+   "ok": true,
+   "selfTest": 33,
+   "regression": 5
+  },
+  {
+   "step": 3,
+   "name": "маппинг Прил.Г → контракт ENG6-PLAN",
+   "ok": true,
+   "nodes": 6,
+   "links": 5,
+   "fleet": 6,
+   "demands": 4,
+   "request_sha256": "b874165500d9f3c5189411ceb4dda12606a7c01fe76e4b4d09c10864f198e551"
+  },
+  {
+   "step": 4,
+   "name": "расчёт plan/sync + NFR-04",
+   "ok": true,
+   "status": "PARTIAL",
+   "grade": "C",
+   "compute_ms": 57.4,
+   "deterministic": true,
+   "core_sha256": "adb610c9eee1ca17b257cbc6087e2278fdde3eef92f3b6a360cfb51968d48b20"
+  },
+  {
+   "step": 5,
+   "name": "обратный маппинг → таблицы платформы (К-03)",
+   "ok": true,
+   "tables": {
+    "map_object": 5,
+    "link_line": 4,
+    "route": 4,
+    "deployment_wave": 2,
+    "schedule_summary": 1,
+    "survivability": 1,
+    "metrics": 1,
+    "issues": 9,
+    "calc_run": 1
+   }
+  },
+  {
+   "step": 6,
+   "name": "паспорт запуска ENG-001",
+   "ok": true,
+   "run_id": "CALC-2026-F029B3",
+   "duration_s": 0.001,
+   "backends": [
+    "ENG6-PLAN-service",
+    "ENG6-JS-vendor-probe"
+   ]
+  },
+  {
+   "step": 7,
+   "name": "кросс-верификация ARC-002 (RAW→ALIGNED)",
+   "ok": true,
+   "verdict": "PASS",
+   "points": 327,
+   "aligned": {
+    "consistent": 325,
+    "degraded": 0,
+    "failed": 0,
+    "excluded": 2,
+    "max_delta_by_model": {
+     "OKUMURA_HATA": 0.0,
+     "COST231_HATA": 0.0,
+     "FSPL": 0.0,
+     "FRESNEL_R1": 0.000928,
+     "NOISE_FLOOR_DB": 0.0,
+     "DIFFRACTION_J": 0.0,
+     "FIBER_LOSS_DB": 0.005,
+     "CALC_LINK_PROP_DB": 0.000209,
+     "CALC_LINK_RX_DBM": 0.004835,
+     "CALC_LINK_NOISE_DBM": 0.0006
+    }
+   }
+  }
+ ],
+ "xver_summary": {
+  "verdict": "PASS",
+  "raw": {
+   "consistent": 264,
+   "degraded": 63,
+   "failed": 0,
+   "excluded": 0,
+   "max_delta_by_model": {
+    "OKUMURA_HATA": 9.942608,
+    "COST231_HATA": 3.0,
+    "FSPL": 0.0,
+    "FRESNEL_R1": 968.378151,
+    "NOISE_FLOOR_DB": 0.0,
+    "DIFFRACTION_J": 0.0,
+    "FIBER_LOSS_DB": 1.3,
+    "CALC_LINK_PROP_DB": 0.000209,
+    "CALC_LINK_RX_DBM": 0.545928,
+    "CALC_LINK_NOISE_DBM": 0.0006
+   }
+  },
+  "aligned": {
+   "consistent": 325,
+   "degraded": 0,
+   "failed": 0,
+   "excluded": 2,
+   "max_delta_by_model": {
+    "OKUMURA_HATA": 0.0,
+    "COST231_HATA": 0.0,
+    "FSPL": 0.0,
+    "FRESNEL_R1": 0.000928,
+    "NOISE_FLOOR_DB": 0.0,
+    "DIFFRACTION_J": 0.0,
+    "FIBER_LOSS_DB": 0.005,
+    "CALC_LINK_PROP_DB": 0.000209,
+    "CALC_LINK_RX_DBM": 0.004835,
+    "CALC_LINK_NOISE_DBM": 0.0006
+   }
+  },
+  "alignments": {
+   "COST231_HATA": {
+    "id": "XVER-COST231-CM",
+    "note": "ENG6.PROP.cost231 при переданном env применяет CM=+3 дБ; Python-стороне явно передаётся cm_db=3.0 (измерено: Δ=+3.0 дБ на всех точках RAW)"
+   },
+   "FRESNEL_R1": {
+    "id": "XVER-FRESNEL",
+    "note": "ENG6.PROP.fresnelR возвращает значение в √1000 раз больше эталона RF-06 (смешение м/км в формуле вендора); после деления на √1000 совпадение точное"
+   },
+   "FIBER_LOSS_DB": {
+    "id": "XVER-FIBER-PARAMS",
+    "note": "ENG6.FIBER.loss фиксирует 2 коннектора и сростки каждые 4 км; Python NET-01 принимает явные количества. Согласование параметризации: connectors=2, splices=⌊км/4⌋ → формулы идентичны (км·att + сростки·splice + коннекторы·conn)"
+   },
+   "CALC_LINK_RX_DBM": {
+    "id": "XVER-GAS-SUBST",
+    "note": "RF-07 (линия A) с 26.10.2026 имеет поле gas_absorption_db, но собственной модели поглощения в газах (ITU-R P.676) не содержит — в стадии ALIGNED член gas = gasGamma(f,15°C,60%)·d подставляется из КАНОНИЧЕСКОГО источника (вендор ENG6) и фиксируется в протоколе (alignment_gas_db каждой строки). Проверяется КОМПОЗИЦИЯ бюджета, а не модель газа (OBS-11 — зазор остаётся открытым до реализации P.676 в линии A). Для f ≤ 900 МГц gas=0 — подстановка не нужна"
+   }
+  },
+  "known_incompatible": [
+   {
+    "id": "XVER-HATA-SUBURBAN",
+    "reason": "ENG6.hata трактует suburban как urban; Python применяет стандартную поправку −2·lg²(f/28)−5.4 дБ. Вендор неизменяем (§9.3.1 Доп. №2). Для suburb при планировании через ENG6-JS применять env='urban' (консервативно) или поправку платформы.",
+    "model": "OKUMURA_HATA",
+    "env": "suburban"
+   }
+  ]
+ },
+ "verdict": "PASS"
+}

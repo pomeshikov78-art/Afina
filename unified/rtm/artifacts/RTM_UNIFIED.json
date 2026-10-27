@@ -1,12 +1,12 @@
 {
  "document": "RTM_UNIFIED — единая матрица трассируемости требований",
- "generated_at": "2026-10-26 22:46:59",
+ "generated_at": "2026-10-27 01:39:34",
  "sources": {
   "A": "afina/data/Афина_RTM_машиночитаемая.csv (83)",
   "B": "unified/rtm/seed_dopolnenie2.json (77)",
   "UNIF": "unified/rtm/build_unified_rtm.py (18)"
  },
- "total": 178,
+ "total": 183,
  "rows": [
   {
    "source": "A:ТЗ.АФИНА.11.0 Прил.А",
@@ -1624,7 +1624,7 @@
    "priority": "P0",
    "text": "Кросс-верификация моделей двух линий (XVER): FSPL, Окамура–Хата, COST-231, Френель, kTB (Гц⇄кГц — ENG-004), J(v) ITU-R P.526, оптический бюджет (NET-01⇄FIBER.loss), КОМПОЗИТНЫЙ уровень — настоящий ENG6.calcLink (prop/rx/noise ⇄ RF-01/RF-07); двухстадийный протокол RAW→ALIGNED",
    "acceptance_criteria": "ALIGNED PASS: все пары в допуске; расхождения документированы (CM, √1000, hata-suburban, порог J(v)), вендор не изменяется",
-   "tests": "unified/bridge/xverify.py → unified/protocols/ПРОТОКОЛ_ARC002_XVER_*.json (102 точки, RAW→ALIGNED PASS, 26.10.2026); 219 точек (217 CONSISTENT): композит calcLink PROP Δ≤0.0002 дБ / RX Δ≤0.005 дБм / NOISE Δ≤0.0006 дБм (f≤900, gas=0); OBS-06/10/11 (порог J(v); REL/NET — решение; зазор RF-07 по газам измерен)",
+   "tests": "unified/bridge/xverify.py → unified/protocols/ПРОТОКОЛ_ARC002_XVER_*.json (102 точки, RAW→ALIGNED PASS, 26.10.2026); 327 точек (325 CONSISTENT): композит calcLink PROP Δ≤0.0002 дБ / RX / NOISE Δ≤0.0006 дБм; f до 7 ГГц — член газа по XVER-GAS-SUBST из канонического источника (OBS-11); OBS-06/10 (порог J(v); REL/NET — решение)",
    "protocols": "",
    "status": "подтверждено прогоном 26.10.2026 (песочница 2 vCPU/1 ГБ)"
   },
@@ -1777,6 +1777,56 @@
    "tests": "unified/bridge/master_chain_sync.py + plan_service (auto_anchor) + audit_bridge (ротация); tests/test_audit_bridge.py 10/10 + test_platform_bridge.py 5/5 (live)",
    "protocols": "",
    "status": "подтверждено прогоном 26.10.2026 (песочница 2 vCPU/1 ГБ)"
+  },
+  {
+   "source": "UNIF:совмещённая платформа",
+   "requirement": "UNIF-19",
+   "priority": "P1",
+   "text": "Наблюдаемость платформы: GET /metrics — Prometheus text exposition 0.0.4 (afina_up/objects/users/audit/calcs/queue); правка линии A №2 по реестру 04_LINE_A_CHANGES",
+   "acceptance_criteria": "эндпоинт отдаёт валидный текст 0.0.4; метрики очереди и расчётов соответствуют состоянию; отказ счётчика не рвёт выдачу",
+   "tests": "afina/src/afina/server/app.py (_metrics); tests/test_platform_bridge.py::test_06 (live); prometheus.unified.yml переключён с healthz-костыля на /metrics",
+   "protocols": "",
+   "status": "подтверждено прогоном 27.10.2026 (песочница 2 vCPU/1 ГБ)"
+  },
+  {
+   "source": "UNIF:совмещённая платформа",
+   "requirement": "UNIF-20",
+   "priority": "P1",
+   "text": "Устранение зазора RF-07 по поглощению в газах: поле gas_absorption_db в LinkBudget (правка линии A №1) + композитная сетка XVER до 7 ГГц",
+   "acceptance_criteria": "обратная совместимость (дефолт 0, 145/145 линии A зелёные); XVER ALIGNED PASS на f 1.4–7 ГГц с документированной подстановкой члена",
+   "tests": "afina/src/afina/eng6/rf.py; tests/test_backend.py (gas-тест); XVER 327 точек; OBS-11 (остаток: собственная P.676 в линии A)",
+   "protocols": "",
+   "status": "подтверждено прогоном 27.10.2026 (песочница 2 vCPU/1 ГБ)"
+  },
+  {
+   "source": "UNIF:совмещённая платформа",
+   "requirement": "UNIF-21",
+   "priority": "P1",
+   "text": "postMessage-мост клиент платформы ⇄ единое рабочее место: afina:ready / afina:scenario-request / afina:scenario (правка линии A №3); токен сессии через мост не передаётся; приёмник в workspace (анкор-конверсия метров, авто-линии только явно)",
+   "acceptance_criteria": "контрактные маркеры на месте; скан безопасности (токен/Authorization не пересекают мост); node --check всех скриптов клиента — регрессионный барьер OBS-12",
+   "tests": "afina/src/client/index.html (мост + фикс OBS-12, правка №4); unified/ui/workspace.html (приёмник); tests/test_client_bridge.py 4/4",
+   "protocols": "",
+   "status": "подтверждено частично: статические тесты — прогон 27.10.2026; браузерный стенд для визуальной проверки моста"
+  },
+  {
+   "source": "UNIF:совмещённая платформа",
+   "requirement": "UNIF-22",
+   "priority": "P2",
+   "text": "Миграционный комплект SQLite → PostgreSQL: DDL unified (plan_runs + К-03 + unified_audit_entry, JSONB, FK, индексы) + детерминированный экспорт (INSERT ON CONFLICT, предочистка по run_id, экспорт леджера с архивами ротации, отказ при дубле seq) + sha256-манифест и verify",
+   "acceptance_criteria": "экспорт детерминирован (повтор → идентичный sha256); подмена артефакта обнаруживается verify_export; фактическая загрузка — psql на стенде",
+   "tests": "unified/deploy/schema_unified_postgres.sql; unified/bridge/pg_export.py; tests/test_pg_export.py 4/4",
+   "protocols": "",
+   "status": "подтверждено частично: офлайн-тесты — прогон 27.10.2026; загрузка в PostgreSQL — на стенде"
+  },
+  {
+   "source": "UNIF:совмещённая платформа",
+   "requirement": "UNIF-23",
+   "priority": "P2",
+   "text": "Сухая валидация артефактов развёртывания без Docker: compose (сервисы/контексты/volume-пути/depends_on), цели Prometheus ⊆ сервисы, COPY-источники Dockerfile.platform",
+   "acceptance_criteria": "18/18 проверок PASS; ограничение (мини-разбор формата, полная валидация — docker compose config в CI) зафиксировано в отчёте",
+   "tests": "unified/scripts/validate_deploy.py → protocols/ОТЧЁТ_VALIDATE_DEPLOY_*.json (PASS 18/18)",
+   "protocols": "",
+   "status": "подтверждено прогоном 27.10.2026 (песочница 2 vCPU/1 ГБ)"
   },
   {
    "source": "UNIF:совмещённая платформа",

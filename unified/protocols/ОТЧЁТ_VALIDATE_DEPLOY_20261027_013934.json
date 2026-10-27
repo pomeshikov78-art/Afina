@@ -1,0 +1,90 @@
+{
+ "document": "ОТЧЁТ сухой валидации артефактов развёртывания (UNIF-23)",
+ "validator_version": "1.0.0",
+ "generated_at": "2026-10-27 01:39:34",
+ "limitation": "мини-разбор собственного формата compose; полная валидация — `docker compose config` (CI-джоба docker)",
+ "services_found": [
+  "engine",
+  "grafana",
+  "platform",
+  "prometheus"
+ ],
+ "checks_total": 18,
+ "checks_failed": 0,
+ "verdict": "PASS",
+ "problems": [],
+ "checks": [
+  {
+   "ok": true,
+   "check": "compose содержит обязательные сервисы (есть: ['engine', 'grafana', 'platform', 'prometheus'])"
+  },
+  {
+   "ok": true,
+   "check": "engine: build.context существует (../.. → /tmp/arena/tenants/71ebd7cc-b365-41c5-863c-79f587b1df1f/sessions/ba74cbb5-89f0-4d88-8a10-2525380dfcd2/workspace/Afina)"
+  },
+  {
+   "ok": true,
+   "check": "engine: dockerfile существует (eng6-service/deploy/Dockerfile)"
+  },
+  {
+   "ok": true,
+   "check": "platform: build.context существует (../.. → /tmp/arena/tenants/71ebd7cc-b365-41c5-863c-79f587b1df1f/sessions/ba74cbb5-89f0-4d88-8a10-2525380dfcd2/workspace/Afina)"
+  },
+  {
+   "ok": true,
+   "check": "platform: dockerfile существует (unified/deploy/Dockerfile.platform)"
+  },
+  {
+   "ok": true,
+   "check": "platform: depends_on «engine» — существующий сервис"
+  },
+  {
+   "ok": true,
+   "check": "prometheus: volume host-путь существует (./prometheus.unified.yml)"
+  },
+  {
+   "ok": true,
+   "check": "prometheus: volume host-путь существует (../../eng6-service/deploy/prometheus/rules)"
+  },
+  {
+   "ok": true,
+   "check": "grafana: volume host-путь существует (../../eng6-service/deploy/grafana/provisioning)"
+  },
+  {
+   "ok": true,
+   "check": "grafana: volume host-путь существует (../../eng6-service/deploy/grafana/dashboards)"
+  },
+  {
+   "ok": true,
+   "check": "prometheus: цель «engine» — имя сервиса compose"
+  },
+  {
+   "ok": true,
+   "check": "prometheus: цель «platform» — имя сервиса compose"
+  },
+  {
+   "ok": true,
+   "check": "Dockerfile.platform: COPY-источник существует (afina/src/afina)"
+  },
+  {
+   "ok": true,
+   "check": "Dockerfile.platform: COPY-источник существует (afina/src/client)"
+  },
+  {
+   "ok": true,
+   "check": "Dockerfile.platform: COPY-источник существует (unified/bridge)"
+  },
+  {
+   "ok": true,
+   "check": "Dockerfile.platform: COPY-источник существует (afina/data/Афина_Реестр_требований_ПриложениеА.json)"
+  },
+  {
+   "ok": true,
+   "check": "Dockerfile.platform: COPY-источник существует (afina/Афина_Техническое_задание.md)"
+  },
+  {
+   "ok": true,
+   "check": "Dockerfile линии B на месте (eng6-service/deploy/Dockerfile)"
+  }
+ ]
+}

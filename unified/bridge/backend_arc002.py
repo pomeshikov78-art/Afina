@@ -123,6 +123,16 @@ ALIGNMENTS: Dict[str, Dict[str, Any]] = {
                 "принимает явные количества. Согласование параметризации: connectors=2, "
                 "splices=⌊км/4⌋ → формулы идентичны (км·att + сростки·splice + коннекторы·conn)",
     },
+    "CALC_LINK_RX_DBM": {
+        "id": "XVER-GAS-SUBST",
+        "gas_substitute": True,
+        "note": "RF-07 (линия A) с 26.10.2026 имеет поле gas_absorption_db, но собственной "
+                "модели поглощения в газах (ITU-R P.676) не содержит — в стадии ALIGNED член "
+                "gas = gasGamma(f,15°C,60%)·d подставляется из КАНОНИЧЕСКОГО источника "
+                "(вендор ENG6) и фиксируется в протоколе (alignment_gas_db каждой строки). "
+                "Проверяется КОМПОЗИЦИЯ бюджета, а не модель газа (OBS-11 — зазор остаётся "
+                "открытым до реализации P.676 в линии A). Для f ≤ 900 МГц gas=0 — подстановка не нужна",
+    },
 }
 
 # Точки, исключённые из ALIGNED с обоснованием (не замалчиваются — попадают в протокол).
@@ -240,14 +250,17 @@ class PythonRefBackend(ComputeBackend):
             return py_rf.path_loss_db("FSPL", float(point["f_mhz"]), float(point["d_km"]), 30.0, 30.0)
         if m in ("CALC_LINK_RX_DBM", "CALC_LINK_NOISE_DBM"):
             # RF-07: бюджет линии с теми же параметрами, что у сценария зонда
-            # (feeder=0, diffraction=0 — flat; усиления одинаковы на обоих концах)
+            # (feeder=0, diffraction=0 — flat; усиления одинаковы на обоих концах;
+            #  gas_absorption_db — из a_kwargs при согласовании XVER-GAS-SUBST)
+            kw = dict(point.get("a_kwargs") or {})
             pl = py_rf.path_loss_db("FSPL", float(point["f_mhz"]), float(point["d_km"]), 30.0, 30.0)
             lb = py_rf.LinkBudget(
                 tx_power_dbm=float(point["tx_dbm"]), tx_feeder_loss_db=0.0,
                 tx_ant_gain_dbi=float(point["gain_dbi"]), path_loss_db=pl,
                 diffraction_db=0.0, rx_ant_gain_dbi=float(point["gain_dbi"]),
                 rx_feeder_loss_db=0.0, noise_figure_db=float(point.get("nf_db", 6.0)),
-                bandwidth_hz=float(point.get("bw_khz", 25.0)) * 1000.0)
+                bandwidth_hz=float(point.get("bw_khz", 25.0)) * 1000.0,
+                gas_absorption_db=float(kw.get("gas_absorption_db", 0.0)))
             res = lb.result()
             return res["rx_level_dbm"] if m == "CALC_LINK_RX_DBM" else res["noise_floor_dbm"]
         kw = dict(point.get("a_kwargs") or {})
@@ -306,13 +319,34 @@ class Eng6ProbeBackend(ComputeBackend):
             q: Dict[str, Any] = {"model": pair["probe"]}
             for k in ("f_mhz", "d_km", "h_bs_m", "h_ms_m", "env", "n", "d1_km", "d2_km", "f_ghz",
                       "bw_khz", "nf_db", "v", "len_km", "att_db_km", "splice_db", "conn_db",
-                      "tx_dbm", "gain_dbi"):
+                      "tx_dbm", "gain_dbi", "temp_c", "hum"):
                 if p.get(k) is not None:
                     q[k] = p[k]
             payload.append(q)
-        resp = self._call({"mode": "batch", "points": payload})
+        return self._eval_raw(payload)
+
+    def _eval_raw(self, payload: Sequence[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        resp = self._call({"mode": "batch", "points": list(payload)})
         self._core = resp.get("core") or self._core
         return resp["results"]
+
+    def gas_gamma_batch(self, freqs_mhz: Sequence[float], temp_c: float = 15.0,
+                        hum: float = 60.0) -> List[float]:
+        """Удельное поглощение в газах, дБ/км (ENG6.PROP.gasGamma) — пакетно.
+
+        Используется согласованием XVER-GAS-SUBST: RF-07 линии A с 26.10.2026
+        имеет поле gas_absorption_db, но собственной модели P.676 нет — значение
+        члена берётся из канонического источника (вендор ENG6) и фиксируется
+        в протоколе как подстановка (OBS-11).
+        """
+        res = self._eval_raw([{"model": "gas_gamma", "f_mhz": f, "temp_c": temp_c, "hum": hum}
+                              for f in freqs_mhz])
+        out = []
+        for r in res:
+            if not r.get("ok"):
+                raise BackendError(f"gasGamma: {r.get('error')}")
+            out.append(float(r["value"]))
+        return out
 
     def evaluate(self, point: Dict[str, Any]) -> float:
         res = self.eval_points([point])[0]
@@ -400,9 +434,12 @@ def default_grid() -> List[Dict[str, Any]]:
         for km in (0.5, 1.0, 4.0, 8.0, 13.7, 25.0, 100.0):
             pts.append({"model": "FIBER_LOSS_DB", "len_km": km,
                         "att_db_km": att, "splice_db": splice, "conn_db": conn})
-    # Композитный уровень ⇄ ENG6.calcLink (РРЛ, flat, f ≤ 900 МГц — gas=0, см. OBS-11)
-    for f in (150.0, 450.0, 900.0):
-        for d in (1.0, 5.0, 10.0, 20.0):
+    # Композитный уровень ⇄ ENG6.calcLink (РРЛ, flat, open, rain/fog/misc=0).
+    # f ≤ 900 МГц: gas=0 — совпадение без подстановок; f ≥ 1400 МГц: в стадии
+    # ALIGNED применяется XVER-GAS-SUBST (член газа из канонического источника,
+    # RF-07.gas_absorption_db; композиция проверяется, модель газа — зазор OBS-11).
+    for f in (150.0, 450.0, 900.0, 1400.0, 2000.0, 7000.0):
+        for d in (1.0, 5.0, 10.0, 20.0, 50.0):
             for tx, g in ((43.0, 30.0), (33.0, 14.0)):
                 base = {"f_mhz": f, "d_km": d, "tx_dbm": tx, "gain_dbi": g,
                         "bw_khz": 25.0, "nf_db": 6.0}
@@ -423,6 +460,17 @@ def _run_stage(a: ComputeBackend, b: ComputeBackend, grid: List[Dict[str, Any]],
         results = b.eval_points(probe_rows)
         for p, r in zip(probe_rows, results):
             b_raw[id(p)] = r
+
+    # XVER-GAS-SUBST: удельное поглощение в газах из канонического источника
+    # (вендор ENG6) — для точек ALIGNMENTS с gas_substitute при f > 900 МГц.
+    gas_by_f: Dict[float, float] = {}
+    if aligned and isinstance(b, Eng6ProbeBackend):
+        freqs = sorted({float(p["f_mhz"]) for p in grid
+                        if ALIGNMENTS.get(p["model"], {}).get("gas_substitute")
+                        and float(p.get("f_mhz", 0)) > 900.0})
+        if freqs:
+            for f, gv in zip(freqs, b.gas_gamma_batch(freqs)):
+                gas_by_f[f] = gv
 
     rows: List[Dict[str, Any]] = []
     n_consistent = n_degraded = n_failed = n_excluded = 0
@@ -450,7 +498,13 @@ def _run_stage(a: ComputeBackend, b: ComputeBackend, grid: List[Dict[str, Any]],
             al = ALIGNMENTS.get(model)
             if al:
                 if "a_kwargs" in al:
-                    point_a["a_kwargs"] = al["a_kwargs"]
+                    point_a["a_kwargs"] = dict(al["a_kwargs"])
+                if al.get("gas_substitute"):
+                    gv = gas_by_f.get(float(p.get("f_mhz", 0.0)), 0.0)
+                    gas_db = gv * float(p.get("d_km", 0.0))
+                    point_a["a_kwargs"] = {**(point_a.get("a_kwargs") or {}),
+                                           "gas_absorption_db": gas_db}
+                    row["alignment_gas_db"] = round(gas_db, 6)
                 scale_div = float(al.get("b_scale_div", 1.0))
                 row["alignment_id"] = al["id"]
 

@@ -105,7 +105,7 @@ def section_c() -> dict:
     entries = []
     bridge = ["eng6_js_client.py", "eng6_probe.mjs", "backend_arc002.py", "xverify.py",
               "datamodel_map.py", "plan_service.py", "platform_db.py", "audit_bridge.py",
-              "platform_client.py", "master_chain_sync.py", "scenario_export.py"]
+              "platform_client.py", "master_chain_sync.py", "scenario_export.py", "pg_export.py"]
     entries += [file_entry(os.path.join("unified", "bridge", f), REPO) for f in bridge]
     entries += [file_entry(os.path.join("unified", p), REPO) for p in
                 ("ui/workspace.html", "ci/unified-ci.yml", "deploy/docker-compose.unified.yml",

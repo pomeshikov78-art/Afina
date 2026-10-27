@@ -103,6 +103,9 @@ function evaluate(E, p) {
       return calcLinkPoint(E, p).rx;
     case 'calc_link_noise':
       return calcLinkPoint(E, p).noise;
+    case 'gas_gamma':
+      // ENG6: PROP.gasGamma(f_mhz, tempC, hum) — удельное поглощение, дБ/км
+      return E.PROP.gasGamma(Number(p.f_mhz), Number(p.temp_c ?? 15), Number(p.hum ?? 60));
     default:
       throw new Error('MODEL_UNSUPPORTED: ' + p.model);
   }

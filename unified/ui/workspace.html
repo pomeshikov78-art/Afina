@@ -86,8 +86,18 @@
         <button class="secondary" id="demoBtn" title="Вставить демо-сценарий (батальонный рубеж)">Демо-сценарий</button>
         <button class="secondary" id="loadBtn" title="Загрузить сценарий JSON (экспорт из платформы: bridge/scenario_export.py --out scenario.json)">📂 Из файла</button>
         <input type="file" id="fileIn" accept=".json,application/json" hidden>
+        <button class="secondary" id="pullBtn" title="Запросить обстановку у клиента платформы (postMessage afina:scenario-request)">⤓ Из платформы</button>
         <button class="secondary" id="exportBtn" title="Выгрузить плоские таблицы К-03 (JSON)">Экспорт К-03</button>
+        <span id="bridgeStatus" class="hint" style="color:#7e90a8;font-size:11px">мост: ожидание afina:ready…</span>
       </div>
+      <details>
+        <summary>Геопривязка сцены платформы (PoC): сцена клиента — локальные метры без CRS</summary>
+        <div class="row" style="padding:6px 0">
+          <label>Центр сцены, широта <input type="text" id="anchorLat" value="55.750000" size="10"></label>
+          <label>долгота <input type="text" id="anchorLng" value="37.620000" size="10"></label>
+          <label><input type="checkbox" id="autoStar"> авто-линии «звезда» от КП/первого узла (синтетика, помечается в meta)</label>
+        </div>
+      </details>
       <details>
         <summary>Сценарий (контракт ENG6-PLAN: topology / fleet / demands / constraints)</summary>
         <textarea id="scenario" spellcheck="false"></textarea>
@@ -324,14 +334,156 @@ function exportTables() {
   log('экспорт таблиц К-03 (JSON) — файл afina_plan_tables_K03.json', 'ok');
 }
 
-/* ============ postMessage-контракт (фаза 2) ============ */
+/* ============ postMessage-контракт с клиентом платформы (UNIF-21) ============
+ * ← afina:ready                — клиент платформы загружен во фрейме;
+ * → afina:scenario-request     — запрос обстановки (кнопка «⤓ Из платформы»);
+ * ← afina:scenario             — обстановка: объекты сервера (attrs-соглашения
+ *   те же, что в bridge/scenario_export.py) и/или локальная сцена (метры).
+ *   Метры без CRS → условная геопривязка через анкор (явное допущение, ENG-004:
+ *   конверсия не молчаливая — логируется и помечается в meta сценария).
+ * Безопасность: токен сессии через мост НЕ передаётся (гарантия клиента).
+ */
+const TS_CODE_TO_CONDITION = {'TS-0':'green','TS-1':'green','TS-2':'yellow','TS-3':'yellow','TS-4':'red','TS-5':'red'};
+const TECH_STATE_TO_CONDITION = {'исправна':'green','исправно':'green','ограниченно пригодна':'yellow','ограниченно пригодно':'yellow','неисправна':'red','неисправно':'red'};
+const M_PER_DEG = 111194.92664455874; // πR/180, R=6371 км — константа ENG6/платформы
+
+function parseAttrs(a){
+  if (a && typeof a === 'object') return a;
+  if (typeof a === 'string' && a.trim()) {
+    try { const v = JSON.parse(a); return (typeof v === 'string') ? (JSON.parse(v) || {}) : (v || {}); } catch(e){ return {}; }
+  }
+  return {};
+}
+function linkTypeByRange(dKm, forced){
+  if (forced) return forced;
+  if (dKm <= 12) return 'FOC'; if (dKm <= 25) return 'VHF';
+  if (dKm <= 45) return 'UHF'; if (dKm <= 90) return 'RRL';
+  return 'SAT';
+}
+function havKm(la1, ln1, la2, ln2){
+  const dLa=(la2-la1)*Math.PI/180, dLn=(ln2-ln1)*Math.PI/180;
+  const a=Math.sin(dLa/2)**2 + Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dLn/2)**2;
+  return 2*6371*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+function buildScenarioFromBridge(payload){
+  const warn = [];
+  const aLat = parseFloat(document.getElementById('anchorLat').value);
+  const aLng = parseFloat(document.getElementById('anchorLng').value);
+  const toDeg = (x, y, w, h) => ({
+    lat: aLat + (y - h/2) / M_PER_DEG,
+    lng: aLng + (x - w/2) / (M_PER_DEG * Math.cos(aLat * Math.PI / 180))
+  });
+  const nodes = [], fleet = [], links = [], demands = [];
+  const unitSeen = {};
+  const addUnit = (u, nodeType, tsCode) => {
+    if (!u || !u.inventoryId || unitSeen[u.inventoryId]) return;
+    unitSeen[u.inventoryId] = true;
+    const f = {unitId: String(u.inventoryId), kind: String(u.model || 'не указан'),
+               nodeType: nodeType || 'radio',
+               condition: TECH_STATE_TO_CONDITION[String(u.techState || '').toLowerCase()] ||
+                          TS_CODE_TO_CONDITION[String(tsCode || 'TS-0')] || 'green'};
+    if (u.cost != null) f.costDeploy = u.cost;
+    if (u.deployTimeMin != null) f.deployTimeMin = u.deployTimeMin;
+    fleet.push(f);
+  };
+  let usedAnchor = false;
+  // 1) серверные объекты платформы (те же классы, что scenario_export.py)
+  for (const o of (payload.objects || [])) {
+    const a = parseAttrs(o.attrs);
+    const cls = String(o.class || '').toUpperCase();
+    if (cls === 'COM') {
+      let lat, lng;
+      if (Math.abs(o.x) <= 180 && Math.abs(o.y) <= 90) { lat = o.y; lng = o.x; }
+      else if (String(a.crs || '').toUpperCase().startsWith('UTM')) {
+        warn.push(`COM/${o.id}: CRS «${a.crs}» — пересчёт UTM доступен серверно (scenario_export.py); здесь объект пропущен`);
+        continue;
+      } else {
+        const sc = payload.scene || {width_m: 6000, height_m: 6000};
+        const p = toDeg(o.x, o.y, sc.width_m, sc.height_m);
+        lat = p.lat; lng = p.lng; usedAnchor = true;
+      }
+      const ntype = a.node_type || 'radio';
+      nodes.push({id: o.id, type: ntype, name: o.name || o.id,
+                  lat: Math.round(lat*1e6)/1e6, lng: Math.round(lng*1e6)/1e6,
+                  status: 'active', ...(a.org_unit ? {parentId: null, _org: a.org_unit} : {})});
+      if (a.unit) { addUnit(a.unit, ntype, o.ts_code); nodes[nodes.length-1].unitId = String(a.unit.inventoryId); }
+    } else if (cls === 'LINK') {
+      if (a.a && a.b) links.push({_id: o.id, a: String(a.a), b: String(a.b), link_type: a.link_type || null});
+      else warn.push(`LINK/${o.id}: нет attrs.a/attrs.b — пропущен`);
+    } else if (cls === 'ORDER') {
+      if (a.src && a.dst) demands.push({id: o.id, from: String(a.src), to: String(a.dst),
+                                        rateKbps: Number(a.rate_kbps || 16),
+                                        ...(a.priority != null ? {priority: a.priority} : {})});
+      else warn.push(`ORDER/${o.id}: нет attrs.src/attrs.dst — пропущен`);
+    }
+  }
+  // 2) локальная сцена клиента (станции в метрах) — если серверных COM не было
+  if (!nodes.length && (payload.stations || []).length) {
+    const sc = payload.scene || {width_m: 6000, height_m: 6000};
+    for (const s of payload.stations) {
+      const p = toDeg(s.x_m, s.y_m, sc.width_m, sc.height_m);
+      usedAnchor = true;
+      nodes.push({id: s.id, type: 'radio', name: s.id, lat: Math.round(p.lat*1e6)/1e6,
+                  lng: Math.round(p.lng*1e6)/1e6, status: 'active', unitId: s.id + '-U'});
+      addUnit({inventoryId: s.id + '-U', model: 'БС клиента (f ' + (s.f_mhz||'?') + ' МГц)', techState: 'исправна',
+               cost: 10, deployTimeMin: 15}, 'radio');
+    }
+  }
+  if (usedAnchor) warn.push(`координаты в метрах пересчитаны через УСЛОВНЫЙ анкор (${aLat}, ${aLng}) — допущение PoC, зафиксировано в meta`);
+  // 3) связи: авто-«звезда» только по явному согласию пользователя
+  const byId = {}; nodes.forEach(n => byId[n.id] = n);
+  const outLinks = [];
+  for (const l of links) {
+    if (!byId[l.a] || !byId[l.b]) { warn.push(`LINE ${l._id}: узел не найден — пропущен`); continue; }
+    const d = havKm(byId[l.a].lat, byId[l.a].lng, byId[l.b].lat, byId[l.b].lng);
+    outLinks.push({id: l._id, from: l.a, to: l.b, type: linkTypeByRange(d, l.link_type)});
+  }
+  let autoStar = false;
+  if (!outLinks.length && nodes.length > 1 && document.getElementById('autoStar').checked) {
+    autoStar = true;
+    const hub = nodes.find(n => n.type === 'cp') || nodes[0];
+    for (const n of nodes) {
+      if (n.id === hub.id) continue;
+      const d = havKm(hub.lat, hub.lng, n.lat, n.lng);
+      outLinks.push({id: `auto-${hub.id}-${n.id}`, from: hub.id, to: n.id, type: linkTypeByRange(d, null)});
+    }
+    warn.push(`линий в обстановке не было — построена СИНТЕТИЧЕСКАЯ «звезда» от ${hub.id} (помечено в meta)`);
+  }
+  for (const d of demands) if (!byId[d.from] || !byId[d.to]) warn.push(`ORDER ${d.id}: узел не найден — пропущен`);
+  const req = {
+    meta: {name: 'Обстановка из клиента платформы (afina:scenario)', author: payload.me ? payload.me.login : 'аноним',
+           description: usedAnchor ? 'условная геопривязка: анкор ' + aLat + ',' + aLng : 'координаты WGS-84 из платформы',
+           ...(autoStar ? {seed: 'auto-star'} : {})},
+    topology: {nodes: nodes.map(({_org, ...n}) => n), links: outLinks},
+    ...(fleet.length ? {fleet} : {}),
+    ...(demands.filter(d => byId[d.from] && byId[d.to]).length ? {demands: demands.filter(d => byId[d.from] && byId[d.to])} : {}),
+    constraints: {budget: 400, physics: 'fast'},
+    environment: {clutterType: 'open', terrain: {source: 'flat'}}
+  };
+  return {req, warn};
+}
 window.addEventListener('message', (ev) => {
   const d = ev.data || {};
-  if (d.type === 'afina:scenario' && d.payload) {
-    $('scenario').value = JSON.stringify(d.payload, null, 1);
-    log('сценарий принят от клиента платформы (afina:scenario)', 'ok');
-  }
+  if (d.type === 'afina:ready') {
+    document.getElementById('bridgeStatus').textContent = 'мост: платформа на связи (bridge v' + (d.bridge || '?') + ')';
+    document.getElementById('bridgeStatus').style.color = '#56d364';
+    log('клиент платформы сообщил о готовности (afina:ready)', 'ok');
+  } else if (d.type === 'afina:scenario') {
+    try {
+      const {req, warn} = buildScenarioFromBridge(d);
+      $('scenario').value = JSON.stringify(req, null, 1);
+      log(`обстановка принята от платформы: ${req.topology.nodes.length} узлов, ${req.topology.links.length} линий` +
+          (d.logged_in ? '' : ' (без сессии — только локальная сцена)'), 'ok');
+      warn.forEach(w => log('⚠ ' + w, 'warn'));
+    } catch (e) { log('сбой разбора afina:scenario: ' + e.message, 'err'); }
+  } else if (d.type === 'afina:plan-result') { /* эхо собственного результата — игнорируем */ }
 });
+document.getElementById('pullBtn').onclick = () => {
+  const fr = document.getElementById('platformFrame');
+  if (!fr || !fr.contentWindow || fr.src === 'about:blank') { log('клиент платформы не загружен во фрейме', 'warn'); return; }
+  fr.contentWindow.postMessage({type: 'afina:scenario-request'}, '*');
+  log('запрошена обстановка у клиента платформы (afina:scenario-request)');
+};
 
 /* ============ инициализация ============ */
 $('demoBtn').onclick = () => { $('scenario').value = JSON.stringify(DEMO, null, 1); log('демо-сценарий загружен'); };

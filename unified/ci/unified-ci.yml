@@ -73,9 +73,14 @@ jobs:
       - name: Сквозной сценарий UNIF (платформа → ENG6-PLAN → таблицы + паспорт)
         working-directory: unified/scripts
         run: python demo_e2e.py
-      - name: Единый RTM (170 требований)
+      - name: Единый RTM (183 требования) и манифест поставки
         working-directory: unified/rtm
-        run: python build_unified_rtm.py
+        run: |
+          python build_unified_rtm.py
+          python build_unified_manifest.py
+      - name: Сухая валидация артефактов развёртывания (без Docker)
+        working-directory: unified/scripts
+        run: python validate_deploy.py
       - name: Артефакты — протоколы и RTM
         uses: actions/upload-artifact@v4
         with:

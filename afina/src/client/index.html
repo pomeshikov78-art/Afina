@@ -1106,7 +1106,7 @@ async function missionStart(){
   try{
     const t=await api('POST','/game/missions/'+encodeURIComponent(curMission)+'/start',{seed});
     const data=JSON.parse(JSON.stringify(t));delete data.status;delete data.mission;delete data.seed;delete data.isolation;
-    document.getElementById('missionBox').innerHTML='<b>'+esc(t.mission.replace(/_/g,' '))+'</b> <span style="color:var(--dim)">(seed '+t.seed+' · '+esc(t.isolation)')</span><pre style="font-size:10px;background:var(--panel2);padding:7px;border-radius:6px;max-height:180px;overflow:auto">'+esc(JSON.stringify(data,null,1))+'</pre>';
+    document.getElementById('missionBox').innerHTML='<b>'+esc(t.mission.replace(/_/g,' '))+'</b> <span style="color:var(--dim)">(seed '+t.seed+' · '+esc(t.isolation)+')</span><pre style="font-size:10px;background:var(--panel2);padding:7px;border-radius:6px;max-height:180px;overflow:auto">'+esc(JSON.stringify(data,null,1))+'</pre>';
   }catch(e){toast('Миссия: '+e.message,'err');}
 }
 async function missionCheck(){
@@ -1129,6 +1129,48 @@ async function missionHint(level){
     document.getElementById('missionBox').insertAdjacentHTML('beforeend','<div style="margin-top:4px;color:var(--dim)">💡 '+esc(r.hint)+'</div>');
   }catch(e){toast('Подсказка: '+e.message,'err');}
 }
+
+/* ---------- Мост единого рабочего места (UNIF-21, postMessage-контракт) ----------
+ * Клиент, встроенный во фрейм единого рабочего места (unified/ui/workspace.html),
+ * объявляет готовность и по запросу отдаёт обстановку.
+ * БЕЗОПАСНОСТЬ: токен сессии НИКОГДА не передаётся через postMessage — только
+ * роль/логин для отображения; данные — те, что уже видны текущей сессии.
+ * Координаты сцены — локальные метры (W_M×H_M) без геопривязки: географический
+ * анкор задаёт принимающая сторона (честная конверсия — ENG-004).
+ */
+const UNIFIED_BRIDGE_VERSION = '1.0.0';
+function unifiedIsEmbedded(){ try { return window.parent && window.parent !== window; } catch(e){ return false; } }
+function unifiedPost(msg){ try { window.parent.postMessage(Object.assign({type:msg.type, bridge:UNIFIED_BRIDGE_VERSION}, msg), '*'); } catch(e){} }
+async function unifiedSendScenario(){
+  const payload = {
+    type: 'afina:scenario',
+    source: 'afina-client',
+    logged_in: !!TOKEN,
+    me: ME ? {login: ME.login, role: ME.role} : null,
+    scene: {width_m: W_M, height_m: H_M},
+    stations: stations.map(s => ({id: s.id, x_m: s.x_m, y_m: s.y_m, h_ant_m: s.h_ant_m,
+                                  f_mhz: s.f_mhz, tx_power_dbm: s.tx_power_dbm, sector: !!s.sector})),
+    objects: null, objects_note: null
+  };
+  if (TOKEN) {
+    try {
+      const r = await api('GET', '/objects');
+      const rows = Array.isArray(r) ? r : (r.objects || []);
+      payload.objects = rows.slice(0, 2000).map(o => ({id: o.id, class: o.class, name: o.name,
+        x: o.x, y: o.y, z: o.z, ts_code: o.ts_code, attrs: o.attrs}));
+      if (rows.length > 2000) payload.objects_note = 'усечено до 2000 объектов';
+    } catch(e) { payload.objects_note = 'объекты недоступны: ' + e.message; }
+  } else {
+    payload.objects_note = 'сессия не активна — переданы только объекты локальной сцены';
+  }
+  unifiedPost(payload);
+  toast('Обстановка передана в единое рабочее место', 'ok');
+}
+window.addEventListener('message', (ev) => {
+  const d = ev.data || {};
+  if (d.type === 'afina:scenario-request') unifiedSendScenario();
+});
+if (unifiedIsEmbedded()) unifiedPost({type: 'afina:ready'});
 
 </script>
 </body>

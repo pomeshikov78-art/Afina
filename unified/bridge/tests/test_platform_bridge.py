@@ -11,6 +11,7 @@
 """
 import json
 import os
+import re
 import shutil
 import signal
 import socket
@@ -233,6 +234,23 @@ class TestPlatformBridgeLive(unittest.TestCase):
             self.assertIn("ENG6-PLAN-service", run["passport"]["environment"]["backend"])
         finally:
             conn.close()
+
+    def test_06_platform_metrics_endpoint(self):
+        # правка линии A №2: GET /metrics — Prometheus text exposition 0.0.4 (UNIF-19)
+        import urllib.request
+        with urllib.request.urlopen(f"{self.plat_url}/metrics", timeout=5) as r:
+            ctype = r.headers.get("Content-Type", "")
+            body = r.read().decode("utf-8")
+        self.assertIn("text/plain", ctype)
+        self.assertIn("version=0.0.4", ctype)
+        self.assertIn("afina_up 1", body)
+        self.assertIn("afina_objects_total", body)
+        self.assertIn("afina_queue_jobs", body)
+        self.assertIn("afina_audit_entries_total", body)
+        # объекты, созданные тестом, видны в метрике
+        m = re.search(r"afina_objects_total (\d+)", body)
+        self.assertIsNotNone(m)
+        self.assertGreaterEqual(int(m.group(1)), 10)
 
 
 if __name__ == "__main__":

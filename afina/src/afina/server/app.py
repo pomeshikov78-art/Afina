@@ -18,6 +18,7 @@ from afina.ai import rag as ai_rag
 
 API = "/api/v1"
 VERSION = "1.0.0"
+_START_TIME = None  # инициализируется при старте сервера (для afina_uptime_seconds)
 
 
 class AfinaApp:
@@ -1049,6 +1050,71 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, *a):  # тишина в stderr; структурированный лог — в аудит
         pass
 
+    def _metrics(self):
+        """Prometheus text exposition 0.0.4 — единая программа (UNIF-19).
+
+        Без аутентификации (как /healthz и /metrics линии B): предполагается
+        закрытый контур; в проде — за TLS/ingress. Отказ отдельного счётчика
+        не рвёт выдачу: метрики независимы, ошибка фиксируется комментарием.
+        """
+        import time as _t
+        st = self.app.store
+        out = []
+
+        def fam(name, help_, type_, samples):
+            out.append(f"# HELP {name} {help_}")
+            out.append(f"# TYPE {name} {type_}")
+            out.extend(samples)
+
+        def safe(fn):
+            try:
+                fn()
+            except Exception as e:
+                out.append(f"# afina_metric_error {type(e).__name__}: {e}")
+
+        def m_up():
+            up = (_t.time() - _START_TIME) if _START_TIME else 0.0
+            fam("afina_up", "Платформа Афина жива", "gauge", ["afina_up 1"])
+            fam("afina_uptime_seconds", "Аптайм процесса, с", "counter",
+                [f"afina_uptime_seconds {up:.3f}"])
+            fam("afina_build_info", "Версия платформы", "gauge",
+                [f'afina_build_info{{version="{VERSION}"}} 1'])
+        safe(m_up)
+
+        def m_counts():
+            n_obj = st.q("SELECT COUNT(*) c FROM objects")[0]["c"]
+            fam("afina_objects_total", "Объектов обстановки", "gauge", [f"afina_objects_total {n_obj}"])
+            n_users = st.q("SELECT COUNT(*) c FROM users")[0]["c"]
+            fam("afina_users_total", "Пользователей", "gauge", [f"afina_users_total {n_users}"])
+            n_audit = st.q("SELECT COUNT(*) c FROM audit")[0]["c"]
+            fam("afina_audit_entries_total", "Записей мастер-журнала аудита", "counter",
+                [f"afina_audit_entries_total {n_audit}"])
+        safe(m_counts)
+
+        def m_calcs():
+            rows = st.q("SELECT status, COUNT(*) c FROM calcs GROUP BY status")
+            fam("afina_calcs_total", "Расчётов по статусам", "gauge",
+                [f'afina_calcs_total{{status="{r["status"]}"}} {r["c"]}' for r in rows] or ['afina_calcs_total 0'])
+        safe(m_calcs)
+
+        def m_queue():
+            snap = self.app.queue.snapshot()
+            counts = {}
+            for j in snap.get("jobs", []):
+                counts[j["status"]] = counts.get(j["status"], 0) + 1
+            fam("afina_queue_jobs", "Заданий очереди расчётов по статусам (ARC-003)", "gauge",
+                [f'afina_queue_jobs{{status="{k}"}} {v}' for k, v in sorted(counts.items())]
+                or ['afina_queue_jobs 0'])
+        safe(m_queue)
+
+        body = ("\n".join(out) + "\n").encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "text/plain; version=0.0.4; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(body)
+
     def _json(self, code, obj):
         b = json.dumps(obj, ensure_ascii=False, default=str).encode()
         self.send_response(code)
@@ -1078,6 +1144,8 @@ class Handler(BaseHTTPRequestHandler):
                 return
         if method == "GET" and u_path == "/healthz":
             return self._json(200, {"status": "ok", "version": VERSION, "external_calls": 0})
+        if method == "GET" and u_path == "/metrics":
+            return self._metrics()
         n = int(self.headers.get("Content-Length") or 0)
         body = json.loads(self.rfile.read(n).decode() or "{}") if n else {}
         for m, rx, fn, op, auth in self.routes:
@@ -1112,6 +1180,10 @@ class Handler(BaseHTTPRequestHandler):
 
 def create_server(db_path="data/afina.db", host="127.0.0.1", port=8470, requirements_path=None,
                   tz_path=None, ai_enabled=True):
+    global _START_TIME
+    if _START_TIME is None:
+        import time as _t
+        _START_TIME = _t.time()          # для afina_uptime_seconds (/metrics, UNIF-19)
     app = AfinaApp(db_path=db_path, requirements_path=requirements_path, tz_path=tz_path, ai_enabled=ai_enabled)
     Handler.app = app
     Handler.routes = app.routes()

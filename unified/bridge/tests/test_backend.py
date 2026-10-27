@@ -76,6 +76,29 @@ class TestArc002(unittest.TestCase):
         self.assertIn("ENG6-JS-vendor-probe", d["environment"]["backend"])
         self.assertIn(VENDOR_SHA256[:16], d["environment"]["backends"])
 
+    def test_gas_absorption_field_rf07(self):
+        # правка линии A №1: RF-07 LinkBudget.gas_absorption_db (OBS-11)
+        a = PythonRefBackend()
+        base = {"model": "CALC_LINK_RX_DBM", "f_mhz": 7000.0, "d_km": 50.0,
+                "tx_dbm": 43.0, "gain_dbi": 30.0, "bw_khz": 25.0, "nf_db": 6.0}
+        rx0 = a.evaluate(dict(base))
+        rx_gas = a.evaluate({**base, "a_kwargs": {"gas_absorption_db": 0.545}})
+        self.assertAlmostEqual(rx0 - rx_gas, 0.545, places=2)
+        # обратная совместимость: без члена результат прежний (дефолт 0)
+        self.assertAlmostEqual(rx0, a.evaluate(dict(base)), places=9)
+
+
+@unittest.skipUnless(HAS_NODE, "node недоступен")
+class TestProbeGasGamma(unittest.TestCase):
+    def test_gas_gamma_zero_below_1ghz_positive_above(self):
+        b = Eng6ProbeBackend()
+        vals = b.gas_gamma_batch([150.0, 900.0, 1400.0, 7000.0])
+        self.assertEqual(vals[0], 0.0)
+        self.assertEqual(vals[1], 0.0)
+        self.assertGreater(vals[2], 0.001)     # ~0.0018 дБ/км
+        self.assertGreater(vals[3], 0.008)     # ~0.0109 дБ/км
+        self.assertLess(vals[3], 0.02)
+
 
 if __name__ == "__main__":
     unittest.main()

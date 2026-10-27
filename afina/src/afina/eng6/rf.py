@@ -113,10 +113,16 @@ class LinkBudget:
     bandwidth_hz: float = 100e6
     rx_sensitivity_dbm: Optional[float] = None  # None — «не измерено» (EQP-001)
     vswr: float = 1.3
+    # поглощение в атмосферных газах, дБ (внешний член; значение — из канонической
+    # модели, напр. ENG6 gasGamma / ITU-R P.676). Добавлено 26.10.2026 по итогам
+    # кросс-верификации XVER (OBS-11): без члена бюджет оптимистичен до ~0.011 дБ/км
+    # на РРЛ-диапазонах. По умолчанию 0 — обратная совместимость сохранена.
+    gas_absorption_db: float = 0.0
 
     def result(self) -> Dict:
         eirp = self.tx_power_dbm - self.tx_feeder_loss_db + self.tx_ant_gain_dbi
         rx = db_add([eirp, -self.path_loss_db, -self.diffraction_db,
+                     -self.gas_absorption_db,
                      self.rx_ant_gain_dbi, -self.rx_feeder_loss_db])
         noise = K_BOLTZMANN_DB + 10 * math.log10(self.bandwidth_hz) + self.noise_figure_db
         margin = rx - noise
@@ -124,6 +130,10 @@ class LinkBudget:
                "noise_floor_dbm": round(noise, 2), "margin_db": round(margin, 2),
                "vswr": self.vswr,
                "vswr_mismatch_loss_db": round(-10 * math.log10(1 - ((self.vswr - 1) / (self.vswr + 1)) ** 2), 3)}
+        if self.gas_absorption_db:
+            out["gas_absorption_db"] = round(self.gas_absorption_db, 3)
+        else:
+            out["assumption"] = "поглощение в атмосферных газах не учтено (gas_absorption_db=0); для f > 1 ГГц член обязателен (OBS-11)"
         if self.rx_sensitivity_dbm is None:
             out["sensitivity"] = "не измерено — запас до чувствительности не определён (EQP-001); результат маркирован как предварительный"
         else:

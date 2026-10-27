@@ -7,11 +7,11 @@ rule_files:
   - /etc/prometheus/rules/*.yml
 
 scrape_configs:
-  - job_name: eng6-plan          # вычислительный контур (линия B)
+  - job_name: eng6-plan          # вычислительный контур (линия B): /metrics (Prometheus 0.0.4)
     static_configs:
       - targets: ['engine:8080']
 
-  - job_name: afina-platform     # платформа (линия A): /healthz отдаёт JSON; метрик Prometheus
-    metrics_path: /healthz       # в линии A пока нет — скрейп healthz как up-индикатор.
-    static_configs:              # TODO(UNIF): добавить /metrics в afina/server (фаза 1).
-      - targets: ['platform:8470']
+  - job_name: afina-platform     # платформа (линия A): /metrics добавлен 26.10.2026
+    metrics_path: /metrics       # (правка линии A №2, реестр unified/docs/04_LINE_A_CHANGES.md)
+    static_configs:              # afina_up, afina_objects_total, afina_queue_jobs{status},
+      - targets: ['platform:8470']  # afina_calcs_total{status}, afina_audit_entries_total

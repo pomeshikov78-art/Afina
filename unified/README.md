@@ -42,14 +42,19 @@ unified/
 │   ├── scenario_export.py      обстановка платформы (objects COM/LINK/ORDER/ORG) →
 │   │                           контракт ENG6-PLAN; CRS: градусы + UTM через ГИС-ядро
 │   │                           линии A (round-trip 1e-6); честные пропуски (UNIF-18)
-│   └── tests/                  55 тестов: маппинг 8 + бэкенды 8 + БД 5 + аудит/ротация 10 +
-│                               экспорт 8 + live-сервис 7 + очередь live 4 + платформа live 5
+│   ├── pg_export.py            миграционный комплект SQLite→PostgreSQL: детерминированный
+│   │                           экспорт (INSERT ON CONFLICT + леджер с архивами ротации),
+│   │                           sha256-манифест, verify (UNIF-22)
+│   └── tests/                  66 тестов: маппинг 8 + бэкенды 10 + БД 5 + аудит/ротация 10 +
+│                               экспорт 8 + PG-экспорт 4 + клиент-мост 4 + live-сервис 7 +
+│                               очередь live 4 + платформа live 6
 ├── ui/workspace.html           единое рабочее место (PoC, UNIF-14): платформа во фрейме +
 │                               модуль планирования по CORS, Canvas2D, экспорт К-03,
 │                               заготовка postMessage-контракта; NFR-02 скан PASS
 ├── scripts/
 │   ├── demo_e2e.py             сквозной сценарий UNIF-05: сущности платформы → расчёт →
 │   │                           таблицы → паспорт → XVER → протокол
+│   ├── validate_deploy.py      сухая валидация compose/Dockerfile/prometheus без Docker (UNIF-23)
 │   ├── start_stack.sh          локальный подъём стека (engine :8080 + platform :8470)
 │   └── stop_stack.sh           остановка стека
 ├── rtm/
@@ -80,11 +85,12 @@ docker compose -f deploy/docker-compose.unified.yml up -d --build
 #    platform → http://localhost:8470 · engine → :8080 · grafana → :3000 · prometheus → :9090
 
 # 3. Проверки единой программы (всё stdlib/zero-deps)
-cd bridge && python3 -m unittest discover -s tests -p "test_*.py"   # 55/55 (live-тесты сами поднимают оба сервера)
-python3 xverify.py                                                   # XVER 219 точек → protocols/
+cd bridge && python3 -m unittest discover -s tests -p "test_*.py"   # 66/66 (live-тесты сами поднимают оба сервера)
+python3 xverify.py                                                   # XVER 327 точек → protocols/
 cd ../scripts && python3 demo_e2e.py                                 # E2E 7 шагов → protocols/
-cd ../rtm && python3 build_unified_rtm.py                            # RTM 178 → rtm/artifacts/
+cd ../rtm && python3 build_unified_rtm.py                            # RTM 183 → rtm/artifacts/
 python3 build_unified_manifest.py                                    # манифест поставки → rtm/artifacts/
+cd ../scripts && python3 validate_deploy.py                          # сухая валидация deploy (18 проверок)
 
 # 4. Экспорт обстановки платформы в сценарий (для рабочего места / контура)
 cd ../bridge && python3 scenario_export.py --platform-url http://127.0.0.1:8470 \
@@ -102,13 +108,16 @@ cd ../bridge && python3 scenario_export.py --platform-url http://127.0.0.1:8470 
 | Линия B: 125 тестов + conformance 16/16 + selfcheck 21/21 | ✅ (sha256 вендора совпал) |
 | Линия B: `npm run smoke` после фикса UNIF-09 | ✅ planner + api целиком |
 | Линия B: bench quick (10⁴ узлов, burst 40×2000) | ✅ PASS, 61 с |
-| Мост: 55 тестов (маппинг 8, бэкенды 8, БД 5, аудит/ротация 10, экспорт 8, live-сервис 7, очередь live 4, платформа live 5) | ✅ 55/55 |
-| **XVER / ARC-002** (219 точек, RAW→ALIGNED) | ✅ **ALIGNED PASS** (217 CONSISTENT, 0 FAIL, 2 EXCLUDED; FSPL/Hata/kTB/J(v) — Δ=0.0; NET-01⇄FIBER — параметризация; **композит calcLink**: prop Δ≤0.0002 дБ, rx Δ≤0.005 дБм) |
+| Мост: 66 тестов (маппинг 8, бэкенды 10, БД 5, аудит/ротация 10, экспорт 8, PG-экспорт 4, клиент-мост 4, live-сервис 7, очередь live 4, платформа live 6) | ✅ 66/66 |
+| **XVER / ARC-002** (327 точек, RAW→ALIGNED) | ✅ **ALIGNED PASS** (325 CONSISTENT, 0 FAIL, 2 EXCLUDED; примитивы Δ=0.0; **композит calcLink до 7 ГГц**: prop Δ≤0.0002 дБ, rx/noise — в допуске; газ — XVER-GAS-SUBST из канона, OBS-11) |
 | **E2E UNIF-05** (7 шагов) | ✅ **PASS** (план PARTIAL/C — честный отказ red-технике, детерминизм ok) |
 | **PLAN-01 в очереди платформы** (UNIF-11, live) | ✅ паспорт с двумя бэкендами, БД+верификация, якорь аудита matched≥1 |
 | **Сшивка трёх журналов** (UNIF-17, live) | ✅ **ANCHORED**, встроена в продуктивный цикл PLAN-01 (авто-якорь); RBAC 403-проверки (OBS-07) |
 | **Экспорт обстановки платформы** (UNIF-18, live) | ✅ objects → сценарий → план PARTIAL (red-техника отклонена) |
-| Единый RTM | ✅ 178 требований: 118 подтверждено, 47 стенд/данные, 2 ждут стенда |
+| Единый RTM | ✅ 183 требования: 123 подтверждено, 47 стенд/данные |
+| Миграция PostgreSQL (UNIF-22) | ✅ комплект: DDL + детерминированный экспорт + sha256-манифест (4 теста); загрузка — на стенде |
+| Deploy-валидация (UNIF-23) | ✅ PASS 18/18 проверок без Docker |
+| Правки линии A (4 шт.) | ✅ реестр `docs/04_LINE_A_CHANGES.md`; 145/145 линии A зелёные; **OBS-12: исправлен критический SyntaxError клиента** |
 | Единый манифест поставки (UNIF-16) | ✅ COMPLETE: A 17/18 целы (1 — «без хэш-контроля» честно), B 13/13 + вендор, C 32/32 |
 | UI PoC (UNIF-14) | ✅ NFR-02 скан PASS, JS-синтаксис ok, +загрузка сценария из файла; визуальный контроль — браузерный стенд |
 
