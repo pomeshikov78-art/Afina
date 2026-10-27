@@ -32,8 +32,8 @@ os.makedirs(DATA, exist_ok=True)
 LOG = os.path.join(DATA, "unified.log")
 PIDFILE = os.path.join(DATA, "unified.pid")
 DB = os.path.join(DATA, "afina.db")
-QUEUE = os.path.join(DATA, "queue.json")
-LEDGER = os.path.join(DATA, "unified_audit.ndjson")
+# очередь платформы и аудит-леджер создаются рядом с БД автоматически
+# (dirname(db_path) → %LOCALAPPDATA%\AfinaUnified) — явные пути не нужны
 
 NODE_EXE = os.path.join(HERE, "runtimes", "node", "node.exe")
 ENGINE_DIR = os.path.join(HERE, "eng6-service")
@@ -134,22 +134,47 @@ def main():
     except Exception as e:
         engine.terminate()
         fail(f"Не удалось импортировать платформу: {e}")
-    httpd, app = create_server(db_path=DB, host="127.0.0.1", port=plat_port,
-                               queue_path=QUEUE,
-                               requirements_path=REQUIREMENTS if os.path.exists(REQUIREMENTS) else None,
-                               tz_path=TZ if os.path.exists(TZ) else None)
-    seed.build(app.store)
+
+    # pid-файл — СРАЗУ после старта движка: «Остановить» убьёт сироту даже при
+    # падении платформы (дефект OBS-14: раньше pid писался позже, движок зависал)
+    def write_pid(**extra):
+        data = {"engine_pid": engine.pid, "launcher_pid": os.getpid(),
+                "engine_port": eng_port, "platform_port": plat_port,
+                "started": time.strftime("%Y-%m-%d %H:%M:%S")}
+        data.update(extra)
+        try:
+            with open(PIDFILE, "w", encoding="utf-8") as f:
+                json.dump(data, f)
+        except OSError:
+            pass
+    write_pid(platform="starting")
+
+    try:
+        # ВНИМАНИЕ: только параметры из фактической сигнатуры create_server()
+        # (db_path, host, port, requirements_path, tz_path, ai_enabled) —
+        # queue_path НЕТ в фабрике (OBS-14); очередь платформа кладёт сама
+        # рядом с БД (dirname(db_path)/queue.json) — то есть в %LOCALAPPDATA%.
+        httpd, app = create_server(db_path=DB, host="127.0.0.1", port=plat_port,
+                                   requirements_path=REQUIREMENTS if os.path.exists(REQUIREMENTS) else None,
+                                   tz_path=TZ if os.path.exists(TZ) else None)
+        seed.build(app.store)
+    except Exception as e:
+        engine.terminate()
+        try:
+            engine.wait(timeout=5)
+        except Exception:
+            engine.kill()
+        fail(f"Не удалось запустить платформу: {type(e).__name__}: {e}")
+
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
     log(f"платформа: порт {plat_port}, БД {DB}")
-
-    with open(PIDFILE, "w", encoding="utf-8") as f:
-        json.dump({"engine_pid": engine.pid, "launcher_pid": os.getpid(),
-                   "engine_port": eng_port, "platform_port": plat_port,
-                   "started": time.strftime("%Y-%m-%d %H:%M:%S")}, f)
+    write_pid(platform="running")
 
     if not wait_health(f"http://127.0.0.1:{eng_port}/healthz"):
+        engine.terminate()
         fail("Контур ENG6-PLAN не ответил за 60 с — см. журнал: " + os.path.join(DATA, "engine.log"))
     if not wait_health(f"http://127.0.0.1:{plat_port}/healthz"):
+        engine.terminate()
         fail("Платформа не ответила за 60 с — см. журнал: " + LOG)
     log("оба сервиса готовы")
 

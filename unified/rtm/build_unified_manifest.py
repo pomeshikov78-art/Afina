@@ -118,7 +118,8 @@ def section_c() -> dict:
                  "rtm/artifacts/RTM_UNIFIED.csv", "rtm/artifacts/RTM_UNIFIED.json",
                  "README.md", "WORKPLAN.md", "docs/00_UNIFIED_OVERVIEW.md", "docs/01_OBSERVATIONS.md",
                  "installer/afina_unified.nsi", "installer/build_windows_exe.py",
-                 "installer/run_unified.pyw", "installer/stop_unified.py", "installer/README.md",
+                 "installer/run_unified.pyw", "installer/stop_unified.py",
+                 "installer/test_launcher_contract.py", "installer/README.md",
                  "docs/02_REPO_ANALYSIS_2026-10-26.md", "docs/03_IP_AUDIT_LETTER_DRAFT.md",
                  "docs/04_LINE_A_CHANGES.md")]
     entries += [file_entry(os.path.join("unified", "bridge", "tests", f), REPO) for f in

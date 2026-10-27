@@ -160,7 +160,7 @@ UNIF_REQUIREMENTS = [
     {"id": "UNIF-25", "priority": "P0",
      "text": "Установщик Windows x64 (.exe): self-contained (bundled Python 3.11.9 embeddable + Node v20.18.1), SEC-002 контроль целостности при каждом запуске, единый загрузчик (контур+платформа+браузер), данные в %LOCALAPPDATA%, запись в «Установка и удаление программ», корректное удаление",
      "criteria": "кросс-сборка NSIS v3 воспроизводима (build_windows_exe.py); стенд 194 файла с sha256-манифестом; PE-заголовок валиден; исполнение — чек-лист из 9 шагов на Windows-стенде",
-     "evidence": "unified/installer/ (afina_unified.nsi, build_windows_exe.py, run_unified.pyw, stop_unified.py, README.md); dist/AfinaUnified-Setup-1.0.0.exe 28.8 МБ sha256 e0970924b91f84a2… (вне git — артефакт стенда)",
+     "evidence": "unified/installer/ (nsi, build_windows_exe.py, run_unified.pyw, stop_unified.py, test_launcher_contract.py 5/5, README.md); dist/AfinaUnified-Setup-1.0.1.exe 28.7 МБ sha256 94d7bd1598ae849b… (вне git); 1.0.0 отозван — OBS-14 (найден пользователем на Windows-стенде, исправлен, контракт-тесты в CI)",
      "status": "подтверждено частично: сборка/структура/манифест — прогон 27.10.2026 (Linux); исполнение .exe — Windows-стенд (чек-лист в installer/README.md)"},
     {"id": "UNIF-18", "priority": "P1",
      "text": "Экспорт обстановки платформы в контракт ENG6-PLAN: objects (COM/LINK/ORDER/ORG) → сущности Прил. Г → build_plan_request; RBAC (Инженер-расчётчик создаёт, Администратор аудирует); CRS: градусы WGS-84 + UTM-метры через ГИС-ядро линии A (round-trip), недекодированные единицы — честный пропуск (ENG-004)",

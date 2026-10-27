@@ -75,6 +75,9 @@ jobs:
         run: python demo_e2e.py
       - name: Проверка установки (15 серверных проверок, авто-подъём стека)
         run: python unified/scripts/verify_install.py
+      - name: Контракт-тесты загрузчика установщика (регрессия OBS-14)
+        working-directory: unified/installer
+        run: python test_launcher_contract.py
       - name: Единый RTM (183 требования) и манифест поставки
         working-directory: unified/rtm
         run: |

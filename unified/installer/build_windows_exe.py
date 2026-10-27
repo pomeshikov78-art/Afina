@@ -94,7 +94,7 @@ def copy_tree(src: str, dst: str):
             shutil.copy2(s, d)
 
 
-def stage_payload(payload: str, skip_runtimes: bool, cache: str):
+def stage_payload(payload: str, skip_runtimes: bool, cache: str, version: str = "1.0.0"):
     if os.path.isdir(payload):
         shutil.rmtree(payload)
     os.makedirs(payload)
@@ -130,7 +130,7 @@ def stage_payload(payload: str, skip_runtimes: bool, cache: str):
                                'set "PATH=%~dp0runtimes\\node;%PATH%"\r\n'
                                '"runtimes\\python\\python.exe" unified\\scripts\\verify_install.py '
                                '--skip-xver\r\npause\r\n')
-    write_crlf("README_УСТАНОВКА.txt", README_INSTALL_TXT)
+    write_crlf("README_УСТАНОВКА.txt", README_INSTALL_TXT.replace("{VERSION}", version).replace("{BUILT}", time.strftime("%d.%m.%Y")))
 
     # 3. рантаймы
     if not skip_runtimes:
@@ -230,7 +230,7 @@ README_INSTALL_TXT = """СПО «Афина» — единая программ�
   «Параметры → Приложения → СПО Афина» или ярлык «Удаление».
   Данные в %LOCALAPPDATA%\\AfinaUnified удаляются только по явному подтверждению.
 
-Версия: 1.0.0 · Собрано: """ + time.strftime("%d.%m.%Y") + """
+Версия: {VERSION} · Собрано: {BUILT}
 """
 
 
@@ -271,7 +271,7 @@ def main() -> int:
                     help="вариант без bundled-рантаймов (требует системные Python/Node)")
     args = ap.parse_args()
     payload = os.path.join(HERE, "build", "payload")
-    n = stage_payload(payload, args.skip_runtimes, args.cache)
+    n = stage_payload(payload, args.skip_runtimes, args.cache, version=args.version)
     out = build_nsis(payload, args.dist, args.version)
     print(f"\nУстановщик: {out}")
     print(f"Файлов в бандле: {n} · проверка исполнения — на Windows-стенде (см. README_УСТАНОВКА.txt)")
